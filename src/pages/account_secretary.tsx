@@ -11,12 +11,14 @@ import { Secretary } from "@/types";
 export default  function SecretaryCompte () {
   
   const router = useRouter();
+
   // const [secretary, setSecretary] = useState();
-  const login = localStorage.getItem('LoginMedcine') || " "
+  // const login = localStorage.getItem('LoginMedcine') || " "
 
     const [listSecretary, setListSecretary] = useState<Secretary[] | null>(null);
-        
-    const loginMedcine=localStorage.getItem('LoginMedcine'); 
+    if (typeof window !== 'undefined') {
+
+    const loginMedcine=localStorage.getItem('LoginMedcine')|| " "; 
 
     axios.get(`https://tatbib-api.onrender.com/medcine/getSecretaryByMedcineName/${loginMedcine}`)
     .then(function (response) {
@@ -59,7 +61,14 @@ export default  function SecretaryCompte () {
   const logOut =()=>{
     localStorage.clear()
        router.push('/login_medicine');
-    //    toastr.success(' LogOut SuccessFully')
+       toast.success('Log out SuccessFully', { position: "top-left",
+       autoClose: 5000,
+       hideProgressBar: false,
+       closeOnClick: false,
+       pauseOnHover: false,
+       draggable: false,
+       progress: undefined,
+       theme: "colored", })   
     }
 
 
@@ -72,7 +81,7 @@ export default  function SecretaryCompte () {
     <header className="avatar">
       <Image alt="" src={logo}  />
       <h6>Welcome</h6>
-      <h5 style={{color:'white'}}>{login}</h5>
+      <h5 style={{color:'white'}}>{loginMedcine}</h5>
     </header>
     <ul>
     <li tabIndex={0} className="icon-profil"><Link href='/medicine_dashboard' style={{textDecoration:"none",color:"white"}}><span>MyAccount</span></Link></li>
@@ -129,5 +138,6 @@ export default  function SecretaryCompte () {
   </main>
 </div>
      );
+    }  
 }
 

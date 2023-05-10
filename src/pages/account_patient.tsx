@@ -10,11 +10,16 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Appointment } from '@/types'
 import withAuth from '@/components/withPrivateRoute';
 
+
+
+// if (typeof window !== 'undefined') {
+//   const loginPatient =localStorage.getItem('LoginPatient')
+// }
 const AccountPatient = () => {
   
   const router = useRouter();
 //   const [medcine, setMedcine] = useState();
- const loginPatient =localStorage.getItem('LoginPatient')
+
  const id =localStorage.getItem('id_patient')
  const [firstName, setFirstName] = useState();
  const [lastName, setLastName] = useState();
@@ -49,6 +54,8 @@ const AccountPatient = () => {
     router.push('/update_my_account');
   
   }
+if (typeof window !== 'undefined') {
+  const loginPatient = localStorage.getItem('LoginPatient')
 
   // delete My Account  
   const deleteAccount = (id:any)=>{
@@ -73,7 +80,14 @@ const AccountPatient = () => {
   const logOut =()=>{
     localStorage.clear()
        router.push('/login_patient');
-       toast('Log out SuccessFully', { hideProgressBar: true, autoClose: 2000, type: 'success' ,position:'top-right' })    
+       toast.success('Log out SuccessFully', { position: "top-left",
+       autoClose: 5000,
+       hideProgressBar: false,
+       closeOnClick: false,
+       pauseOnHover: false,
+       draggable: false,
+       progress: undefined,
+       theme: "colored", })    
     }
 
 
@@ -144,6 +158,7 @@ const AccountPatient = () => {
   </main>
 </div>
      );
+    }
 }
 
 export default withAuth(AccountPatient)

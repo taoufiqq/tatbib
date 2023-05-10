@@ -14,7 +14,7 @@ import withAuth from '@/components/withPrivateRoute';
  const UpdateAccountPatient =()=> {
   
   const router = useRouter();
-  const id =localStorage.getItem('id_patient')
+
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -25,7 +25,7 @@ import withAuth from '@/components/withPrivateRoute';
 
  
   useEffect(()=>{
- 
+    const id =localStorage.getItem('id_patient')
    axios.get(`https://tatbib-api.onrender.com/patient/getPatientById/${id}`)
      .then(function (response) {
          
@@ -42,13 +42,13 @@ import withAuth from '@/components/withPrivateRoute';
        console.log(err);
    });
    
-   },[id])
+   },[])
 
    const handleSubmit = (e:any) => {
 		e.preventDefault();
 
 
-  
+    const id =localStorage.getItem('id_patient')
 
     const data = {firstName,lastName,login,age,telephone,email};
 

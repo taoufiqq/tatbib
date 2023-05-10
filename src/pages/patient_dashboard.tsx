@@ -16,9 +16,7 @@ const DashboardPatient = () => {
 
   const [listAppointment, setListAppointment] = useState<Appointment[] | null>(null);
    
-  if (typeof window !== 'undefined') {
-       const login = localStorage.getItem("LoginPatient") || '{}'
-  }
+
 
 
   useEffect(()=>{
@@ -32,6 +30,8 @@ const DashboardPatient = () => {
   
   },[])
 
+  if (typeof window !== 'undefined') {
+    const login = localStorage.getItem("LoginPatient") || '{}'
 
 const logOut =()=>{
   localStorage.clear()
@@ -57,7 +57,7 @@ const logOut =()=>{
     <header className="avatar">
     <Image alt="" src={logo} style={{borderRadius:'50%'}} />
       <h6>Welcome</h6>
-      <h5 style={{color:'white'}}>login</h5>
+      <h5 style={{color:'white'}}>{login}</h5>
     </header>
     <ul>
       <li tabIndex={0} className="icon-customers"><span>Appointment</span></li>
@@ -115,6 +115,7 @@ const logOut =()=>{
   </main>
 </div>
      );
+    }
 }
 
 export default withAuth(DashboardPatient);

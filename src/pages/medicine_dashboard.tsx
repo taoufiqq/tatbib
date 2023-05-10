@@ -19,16 +19,6 @@ const DashboardMedcine = () => {
   const [availablity, setAvailablity] = useState("");
   const [login, setLogin] = useState("");
 
-
-
-
-
-  if (typeof window !== 'undefined') {
-    var medecin = JSON.parse(localStorage.getItem('medcine') || '{}');
-    const login_Medcine  = localStorage.getItem("LoginMedcine") || ""
-
-  }
-
   // console.log(Medecin);
 
   useEffect(()=>{
@@ -58,6 +48,10 @@ const DashboardMedcine = () => {
     router.push('/availability_medicine');
   
   }
+  if (typeof window !== 'undefined') {
+    var medecin = JSON.parse(localStorage.getItem('medcine') || '{}');
+    const login_Medcine  = localStorage.getItem("LoginMedcine") || ""
+
 
 
 //-----------------------log out-----------------
@@ -86,7 +80,7 @@ const DashboardMedcine = () => {
     <header className="avatar">
       <Image alt="" src={logo}  />
       <h6>Welcome</h6>
-      <h5 style={{color:'white'}}></h5>
+      <h5 style={{color:'white'}}>{login_Medcine}</h5>
     </header>
     <ul>
     <li tabIndex={0} className="icon-profil"><Link href='/medicine_dashboard' style={{textDecoration:"none",color:"white"}}><span>MyAccount</span></Link><ToastContainer /></li>
@@ -144,5 +138,6 @@ const DashboardMedcine = () => {
   </main>
 </div>
      );
+    }
 }
 export default withAuth(DashboardMedcine);

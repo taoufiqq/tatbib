@@ -13,10 +13,11 @@ import withAuth from '@/components/withPrivateRoute';
 
   const [availablity, setAvailablity] = useState("");
   const [updatedAvailablity, setUpdatedAvailablity] = useState("");
-  const id =localStorage.getItem('id_medcine')
+
+
 
   useEffect(()=>{
-
+    const id =localStorage.getItem('id_medcine')
     axios.get(`https://tatbib-api.onrender.com/medcine/getMedcineById/${id}`)
     .then(function (response) {
      
@@ -26,7 +27,8 @@ import withAuth from '@/components/withPrivateRoute';
   });
   
   })
-
+  if (typeof window !== "undefined") {
+    const id =localStorage.getItem('id_medcine')
   const handleSubmit = (e:any) => {
     e.preventDefault();
 
@@ -93,6 +95,7 @@ import withAuth from '@/components/withPrivateRoute';
   </main>
 </div>
      );
+}
 }
 export default withAuth(ManagementAvailablityMedcine)
 
