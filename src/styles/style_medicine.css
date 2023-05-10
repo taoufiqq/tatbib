@@ -1,0 +1,264 @@
+*{
+    margin: 0%;
+    padding: 0%;
+    
+}
+.logo1{
+    width: 50%;
+    margin-left: 5%;
+    margin-top: 1%;
+}
+.header{
+    display: flex;
+    justify-content: space-between;
+    /* height: 17vh;
+    background-color: #2CA5B8; */
+}
+.buttons{
+    margin-top: 2%;
+    margin-right: 7%;
+    display: flex;
+    justify-content: space-between;
+  
+    
+}
+.btn_Espace_Professionnels,.btn_Espace_Patients{
+    color: white;
+    background-color: #91BC51;
+    border-radius: 50px;
+    padding: 10px 0;
+    width: 100%;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    height: 100%;
+    line-height: 1;
+}
+.btn_Espace_Patients{
+    background-color: #1371BB;
+}
+.btn_Espace_Patients:hover{
+    background-color: #1AA9E9;
+    color:white ;
+}
+.btn_Espace_Professionnels:hover{
+    background-color: #BFE987;
+    color:white ;
+
+}
+.EspaceMedicine{
+    background-color: #F6F6F6;
+    margin-top: 7em;
+    padding-top: 3%;
+    height: 57vh;
+    /* margin-left: 13em; */
+    border-radius: 15px;
+}
+.Medicine{
+    width: 27%;
+    margin-left: 30rem;
+    margin-top: -2em;
+}
+h5{
+    text-align: center;
+    color: #2CA5B8;
+    font-family: Segoe UI;
+    font-weight: bold;
+}
+.EspaceProfessionnel{
+    color: #2CA5B8;
+    border-radius: 18px;
+    border: none;
+    height: 36px;
+    text-align: center;
+    font-family: Segoe UI;
+    outline: none;
+    font-weight: bold;
+    margin-top: 2%;
+}
+.EspaceProfessionnelButton1{
+    background-color: #2CA5B8;
+    color: white;
+    border-radius: 18px;
+    border: none;
+    height: 40px;
+    width: 40%;
+    margin-left: 7%;
+    font-family: Segoe UI;
+    cursor: pointer;
+    outline: none;
+    font-weight: bold;
+  
+}
+.EspaceProfessionnelButton1:hover{
+    background-color:   #058DA2;
+}
+.EspaceProfessionnelButton:hover{
+    background-color:   #058DA2;
+}
+.btn{
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 1%;
+
+
+}
+@media  screen and (max-width: 950px) {
+    .patient,#health,.Medicine {
+      display: none;
+    }
+    h5{
+        padding-top: 35%;
+    }
+  }
+  .menu ul li.icon-profil {
+    background-image: url("http://www.entypo.com/images/user.svg");
+  }
+  .menu ul li.icon-Secrétaire {
+    background-image: url("http://www.entypo.com/images/v-card.svg");
+    
+  }
+  .menu ul li.icon-folder {
+    background-image: url("http://www.entypo.com/images/folder.svg");
+  }
+.table-responsive {
+    margin: 30px 0;
+}
+.table-wrapper {
+    min-width: 1000px;
+    background: #fff;
+    padding: 20px 25px;
+    border-radius: 3px;
+    box-shadow: 0 1px 1px rgba(0,0,0,.05);
+}
+.table-title {
+    padding-bottom: 15px;
+    background: #299be4;
+    color: #fff;
+    padding: 16px 30px;
+    margin: -20px -25px 10px;
+    border-radius: 3px 3px 0 0;
+}
+.table-title h2 {
+    margin: 5px 0 0;
+    font-size: 24px;
+}
+.table-title .btn {
+    color: #566787;
+    float: right;
+    font-size: 13px;
+    background: #fff;
+    border: none;
+    min-width: 50px;
+    border-radius: 2px;
+    border: none;
+    outline: none !important;
+    margin-left: 10px;
+}
+.table-title .btn:hover, .table-title .btn:focus {
+    color: #566787;
+    background: #f2f2f2;
+}
+.table-title .btn i {
+    float: left;
+    font-size: 21px;
+    margin-right: 5px;
+}
+.table-title .btn span {
+    float: left;
+    margin-top: 2px;
+}
+table.table tr th {
+    border-color: #e9e9e9;
+    padding: 5px 15px;
+    vertical-align: middle;
+    font-weight: 700;
+    /* color: blue; */
+}
+ table.table tr td {
+    border-color: #e9e9e9;
+    padding: 5px 15px;
+    vertical-align: middle;
+    font-weight: 700;
+    color: #2894a5;
+}
+table.table tr th:first-child {
+    width: 220px;
+}
+table.table tr th:last-child {
+    width: 189px;
+}
+table.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #fcfcfc;
+}
+table.table-striped.table-hover tbody tr:hover {
+    background: #f5f5f5;
+}
+table.table th i {
+    font-size: 13px;
+    margin: 0 5px;
+    cursor: pointer;
+}	
+table.table td:last-child i {
+    opacity: 0.9;
+    font-size: 22px;
+    margin: 0 5px;
+}
+table.table td a {
+    font-weight: bold;
+    color: #566787;
+    display: inline-block;
+    text-decoration: none;
+}
+table.table td a:hover {
+    color: #2196F3;
+}
+table.table td a.confirm {
+    color: #10c469;;
+}
+table.table td a.edit {
+    color: #FFC107;;
+}
+table.table td a.delete {
+    color: #F44336;
+}
+table.table td i {
+    font-size: 19px;
+}
+table.table .avatar {
+    border-radius: 50%;
+    vertical-align: middle;
+    margin-right: 10px;
+}
+.status {
+    font-size: 30px;
+    margin: 2px 2px 0 0;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 10px;
+}
+.text-success {
+    color: #10c469;
+}
+.text-info {
+    color: #62c9e8;
+}
+.text-warning {
+    color: #FFC107;
+}
+.text-danger {
+    color: #ff5b5b;
+}
+.ConfirmForm{
+    background: white;
+    border-radius: 7px;
+    margin-left:25%;
+    text-align:center;
+}
+@media screen and (max-width: 510px) {
+    .ConfirmForm{
+        margin-left:0;
+    }
+
+  }
