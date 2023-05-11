@@ -7,7 +7,9 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import logo from '../../public/images/doctor.png'
 import withAuth from '@/components/withPrivateRoute';
-
+import { MdDashboard } from "react-icons/md";
+import { FaNotesMedical, FaUserEdit, FaUserPlus } from "react-icons/fa";
+import { RiLogoutCircleFill } from "react-icons/ri";
 
 const DashboardMedcine = () => {
   
@@ -83,11 +85,12 @@ const DashboardMedcine = () => {
       <h5 style={{color:'white'}}>{login_Medcine}</h5>
     </header>
     <ul>
-    <li tabIndex={0} className="icon-profil"><Link href='/medicine_dashboard' style={{textDecoration:"none",color:"white"}}><span>MyAccount</span></Link><ToastContainer /></li>
-      <li tabIndex={0} className="icon-customers"><Link href='/list_appointments_medicine' style={{textDecoration:"none",color:"white"}}><span>ListAppointments</span></Link><ToastContainer /></li>
-      <li tabIndex={0} className="icon-users"><Link href='/ordonnances_by_medicine' style={{textDecoration:"none",color:"white"}}><span>Ordonnances</span></Link></li>
-      <li tabIndex={0} className="icon-Secrétaire"><Link href='/account_secretary' style={{textDecoration:"none",color:"white"}}><span>Secretary</span></Link><ToastContainer /></li>    
-      <li tabIndex={0} className="icon-settings"><span onClick={logOut}>Log out</span><ToastContainer /></li>
+    <li tabIndex={0} className="icon-customers">    <MdDashboard /><Link href='/list_appointments_medicine' style={{textDecoration:"none",color:"white"}}><span>ListAppointments</span></Link><ToastContainer /></li>
+
+    <li tabIndex={0} className="icon-profil">   <FaUserEdit /><Link href='/medicine_dashboard' style={{textDecoration:"none",color:"white"}}><span>MyAccount</span></Link><ToastContainer /></li>
+      <li tabIndex={0} className="icon-users"> <FaNotesMedical /><Link href='/ordonnances_by_medicine' style={{textDecoration:"none",color:"white"}}><span>Ordonnances</span></Link></li>
+      <li tabIndex={0} className="icon-Secrétaire"><FaUserPlus/><Link href='/account_secretary' style={{textDecoration:"none",color:"white"}}><span>Secretary</span></Link><ToastContainer /></li>    
+      <li tabIndex={0} className="icon-settings">  <RiLogoutCircleFill /><span onClick={logOut}>Log out</span><ToastContainer /></li>
     </ul>
   </nav>
   <main>

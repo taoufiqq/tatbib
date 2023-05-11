@@ -9,6 +9,9 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Appointment } from "@/types";
 import withAuth from "@/components/withPrivateRoute";
+import { MdDashboard } from "react-icons/md";
+import { FaNotesMedical, FaUserEdit } from "react-icons/fa";
+import { RiLogoutCircleFill } from "react-icons/ri";
 
 // if (typeof window !== 'undefined') {
 //   const loginPatient =localStorage.getItem('LoginPatient')
@@ -17,9 +20,6 @@ const AccountPatient = () => {
   const router = useRouter();
   //   const [medcine, setMedcine] = useState();
 
-  
-
-  
   const [firstName, setFirstName] = useState();
   const [lastName, setLastName] = useState();
   const [login, setLogin] = useState();
@@ -44,8 +44,6 @@ const AccountPatient = () => {
         console.log(err);
       });
   }, []);
-
-
 
   if (typeof window !== "undefined") {
     const id = localStorage.getItem("id_patient");
@@ -98,12 +96,17 @@ const AccountPatient = () => {
         <nav className="menu" tabIndex={0}>
           <div className="smartphone-menu-trigger" />
           <header className="avatar">
-            <Image alt="" src={logo} style={{ borderRadius: "50%", width: "150px" }} />
+            <Image
+              alt=""
+              src={logo}
+              style={{ borderRadius: "50%", width: "150px" }}
+            />
             <h6>Welcome</h6>
             <h5 style={{ color: "white" }}>{loginPatient}</h5>
           </header>
           <ul>
             <li tabIndex={0} className="icon-customers">
+              <MdDashboard />
               <Link
                 href="/patient_dashboard"
                 style={{ textDecoration: "none", color: "white" }}
@@ -112,6 +115,7 @@ const AccountPatient = () => {
               </Link>
             </li>
             <li tabIndex={0} className="icon-users">
+              <FaNotesMedical />
               <Link
                 href="/ordonnances_by_patient"
                 style={{ textDecoration: "none", color: "white" }}
@@ -120,6 +124,7 @@ const AccountPatient = () => {
               </Link>
             </li>
             <li tabIndex={0} className="icon-profil">
+              <FaUserEdit />
               <Link
                 href="/account_patient"
                 style={{ textDecoration: "none", color: "white" }}
@@ -128,6 +133,7 @@ const AccountPatient = () => {
               </Link>
             </li>
             <li tabIndex={0} className="icon-settings">
+              <RiLogoutCircleFill />
               <span onClick={logOut}>Log out</span>
               <ToastContainer />
             </li>

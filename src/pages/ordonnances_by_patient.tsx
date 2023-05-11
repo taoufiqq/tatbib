@@ -9,7 +9,9 @@ import user from "../../public/images/patient.png";
 import logo from "../../public/images/logo.png";
 import { Ordonnance } from "@/types";
 import withAuth from "@/components/withPrivateRoute";
-
+import { MdDashboard } from "react-icons/md";
+import { FaNotesMedical, FaUserEdit } from "react-icons/fa";
+import { RiLogoutCircleFill } from "react-icons/ri";
 const ListOrdonnances = () => {
   const router = useRouter();
 
@@ -60,6 +62,7 @@ const ListOrdonnances = () => {
           </header>
           <ul>
             <li tabIndex={0} className="icon-customers">
+            <MdDashboard />
               <Link
                 href="/patient_dashboard"
                 style={{ textDecoration: "none", color: "white" }}
@@ -68,11 +71,13 @@ const ListOrdonnances = () => {
               </Link>
             </li>
             <li tabIndex={0} className="icon-users">
+            <FaNotesMedical />
               <Link href="" style={{ textDecoration: "none", color: "white" }}>
                 <span>Ordonnances</span>
               </Link>
             </li>
             <li tabIndex={0} className="icon-profil">
+            <FaUserEdit />
               <Link
                 href="/account_patient"
                 style={{ textDecoration: "none", color: "white" }}
@@ -81,6 +86,7 @@ const ListOrdonnances = () => {
               </Link>
             </li>
             <li tabIndex={0} className="icon-settings">
+            <RiLogoutCircleFill />
               <span onClick={logOut}>Log out</span>
               <ToastContainer />
             </li>

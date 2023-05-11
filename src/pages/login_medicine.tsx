@@ -43,7 +43,7 @@ export default function LoginMedcine() {
               localStorage.setItem("role", role);
               localStorage.setItem("id_medcine", res.data.id);
             }
-            router.push("/medicine_dashboard");
+            router.push("/list_appointments_medicine");
             toast.success("authenticated SuccessFully", {
               position: "top-right",
               autoClose: 5000,

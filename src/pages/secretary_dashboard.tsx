@@ -8,7 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import logo from "../../public/images/Secretary_avatar.png";
 import withAuth from "@/components/withPrivateRoute";
 import moment from "moment";
-
+import { MdDashboard, MdFolderShared } from "react-icons/md";
 import { Appointment } from "@/types";
 
 const DashboardSecretary = () => {
@@ -101,11 +101,13 @@ const DashboardSecretary = () => {
           </header>
           <ul>
             <li tabIndex={0} className="icon-customers">
+            <MdDashboard />
               <Link href="" style={{ textDecoration: "none", color: "white" }}>
                 <span>Appointment</span>
               </Link>
             </li>
             <li tabIndex={0} className="icon-folder">
+              <MdFolderShared/>
               <Link href="" style={{ textDecoration: "none", color: "white" }}>
                 <span>Patient Record</span>
               </Link>
