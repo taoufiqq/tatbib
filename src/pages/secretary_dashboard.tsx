@@ -5,7 +5,7 @@ import Link from "next/link";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import logo from "../../public/images/ss.jpg";
+import logo from "../../public/images/Secretary_avatar.png";
 import withAuth from "@/components/withPrivateRoute";
 import moment from "moment";
 
@@ -94,7 +94,7 @@ const DashboardSecretary = () => {
             <Image
               alt=""
               src={logo}
-              style={{ borderRadius: "50%", width: "80px" }}
+              style={{ borderRadius: "50%", width: "150px" }}
             />
             <h6>Welcome</h6>
             <h5 style={{ color: "white" }}>{login}</h5>

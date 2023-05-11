@@ -54,7 +54,7 @@ const Ordonnances = () => {
         <nav className="menu" tabIndex={0}>
           <div className="smartphone-menu-trigger" />
           <header className="avatar">
-            <Image alt="" src={doctor} style={{ borderRadius: "50%" }} />
+            <Image alt="" src={doctor} style={{ borderRadius: "50%", width: "150px" }} />
             <h6>Welcome</h6>
             <h5 style={{ color: "white" }}>{login}</h5>
           </header>

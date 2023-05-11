@@ -11,10 +11,8 @@ export default function ManagementCompteSecretary() {
 
   const [status, setStatus] = useState("");
   const [updatedStatus, setUpdatedStatus] = useState("");
- 
 
   useEffect(() => {
-
     const id_Secretary = localStorage.getItem("idSecretary") || "";
     axios
       .get(

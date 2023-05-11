@@ -31,15 +31,14 @@ const ListAppointments = () => {
       });
   }, []);
   if (typeof window !== "undefined") {
-  const getIdAppointment = (id: any) => {
-    localStorage.setItem("idAppointment", id);
-    router.push("/create_ordonnance");
-  };
-  const getIdPatient = (id: any) => {
-    localStorage.setItem("id_patient", id);
-    router.push("/create_ordonnance");
-  };
-
+    const getIdAppointment = (id: any) => {
+      localStorage.setItem("idAppointment", id);
+      router.push("/create_ordonnance");
+    };
+    const getIdPatient = (id: any) => {
+      localStorage.setItem("id_patient", id);
+      router.push("/create_ordonnance");
+    };
 
     const login = localStorage.getItem("LoginMedcine");
     const logOut = () => {
@@ -52,7 +51,7 @@ const ListAppointments = () => {
         <nav className="menu" tabIndex={0}>
           <div className="smartphone-menu-trigger" />
           <header className="avatar">
-            <Image alt="" src={logo} style={{ borderRadius: "50%" }} />
+            <Image alt="" src={logo} style={{ borderRadius: "50%", width: "150px" }} />
             <h6>Welcome</h6>
             <h5 style={{ color: "white" }}>{login}</h5>
           </header>
