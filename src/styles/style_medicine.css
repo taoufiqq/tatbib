@@ -112,16 +112,7 @@ h5{
         padding-top: 35%;
     }
   }
-  .menu ul li.icon-profil {
-    background-image: url("http://www.entypo.com/images/user.svg");
-  }
-  .menu ul li.icon-Secrétaire {
-    background-image: url("http://www.entypo.com/images/v-card.svg");
-    
-  }
-  .menu ul li.icon-folder {
-    background-image: url("http://www.entypo.com/images/folder.svg");
-  }
+
 .table-responsive {
     margin: 30px 0;
 }
