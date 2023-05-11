@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import axios from "axios";
 import logo from "../../public/images/logo.png";
-import Medicine from "../../public/images/doctor.png";
+import Medicine from "../../public/images/medecine.png";
 export default function ProfessionalSpaces() {
   return (
     <div className="container-fluid px-0" style={{ overflow: "auto" }}>
