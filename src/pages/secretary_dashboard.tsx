@@ -10,7 +10,7 @@ import withAuth from "@/components/withPrivateRoute";
 import moment from "moment";
 import { MdDashboard, MdFolderShared } from "react-icons/md";
 import { Appointment } from "@/types";
-
+import { RiLogoutCircleFill } from "react-icons/ri";
 const DashboardSecretary = () => {
   const router = useRouter();
 
@@ -113,6 +113,7 @@ const DashboardSecretary = () => {
               </Link>
             </li>
             <li tabIndex={0} className="icon-settings">
+                  <RiLogoutCircleFill />
               <span onClick={logOut}>Log out</span>
             </li>
           </ul>
