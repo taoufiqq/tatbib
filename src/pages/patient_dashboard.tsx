@@ -12,104 +12,121 @@ import moment from "moment";
 import { MdDashboard } from "react-icons/md";
 import { FaNotesMedical, FaUserEdit } from "react-icons/fa";
 import { RiLogoutCircleFill } from "react-icons/ri";
+import useLocalStorage from '@/hooks/useLocalStorage';
+
+interface Medcine {
+  fullName: string;
+  speciality: string;
+}
+
+interface AppointmentWithMedcine extends Appointment {
+  medcine: Medcine;
+}
+
 const DashboardPatient = () => {
   const router = useRouter();
-
-  const [listAppointment, setListAppointment] = useState<Appointment[] | null>(
-    null
-  );
+  const [listAppointment, setListAppointment] = useState<AppointmentWithMedcine[] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [login] = useLocalStorage<string | null>("LoginPatient", null); // Removed setLogin since we're not using it
 
   useEffect(() => {
-    const id = localStorage.getItem("id_patient") || "{}";
-    axios
-      .get(
-        `https://tatbib-api.onrender.com/appointment/getAppointmenPatient/${id}`
-      )
-      .then(function (response) {
-        setListAppointment(response.data);
-      })
-      .catch(function (err) {
-        console.log(err);
-      });
-  }, []);
+    const fetchAppointments = async () => {
+      if (typeof window !== 'undefined') {
+        const id = localStorage.getItem("id_patient");
+        
+        if (!id) {
+          router.push("/login_patient");
+          return;
+        }
 
-  if (typeof window !== "undefined") {
-    const login = localStorage.getItem("LoginPatient") || "{}";
-
-    const logOut = () => {
-      localStorage.clear();
-      router.push("/login_patient");
-
-      toast.success("Log out SuccessFully", {
-        position: "top-left",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: false,
-        draggable: false,
-        progress: undefined,
-        theme: "colored",
-      });
+        try {
+          const response = await axios.get(
+            `https://tatbib-api.onrender.com/appointment/getAppointmenPatient/${id}`
+          );
+          setListAppointment(response.data);
+        } catch (err) {
+          console.error("Error fetching appointments:", err);
+          toast.error("Failed to load appointments");
+        } finally {
+          setLoading(false);
+        }
+      }
     };
 
-    return (
-      <div className="Container">
-        <nav className="menu" tabIndex={0}>
-          <div className="smartphone-menu-trigger" />
-          <header className="avatar">
-            <Image alt="" src={logo} style={{ borderRadius: "50%", width: "150px" }} />
-            <h6>Welcome</h6>
-            <h5 style={{ color: "white" }}>{login}</h5>
-          </header>
-          <ul>
-            <li tabIndex={0} className="icon-customers">
+    fetchAppointments();
+  }, [router]);
+
+  const logOut = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.clear();
+    }
+    router.push("/login_patient");
+    toast.success("Logged out successfully", {
+      position: "top-left",
+      autoClose: 5000,
+      theme: "colored",
+    });
+  };
+
+  if (loading) {
+    return <div className="loading">Loading appointments...</div>;
+  }
+
+  return (
+    <div className="Container">
+      <nav className="menu" tabIndex={0}>
+        <div className="smartphone-menu-trigger" />
+        <header className="avatar">
+          <Image 
+            alt="Patient profile" 
+            src={logo} 
+            width={150}
+            height={150}
+            style={{ borderRadius: "50%" }}
+          />
+          <h6>Welcome</h6>
+          <h5 style={{ color: "white" }}>{login}</h5>
+        </header>
+        <ul>
+          <li tabIndex={0} className="icon-customers">
             <MdDashboard />
-              <span>Appointment</span>
-            </li>
-            <li tabIndex={0} className="icon-users">
+            <span>Appointment</span>
+          </li>
+          <li tabIndex={0} className="icon-users">
             <FaNotesMedical />
-              <Link
-                href="/ordonnances_by_patient"
-                style={{ textDecoration: "none", color: "white" }}
-              >
-                <span>Ordonnances</span>
-              </Link>
-            </li>
-            <li tabIndex={0} className="icon-profil">
+            <Link href="/ordonnances_by_patient" passHref>
+              <span style={{ textDecoration: "none", color: "white" }}>Ordonnances</span>
+            </Link>
+          </li>
+          <li tabIndex={0} className="icon-profil">
             <FaUserEdit />
-              <Link
-                href="/account_patient"
-                style={{ textDecoration: "none", color: "white" }}
-              >
-                <span>MyAccount</span>
-              </Link>
-            </li>
-            <li tabIndex={0} className="icon-settings">
+            <Link href="/account_patient" passHref>
+              <span style={{ textDecoration: "none", color: "white" }}>MyAccount</span>
+            </Link>
+          </li>
+          <li tabIndex={0} className="icon-settings">
             <RiLogoutCircleFill />
-              <span onClick={logOut}>Log out</span>
-              <ToastContainer />
-            </li>
-          </ul>
-        </nav>
-        <main>
-          <div className="helper">
-            My Appointemnt<span> Management | Appointemnt</span>
-          </div>
-          <div className="table-responsive">
-            <div className="table-wrapper">
-              <div className="table-title">
-                <div className="row">
-                  <div className="col-sm-5">
-                    <h2>
-                      Appointemnt <b>list</b>
-                    </h2>
-                  </div>
-                  {/* <div className="col-sm-7">
-          <a href="#" className="btn btn-secondary"><i className="material-icons"></i> <span>Add New User</span></a>
-          <a href="#" className="btn btn-secondary"><i className="material-icons"></i> <span>Export to Excel</span></a>						
-        </div> */}
+            <span onClick={logOut} style={{ cursor: "pointer" }}>Log out</span>
+          </li>
+        </ul>
+      </nav>
+
+      <main>
+        <div className="helper">
+          My Appointment<span> Management | Appointment</span>
+        </div>
+        
+        <div className="table-responsive">
+          <div className="table-wrapper">
+            <div className="table-title">
+              <div className="row">
+                <div className="col-sm-5">
+                  <h2>Appointment <b>list</b></h2>
                 </div>
               </div>
+            </div>
+
+            {listAppointment && listAppointment.length > 0 ? (
               <table className="table table-striped table-hover">
                 <thead>
                   <tr>
@@ -120,42 +137,48 @@ const DashboardPatient = () => {
                     <th>Status</th>
                   </tr>
                 </thead>
-                {listAppointment &&
-                  listAppointment.map((item, index) => (
-                    <tbody key={index}>
-                      <tr>
-                        <td>{item.medcine.fullName}</td>
-                        <td>{item.medcine.speciality}</td>
-                        <td>{moment(item.dateTime).format(`MMMM DD YYYY`)}</td>
-                        <td>{moment(item.dateTime).format(`HH:MM`)}</td>
-                        <td
-                          style={{
-                            color:
-                              item.status !== "Unconfirmed" ? "color" : "red",
-                          }}
-                        >
-                          {item.status}
-                        </td>
-                        <td></td>
-                      </tr>
-                    </tbody>
+                <tbody>
+                  {listAppointment.map((item, index) => (
+                    <tr key={index}>
+                      <td>{item.medcine?.fullName || "N/A"}</td>
+                      <td>{item.medcine?.speciality || "N/A"}</td>
+                      <td>{moment(item.dateTime).format("MMMM DD YYYY")}</td>
+                      <td>{moment(item.dateTime).format("HH:mm")}</td>
+                      <td style={{
+                        color: item.status === "Confirmed" ? "green" : 
+                              item.status === "Pending" ? "orange" : "red"
+                      }}>
+                        {item.status}
+                      </td>
+                    </tr>
                   ))}
+                </tbody>
               </table>
-            </div>
+            ) : (
+              <div className="no-appointments">
+                <p>No appointments found</p>
+                <Link href="/search_medicine" passHref>
+                  <button className="btn btn-primary">
+                    Make an appointment
+                  </button>
+                </Link>
+              </div>
+            )}
           </div>
+        </div>
 
-          <Link href="/search_medicine" style={{ textDecoration: "none" }}>
-            <input
-              type="button"
-              className="form-control mt-5 btnConnect rendez-vous"
-              id="Rdv"
-              value="Make an appointment"
-            />
+        {listAppointment && listAppointment.length > 0 && (
+          <Link href="/search_medicine" passHref>
+            <button className="btn btn-primary mt-5">
+              Make another appointment
+            </button>
           </Link>
-        </main>
-      </div>
-    );
-  }
+        )}
+
+        <ToastContainer />
+      </main>
+    </div>
+  );
 };
 
 export default withAuth(DashboardPatient);
