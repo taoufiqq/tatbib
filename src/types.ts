@@ -27,15 +27,21 @@ export interface Medicine {
     roleSecretary : string
   }
 
-  export interface Appointment {
-    dateTime : string,
-    status : string,
-    medcine : Medicine,
-    patient : Patient
+  interface AppointmentData {
+    dateTime: string;
+    medcine: string;
+    patient: string;
+    loginMedcine?: string;
+  }
+  
+  interface ApiResponse {
+    _id?: string;
+    error?: boolean;
+    message?: string;
   }
   export interface Ordonnance {
     medicamment : string,
-    appointment : Appointment,
+    appointment : AppointmentData,
     medcine : Medicine,
     patient : Patient
   }

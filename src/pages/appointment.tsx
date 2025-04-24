@@ -32,73 +32,142 @@ export default function RendezVous() {
     const idPatient = localStorage.getItem("id_patient") || "{}";
 
     // ------------------------------- get information medcine's Appointment  ------------------------------
-
-    const handleSubmit = (e: any) => {
+    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
-      const token = localStorage.getItem("tokenPatient") || "{}";
+      
+      // 1. Better token handling
+      const token = localStorage.getItem("tokenPatient");
       if (!token) {
         router.push("/login_patient");
-        toast.warn("you are not connected!!!!!!", {
+        toast.warn("Please login first", { 
           position: "top-center",
           autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: false,
-          draggable: false,
-          progress: undefined,
-          theme: "colored",
+          theme: "colored"
         });
-        // toastr.warning('You must have an Account, Create it now')
-      } else {
-        const Appointment = {
-          dateTime,
-          medcine: data.id,
-          patient: idPatient,
-          loginMedcine: data.login,
-        };
-        console.log(Appointment);
-
-        axios
-          .post(
-            `https://tatbib-api.onrender.com/appointment/addAppointment`,
-            Appointment
-          )
-
-          .then((res) => {
-            console.log(res.data.error);
-            if (res.data.error === true) {
-              toast.info(
-                "this date has aleready reserved,Please choose another date",
-                {
-                  position: "top-center",
-                  autoClose: 5000,
-                  hideProgressBar: false,
-                  closeOnClick: false,
-                  pauseOnHover: false,
-                  draggable: false,
-                  progress: undefined,
-                  theme: "colored",
-                }
-              );
-              router.push("/appointment");
-            } else {
-              localStorage.setItem("id_appointment", res.data._id);
-              router.push("/patient_dashboard");
-              toast.success("Appointment Reserved Successfully", {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: false,
-                pauseOnHover: false,
-                draggable: false,
-                progress: undefined,
-                theme: "colored",
-              });
-              console.log(res.data);
+        return;
+      }
+    
+      // 2. Basic validation
+      if (!dateTime || !data?.id || !idPatient) {
+        toast.error("Missing required information");
+        return;
+      }
+    
+      try {
+        // 3. API call with proper headers and error handling
+        const response = await axios.post(
+          "https://tatbib-api.onrender.com/appointment/addAppointment",
+          {
+            dateTime,  // Ensure this is in correct format
+            medcine: data.id,
+            patient: idPatient,
+            loginMedcine: data.login
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
             }
+          }
+        );
+    
+        // 4. Handle response (no interface needed)
+        if (response.data?.error) {
+          toast.info("This time slot is already booked", { 
+            position: "top-center",
+            autoClose: 5000,
+            theme: "colored"
           });
+        } else {
+          localStorage.setItem("id_appointment", response.data._id);
+          toast.success("Appointment booked successfully", {
+            position: "top-right",
+            autoClose: 5000,
+            theme: "colored"
+          });
+          router.push("/patient_dashboard");
+        }
+      } catch (error) {
+        // 5. Better error handling
+        console.error("Appointment error:", error);
+        
+        let errorMessage = "Failed to book appointment";
+        if (axios.isAxiosError(error)) {
+          errorMessage = error.response?.data?.message || errorMessage;
+        }
+        
+        toast.error(errorMessage, {
+          position: "top-center",
+          autoClose: 5000,
+          theme: "colored"
+        });
       }
     };
+    // const handleSubmit = (e: any) => {
+    //   e.preventDefault();
+    //   const token = localStorage.getItem("tokenPatient") || "{}";
+    //   if (!token) {
+    //     router.push("/login_patient");
+    //     toast.warn("you are not connected!!!!!!", {
+    //       position: "top-center",
+    //       autoClose: 5000,
+    //       hideProgressBar: false,
+    //       closeOnClick: false,
+    //       pauseOnHover: false,
+    //       draggable: false,
+    //       progress: undefined,
+    //       theme: "colored",
+    //     });
+    //     // toastr.warning('You must have an Account, Create it now')
+    //   } else {
+    //     const Appointment = {
+    //       dateTime,
+    //       medcine: data.id,
+    //       patient: idPatient,
+    //       loginMedcine: data.login,
+    //     };
+    //     console.log(Appointment);
+
+    //     axios
+    //       .post(
+    //         `https://tatbib-api.onrender.com/appointment/addAppointment`,
+    //         Appointment
+    //       )
+
+    //       .then((res) => {
+    //         console.log(res.data.error);
+    //         if (res.data.error === true) {
+    //           toast.info(
+    //             "this date has aleready reserved,Please choose another date",
+    //             {
+    //               position: "top-center",
+    //               autoClose: 5000,
+    //               hideProgressBar: false,
+    //               closeOnClick: false,
+    //               pauseOnHover: false,
+    //               draggable: false,
+    //               progress: undefined,
+    //               theme: "colored",
+    //             }
+    //           );
+    //           router.push("/appointment");
+    //         } else {
+    //           localStorage.setItem("id_appointment", res.data._id);
+    //           router.push("/patient_dashboard");
+    //           toast.success("Appointment Reserved Successfully", {
+    //             position: "top-right",
+    //             autoClose: 5000,
+    //             hideProgressBar: false,
+    //             closeOnClick: false,
+    //             pauseOnHover: false,
+    //             draggable: false,
+    //             progress: undefined,
+    //             theme: "colored",
+    //           });
+    //           console.log(res.data);
+    //         }
+    //       });
+    //   }
+    // };
     return (
       <div className="container-fluid px-0" style={{ overflow: "auto" }}>
         <section className="header-page">
