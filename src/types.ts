@@ -29,7 +29,7 @@ export interface Secretary {
 
 export interface Appointment {
   dateTime: string;
-  medcine: string;
+  medcine: string;  // Note: Should this be "medicine" instead of "medcine"?
   patient: string;
   loginMedcine?: string;
 }
