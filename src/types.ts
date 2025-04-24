@@ -41,15 +41,18 @@ export interface Appointment {
   status: string;
   // ... other fields
 }
-interface Ordonnance {
+// In your component file
+export interface Ordonnance {
   _id: string;
   patient: {
-    name: string;
-    age: number;
+    _id: string;
+    firstName: string;
+    lastName: string;
   };
   medications: Array<{
     name: string;
     dosage: string;
+    duration: string;
   }>;
   date: string;
 }
