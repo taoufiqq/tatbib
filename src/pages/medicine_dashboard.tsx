@@ -35,7 +35,7 @@ const DashboardMedcine = () => {
 
         // Safely get doctor ID
         const doctorId = localStorage.getItem("id_medcine");
-
+        console.log("hhhhhhhhhhhhhhhh", doctorId);
         // Validate ID before making API call
         if (!doctorId) {
           setError("Doctor ID not found");
@@ -50,7 +50,6 @@ const DashboardMedcine = () => {
         );
 
         setMedecinData(response.data);
-        console.log("hhhhhhhhhhhhhhhh", response.data._id);
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "Failed to load doctor data";
