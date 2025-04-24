@@ -30,27 +30,37 @@ const DashboardMedcine = () => {
   useEffect(() => {
     const fetchMedecinData = async () => {
       try {
-        const id = localStorage.getItem('id_medcine');
+        // First check if we're on client-side
+        if (typeof window === 'undefined') return;
+
+        // Safely get doctor ID
+        const doctorId = localStorage.getItem('id_medcine');
         
-        if (!id) {
-          throw new Error('Doctor ID not found');
+        // Validate ID before making API call
+        if (!doctorId) {
+          setError('Doctor ID not found');
+          toast.error('Doctor ID not found');
+          router.push('/login_medicine');
+          return;
         }
 
+        // Make API request
         const response = await axios.get<MedecinData>(
-          `https://tatbib-api.onrender.com/medcine/getMedcineById/${id}`
+          `https://tatbib-api.onrender.com/medcine/getMedcineById/${doctorId}`
         );
         
         setMedecinData(response.data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load doctor data');
-        toast.error('Failed to load doctor data');
+        const errorMessage = err instanceof Error ? err.message : 'Failed to load doctor data';
+        setError(errorMessage);
+        toast.error(errorMessage);
       } finally {
         setLoading(false);
       }
     };
 
     fetchMedecinData();
-  }, []);
+  }, [router]);
 
   const handleEditAccount = (id: string) => {
     localStorage.setItem('id_medcine', id);
@@ -60,7 +70,7 @@ const DashboardMedcine = () => {
   const logOut = () => {
     localStorage.clear();
     router.push('/login_medicine');
-    toast.success('Log out Successfully', {
+    toast.success('Logged out successfully', {
       position: "top-right",
       autoClose: 5000,
       hideProgressBar: false,
@@ -190,7 +200,7 @@ const DashboardMedcine = () => {
           </div>
         </div>
       </main>
-      <ToastContainer />
+      <ToastContainer position="top-right" autoClose={5000} />
     </div>
   );
 };
