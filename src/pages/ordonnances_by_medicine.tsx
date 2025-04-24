@@ -1,10 +1,10 @@
-import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import Image from 'next/image';
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Image from "next/image";
 import doctor from "../../public/images/doctor.png";
 import logo from "../../public/images/logo.png";
 import withAuth from "@/components/withPrivateRoute";
@@ -41,11 +41,11 @@ const OrdonnancesByMedicine = () => {
     const fetchOrdonnances = async () => {
       try {
         // Check if running on client side
-        if (typeof window === 'undefined') return;
+        if (typeof window === "undefined") return;
 
-        const doctorId = localStorage.getItem('id_medcine');
+        const doctorId = localStorage.getItem("id_medcine");
         if (!doctorId) {
-          throw new Error('Doctor ID not found in localStorage');
+          throw new Error("Doctor ID not found in localStorage");
         }
 
         const response = await axios.get<Ordonnance[]>(
@@ -54,15 +54,16 @@ const OrdonnancesByMedicine = () => {
 
         // Ensure response.data exists and is an array
         if (!response.data || !Array.isArray(response.data)) {
-          throw new Error('Invalid data format received from API');
+          throw new Error("Invalid data format received from API");
         }
 
         setOrdonnances(response.data);
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Failed to load ordonnances';
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to load ordonnances";
         setError(errorMessage);
         toast.error(errorMessage);
-        console.error('Error fetching ordonnances:', err);
+        console.error("Error fetching ordonnances:", err);
       } finally {
         setLoading(false);
       }
@@ -73,11 +74,11 @@ const OrdonnancesByMedicine = () => {
 
   const logOut = () => {
     localStorage.clear();
-    router.push('/login_medicine');
-    toast.success('Logged out successfully');
+    router.push("/login_medicine");
+    toast.success("Logged out successfully");
   };
 
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return null; // Skip rendering during SSR
   }
 
@@ -85,7 +86,9 @@ const OrdonnancesByMedicine = () => {
     return (
       <div className="loading-container">
         <div className="spinner"></div>
-        <p>Loading ordonnances...</p>
+        <p style={{ color: "green", fontSize: "30px" }}>
+          Loading ordonnances...
+        </p>
       </div>
     );
   }
@@ -94,7 +97,7 @@ const OrdonnancesByMedicine = () => {
     return (
       <div className="error-container">
         <p className="error-message">Error: {error}</p>
-        <button 
+        <button
           onClick={() => window.location.reload()}
           className="retry-button"
         >
@@ -105,20 +108,20 @@ const OrdonnancesByMedicine = () => {
   }
 
   return (
-    <div className="Container" style={{ overflow: 'hidden' }}>
+    <div className="Container" style={{ overflow: "hidden" }}>
       <nav className="menu" tabIndex={0}>
         <div className="smartphone-menu-trigger" />
         <header className="avatar">
-          <Image 
-            alt="Doctor profile" 
-            src={doctor} 
+          <Image
+            alt="Doctor profile"
+            src={doctor}
             width={150}
             height={150}
-            style={{ borderRadius: '50%' }}
+            style={{ borderRadius: "50%" }}
             priority
           />
           <h6>Welcome</h6>
-          <h5 style={{ color: 'white' }}>
+          <h5 style={{ color: "white" }}>
             {localStorage.getItem("LoginMedcine") || "Doctor"}
           </h5>
         </header>
@@ -127,7 +130,7 @@ const OrdonnancesByMedicine = () => {
           <li tabIndex={0} className="icon-customers">
             <MdDashboard />
             <Link href="/list_appointments_medicine" passHref>
-              <span style={{ textDecoration: 'none', color: 'white' }}>
+              <span style={{ textDecoration: "none", color: "white" }}>
                 List Appointments
               </span>
             </Link>
@@ -135,7 +138,7 @@ const OrdonnancesByMedicine = () => {
           <li tabIndex={0} className="icon-profil">
             <FaUserEdit />
             <Link href="/medicine_dashboard" passHref>
-              <span style={{ textDecoration: 'none', color: 'white' }}>
+              <span style={{ textDecoration: "none", color: "white" }}>
                 My Account
               </span>
             </Link>
@@ -143,7 +146,7 @@ const OrdonnancesByMedicine = () => {
           <li tabIndex={0} className="icon-users">
             <FaNotesMedical />
             <Link href="/ordonnances_by_medicine" passHref>
-              <span style={{ textDecoration: 'none', color: 'white' }}>
+              <span style={{ textDecoration: "none", color: "white" }}>
                 Ordonnances
               </span>
             </Link>
@@ -151,17 +154,14 @@ const OrdonnancesByMedicine = () => {
           <li tabIndex={0} className="icon-Secrétaire">
             <FaUserPlus />
             <Link href="/account_secretary" passHref>
-              <span style={{ textDecoration: 'none', color: 'white' }}>
+              <span style={{ textDecoration: "none", color: "white" }}>
                 Secretary
               </span>
             </Link>
           </li>
           <li tabIndex={0} className="icon-settings">
             <RiLogoutCircleFill />
-            <span 
-              onClick={logOut} 
-              style={{ cursor: 'pointer' }}
-            >
+            <span onClick={logOut} style={{ cursor: "pointer" }}>
               Log out
             </span>
           </li>
@@ -178,7 +178,9 @@ const OrdonnancesByMedicine = () => {
             <div className="table-title">
               <div className="row">
                 <div className="col-sm-5">
-                  <h2>Ordonnances <b>List</b></h2>
+                  <h2>
+                    Ordonnances <b>List</b>
+                  </h2>
                 </div>
               </div>
             </div>
@@ -201,16 +203,16 @@ const OrdonnancesByMedicine = () => {
                   {ordonnances.map((ordonnance) => (
                     <tr key={ordonnance._id}>
                       <td>
-                        {ordonnance.patient.firstName} {ordonnance.patient.lastName}
+                        {ordonnance.patient.firstName}{" "}
+                        {ordonnance.patient.lastName}
                       </td>
-                      <td>
-                        {new Date(ordonnance.date).toLocaleDateString()}
-                      </td>
+                      <td>{new Date(ordonnance.date).toLocaleDateString()}</td>
                       <td>
                         <ul className="medication-list">
                           {ordonnance.medications.map((medication, index) => (
                             <li key={index}>
-                              {medication.name} - {medication.dosage} ({medication.duration})
+                              {medication.name} - {medication.dosage} (
+                              {medication.duration})
                             </li>
                           ))}
                         </ul>
@@ -229,7 +231,7 @@ const OrdonnancesByMedicine = () => {
         </div>
       </main>
 
-      <ToastContainer 
+      <ToastContainer
         position="top-right"
         autoClose={5000}
         hideProgressBar={false}
