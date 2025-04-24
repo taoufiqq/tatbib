@@ -1,11 +1,11 @@
-export interface Medc {
-    fullName? : string,
-    email : string,
-    login : string,
-    password : string,
-    city : string,
-    speciality : string
-  }
+export interface Medicine {
+  _id: string;
+  fullName: string;
+  speciality: string;
+  city: string;
+  availablity: string;
+  login?: string; // Optional property
+}
 
   export interface Patient {
     firstName : string,
@@ -30,12 +30,12 @@ export interface Medc {
   export interface Appointment {
     dateTime : string,
     status : string,
-    medcine : Medc,
+    medcine : Medicine,
     patient : Patient
   }
   export interface Ordonnance {
     medicamment : string,
     appointment : Appointment,
-    medcine : Medc,
+    medcine : Medicine,
     patient : Patient
   }

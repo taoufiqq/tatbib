@@ -22,6 +22,25 @@
   
     
 }
+.btn_Espace_Professionnels,
+.btn_Espace_Patients {
+  padding: 10px 20px;
+  background: #007bff;
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.btn_Espace_Patients {
+  background: #28a745;
+}
+
+@media (max-width: 768px) {
+  .imgLogin {
+    max-width: 100% !important;
+  }
+}
 .btn_Espace_Professionnels,.btn_Espace_Patients{
     color: white;
     background-color: #91BC51;

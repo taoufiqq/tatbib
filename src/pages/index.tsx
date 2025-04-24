@@ -9,9 +9,9 @@ import icon1 from "../../public/images/map-doctor.png";
 import icon2 from "../../public/images/bell.png";
 import icon3 from "../../public/images/phone-alt.png";
 import icon4 from "../../public/images/clipboard-list.png";
-import Medicine from "../../public/images/doctor.png";
+import Medicin from "../../public/images/doctor.png";
 import wiqaytna from "../../public/images/wiqaytna.png";
-import { Medc } from "@/types";
+import { Medicine } from "@/types";
 
 export default function Home() {
   const [speciality, setSpeciality] = useState("");
@@ -19,7 +19,7 @@ export default function Home() {
 
   const router = useRouter();
 
-  const [medcine, setMedcine] = useState<Medc[] | null>(null);
+  const [medcine, setMedcine] = useState<Medicine[] | null>(null);
 
   useEffect(() => {
     axios
@@ -27,8 +27,7 @@ export default function Home() {
       .then(function (response) {
         setMedcine(response.data);
         setSpeciality(response.data.speciality);
-        console.log("all medcine",response.data);
-        
+        console.log("all medcine", response.data);
       })
       .catch(function (err) {
         console.log(err);
@@ -243,7 +242,7 @@ export default function Home() {
               >
                 <Image
                   alt=""
-                  src={Medicine}
+                  src={Medicin}
                   style={{ width: "70%", height: "80%" }}
                 />
                 <h4>{item.fullName}</h4>
