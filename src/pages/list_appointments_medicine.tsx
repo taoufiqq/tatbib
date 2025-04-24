@@ -201,11 +201,17 @@ const ListAppointments = () => {
         const response = await axios.get(
           `https://tatbib-api.onrender.com/appointment/getAppointmentMedcine/${id}`
         );
+        
+        // Add error handling for empty or invalid response
+        if (!response.data) {
+          throw new Error("No data received from server");
+        }
+        
         setListAppointment(response.data);
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching appointments:", err);
         setError("Failed to load appointments");
-        toast.error("Failed to load appointments");
+        toast.error("Failed to load appointments. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -215,6 +221,11 @@ const ListAppointments = () => {
   }, []);
 
   const handleCreateOrdonnance = (appointmentId: string, patientId: string) => {
+    if (!appointmentId || !patientId) {
+      toast.error("Missing appointment or patient information");
+      return;
+    }
+    
     localStorage.setItem("idAppointment", appointmentId);
     localStorage.setItem("id_patient", patientId);
     router.push("/create_ordonnance");
@@ -226,8 +237,9 @@ const ListAppointments = () => {
     toast.success("Logged out successfully");
   };
 
+  // Safe rendering guard for SSR
   if (typeof window === 'undefined') {
-    return null; // Skip rendering during SSR
+    return null;
   }
 
   const login = localStorage.getItem("LoginMedcine");
@@ -317,33 +329,45 @@ const ListAppointments = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {listAppointment.map((item, index) => (
-                    <tr key={index}>
-                      <td>{item.patient?.lastName || "N/A"}</td>
-                      <td>{item.patient?.firstName || "N/A"}</td>
-                      <td>{item.patient?.email || "N/A"}</td>
-                      <td>{item.patient?.telephone || "N/A"}</td>
-                      <td>{moment(item.dateTime).format("MMMM DD YYYY")}</td>
-                      <td>{moment(item.dateTime).format("HH:mm")}</td>
-                      <td style={{
-                        color: item.status === "Confirmed" ? "green" :
-                              item.status === "Pending" ? "orange" : "red"
-                      }}>
-                        {item.status}
-                      </td>
-                      <td>
-                        {item.status !== "Unconfirmed" && (
-                          <button
-                            onClick={() => handleCreateOrdonnance(item._id, item.patient._id)}
-                            className="confirm"
-                            title="Writing a Ordonnance"
-                          >
-                            <i className="material-icons border_color">&#xe22b;</i>
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
+                  {listAppointment.map((item, index) => {
+                    // Guard against missing patient data
+                    if (!item.patient) {
+                      return (
+                        <tr key={index}>
+                          <td colSpan={8} className="text-center">Invalid patient data</td>
+                        </tr>
+                      );
+                    }
+                    
+                    return (
+                      <tr key={index}>
+                        <td>{item.patient.lastName || "N/A"}</td>
+                        <td>{item.patient.firstName || "N/A"}</td>
+                        <td>{item.patient.email || "N/A"}</td>
+                        <td>{item.patient.telephone || "N/A"}</td>
+                        <td>{item.dateTime ? moment(item.dateTime).format("MMMM DD YYYY") : "N/A"}</td>
+                        <td>{item.dateTime ? moment(item.dateTime).format("HH:mm") : "N/A"}</td>
+                        <td style={{
+                          color: item.status === "Confirmed" ? "green" :
+                                item.status === "Pending" ? "orange" : "red"
+                        }}>
+                          {item.status || "Unknown"}
+                        </td>
+                        <td>
+                          {item.status !== "Unconfirmed" && (
+                            <button
+                              onClick={() => handleCreateOrdonnance(item._id, item.patient._id)}
+                              className="confirm"
+                              title="Writing a Ordonnance"
+                              disabled={!item._id || !item.patient._id}
+                            >
+                              <i className="material-icons border_color">&#xe22b;</i>
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             ) : (
@@ -358,4 +382,5 @@ const ListAppointments = () => {
     </div>
   );
 };
+
 export default withAuth(ListAppointments);
