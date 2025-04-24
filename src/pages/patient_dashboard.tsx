@@ -12,7 +12,7 @@ import moment from "moment";
 import { MdDashboard } from "react-icons/md";
 import { FaNotesMedical, FaUserEdit } from "react-icons/fa";
 import { RiLogoutCircleFill } from "react-icons/ri";
-import useLocalStorage from '@/hooks/useLocalStorage';
+import useLocalStorage from "@/hooks/useLocalStorage";
 
 interface Medcine {
   fullName: string;
@@ -25,15 +25,17 @@ interface AppointmentWithMedcine extends Appointment {
 
 const DashboardPatient = () => {
   const router = useRouter();
-  const [listAppointment, setListAppointment] = useState<AppointmentWithMedcine[] | null>(null);
+  const [listAppointment, setListAppointment] = useState<
+    AppointmentWithMedcine[] | null
+  >(null);
   const [loading, setLoading] = useState(true);
   const [login] = useLocalStorage<string | null>("LoginPatient", null); // Removed setLogin since we're not using it
 
   useEffect(() => {
     const fetchAppointments = async () => {
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         const id = localStorage.getItem("id_patient");
-        
+
         if (!id) {
           router.push("/login_patient");
           return;
@@ -57,7 +59,7 @@ const DashboardPatient = () => {
   }, [router]);
 
   const logOut = () => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       localStorage.clear();
     }
     router.push("/login_patient");
@@ -77,9 +79,9 @@ const DashboardPatient = () => {
       <nav className="menu" tabIndex={0}>
         <div className="smartphone-menu-trigger" />
         <header className="avatar">
-          <Image 
-            alt="Patient profile" 
-            src={logo} 
+          <Image
+            alt="Patient profile"
+            src={logo}
             width={150}
             height={150}
             style={{ borderRadius: "50%" }}
@@ -95,18 +97,24 @@ const DashboardPatient = () => {
           <li tabIndex={0} className="icon-users">
             <FaNotesMedical />
             <Link href="/ordonnances_by_patient" passHref>
-              <span style={{ textDecoration: "none", color: "white" }}>Ordonnances</span>
+              <span style={{ textDecoration: "none", color: "white" }}>
+                Ordonnances
+              </span>
             </Link>
           </li>
           <li tabIndex={0} className="icon-profil">
             <FaUserEdit />
             <Link href="/account_patient" passHref>
-              <span style={{ textDecoration: "none", color: "white" }}>MyAccount</span>
+              <span style={{ textDecoration: "none", color: "white" }}>
+                MyAccount
+              </span>
             </Link>
           </li>
           <li tabIndex={0} className="icon-settings">
             <RiLogoutCircleFill />
-            <span onClick={logOut} style={{ cursor: "pointer" }}>Log out</span>
+            <span onClick={logOut} style={{ cursor: "pointer" }}>
+              Log out
+            </span>
           </li>
         </ul>
       </nav>
@@ -115,13 +123,15 @@ const DashboardPatient = () => {
         <div className="helper">
           My Appointment<span> Management | Appointment</span>
         </div>
-        
+
         <div className="table-responsive">
           <div className="table-wrapper">
             <div className="table-title">
               <div className="row">
                 <div className="col-sm-5">
-                  <h2>Appointment <b>list</b></h2>
+                  <h2>
+                    Appointment <b>list</b>
+                  </h2>
                 </div>
               </div>
             </div>
@@ -144,10 +154,16 @@ const DashboardPatient = () => {
                       <td>{item.medcine?.speciality || "N/A"}</td>
                       <td>{moment(item.dateTime).format("MMMM DD YYYY")}</td>
                       <td>{moment(item.dateTime).format("HH:mm")}</td>
-                      <td style={{
-                        color: item.status === "Confirmed" ? "green" : 
-                              item.status === "Pending" ? "orange" : "red"
-                      }}>
+                      <td
+                        style={{
+                          color:
+                            item.status === "Confirmed"
+                              ? "green"
+                              : item.status === "Pending"
+                              ? "orange"
+                              : "red",
+                        }}
+                      >
                         {item.status}
                       </td>
                     </tr>
@@ -169,15 +185,62 @@ const DashboardPatient = () => {
 
         {listAppointment && listAppointment.length > 0 && (
           <Link href="/search_medicine" passHref>
-          <button className="appointment-button">
-            <span className="button-content">
-              <svg className="button-icon" viewBox="0 0 24 24">
-                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-              </svg>
-              Make Another Appointment
-            </span>
-          </button>
-        </Link>
+            <button
+              className="
+           relative
+           inline-flex
+           items-center
+           justify-center
+           mt-8
+           px-6
+           py-3
+           bg-gradient-to-br
+           from-blue-500
+           to-blue-600
+           text-white
+           font-medium
+           rounded-lg
+           shadow-md
+           hover:from-blue-600
+           hover:to-blue-700
+           hover:shadow-lg
+           hover:-translate-y-0.5
+           active:translate-y-0
+           active:shadow-sm
+           transition-all
+           duration-300
+           ease-in-out
+           overflow-hidden
+           group
+         "
+            >
+              <span className="flex items-center gap-2">
+                <svg
+                  className="w-5 h-5 transition-transform duration-300 group-hover:scale-110"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                </svg>
+                Make Another Appointment
+              </span>
+              <span
+                className="
+             absolute
+             inset-0
+             bg-gradient-to-r
+             from-transparent
+             via-white/20
+             to-transparent
+             -translate-x-full
+             group-hover:translate-x-full
+             transition-transform
+             duration-600
+             ease-in-out
+           "
+              ></span>
+            </button>
+          </Link>
         )}
 
         <ToastContainer />
@@ -185,73 +248,5 @@ const DashboardPatient = () => {
     </div>
   );
 };
-<style jsx>{`
-  .appointment-button {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px 24px;
-    margin-top: 2rem;
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
 
-  .appointment-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(59, 130, 246, 0.25);
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-  }
-
-  .appointment-button:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  .appointment-button::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.2),
-      transparent
-    );
-    transform: translateX(-100%);
-    transition: transform 0.6s ease;
-  }
-
-  .appointment-button:hover::after {
-    transform: translateX(100%);
-  }
-
-  .button-content {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .button-icon {
-    width: 20px;
-    height: 20px;
-    fill: currentColor;
-    transition: transform 0.3s ease;
-  }
-
-  .appointment-button:hover .button-icon {
-    transform: scale(1.1);
-  }
-`}</style>
 export default withAuth(DashboardPatient);
