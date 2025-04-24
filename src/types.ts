@@ -27,7 +27,7 @@ export interface Secretary {
   roleSecretary: string;
 }
 
-interface Appointment {
+export interface Appointment {
   dateTime: string;
   medcine: string;
   patient: string;
