@@ -13,7 +13,7 @@ import { MdDashboard } from "react-icons/md";
 import { FaNotesMedical, FaUserEdit } from "react-icons/fa";
 import { RiLogoutCircleFill } from "react-icons/ri";
 import useLocalStorage from "@/hooks/useLocalStorage";
-
+import styles from "../styles/AppointmentButton.module.css";
 interface Medcine {
   fullName: string;
   speciality: string;
@@ -185,60 +185,13 @@ const DashboardPatient = () => {
 
         {listAppointment && listAppointment.length > 0 && (
           <Link href="/search_medicine" passHref>
-            <button
-              className="
-           relative
-           inline-flex
-           items-center
-           justify-center
-           mt-8
-           px-6
-           py-3
-           bg-gradient-to-br
-           from-blue-500
-           to-blue-600
-           text-white
-           font-medium
-           rounded-lg
-           shadow-md
-           hover:from-blue-600
-           hover:to-blue-700
-           hover:shadow-lg
-           hover:-translate-y-0.5
-           active:translate-y-0
-           active:shadow-sm
-           transition-all
-           duration-300
-           ease-in-out
-           overflow-hidden
-           group
-         "
-            >
-              <span className="flex items-center gap-2">
-                <svg
-                  className="w-5 h-5 transition-transform duration-300 group-hover:scale-110"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
+            <button className={styles.button}>
+              <span className={styles.content}>
+                <svg className={styles.icon} viewBox="0 0 24 24">
                   <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                 </svg>
                 Make Another Appointment
               </span>
-              <span
-                className="
-             absolute
-             inset-0
-             bg-gradient-to-r
-             from-transparent
-             via-white/20
-             to-transparent
-             -translate-x-full
-             group-hover:translate-x-full
-             transition-transform
-             duration-600
-             ease-in-out
-           "
-              ></span>
             </button>
           </Link>
         )}
