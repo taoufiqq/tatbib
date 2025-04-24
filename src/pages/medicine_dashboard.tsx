@@ -1,12 +1,12 @@
-import Image from 'next/image';
-import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import logo from '../../public/images/doctor.png';
-import withAuth from '@/components/withPrivateRoute';
+import Image from "next/image";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import logo from "../../public/images/doctor.png";
+import withAuth from "@/components/withPrivateRoute";
 import { MdDashboard } from "react-icons/md";
 import { FaNotesMedical, FaUserEdit, FaUserPlus } from "react-icons/fa";
 import { RiLogoutCircleFill } from "react-icons/ri";
@@ -31,16 +31,16 @@ const DashboardMedcine = () => {
     const fetchMedecinData = async () => {
       try {
         // First check if we're on client-side
-        if (typeof window === 'undefined') return;
+        if (typeof window === "undefined") return;
 
         // Safely get doctor ID
-        const doctorId = localStorage.getItem('id_medcine');
-        
+        const doctorId = localStorage.getItem("id_medcine");
+
         // Validate ID before making API call
         if (!doctorId) {
-          setError('Doctor ID not found');
-          toast.error('Doctor ID not found');
-          router.push('/login_medicine');
+          setError("Doctor ID not found");
+          toast.error("Doctor ID not found");
+          router.push("/login_medicine");
           return;
         }
 
@@ -48,10 +48,12 @@ const DashboardMedcine = () => {
         const response = await axios.get<MedecinData>(
           `https://tatbib-api.onrender.com/medcine/getMedcineById/${doctorId}`
         );
-        
+
         setMedecinData(response.data);
+        console.log("hhhhhhhhhhhhhhhh", response.data._id);
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Failed to load doctor data';
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to load doctor data";
         setError(errorMessage);
         toast.error(errorMessage);
       } finally {
@@ -63,14 +65,14 @@ const DashboardMedcine = () => {
   }, [router]);
 
   const handleEditAccount = (id: string) => {
-    localStorage.setItem('id_medcine', id);
-    router.push('/availability_medicine');
+    localStorage.setItem("id_medcine", id);
+    router.push("/availability_medicine");
   };
 
   const logOut = () => {
     localStorage.clear();
-    router.push('/login_medicine');
-    toast.success('Logged out successfully', {
+    router.push("/login_medicine");
+    toast.success("Logged out successfully", {
       position: "top-right",
       autoClose: 5000,
       hideProgressBar: false,
@@ -82,7 +84,7 @@ const DashboardMedcine = () => {
     });
   };
 
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return null; // Skip rendering during SSR
   }
 
@@ -101,49 +103,59 @@ const DashboardMedcine = () => {
   const loginMedcine = localStorage.getItem("LoginMedcine") || "";
 
   return (
-    <div className="Container" style={{ overflow: 'hidden' }}>
+    <div className="Container" style={{ overflow: "hidden" }}>
       <nav className="menu" tabIndex={0}>
         <div className="smartphone-menu-trigger" />
         <header className="avatar">
-          <Image 
-            alt="Doctor profile" 
-            src={logo} 
+          <Image
+            alt="Doctor profile"
+            src={logo}
             width={150}
             height={150}
-            style={{ borderRadius: '50%' }}
+            style={{ borderRadius: "50%" }}
           />
           <h6>Welcome</h6>
-          <h5 style={{ color: 'white' }}>{loginMedcine}</h5>
+          <h5 style={{ color: "white" }}>{loginMedcine}</h5>
         </header>
 
         <ul>
           <li tabIndex={0} className="icon-customers">
             <MdDashboard />
             <Link href="/list_appointments_medicine" passHref>
-              <span style={{ textDecoration: 'none', color: 'white' }}>List Appointments</span>
+              <span style={{ textDecoration: "none", color: "white" }}>
+                List Appointments
+              </span>
             </Link>
           </li>
           <li tabIndex={0} className="icon-profil">
             <FaUserEdit />
             <Link href="/medicine_dashboard" passHref>
-              <span style={{ textDecoration: 'none', color: 'white' }}>My Account</span>
+              <span style={{ textDecoration: "none", color: "white" }}>
+                My Account
+              </span>
             </Link>
           </li>
           <li tabIndex={0} className="icon-users">
             <FaNotesMedical />
             <Link href="/ordonnances_by_medicine" passHref>
-              <span style={{ textDecoration: 'none', color: 'white' }}>Ordonnances</span>
+              <span style={{ textDecoration: "none", color: "white" }}>
+                Ordonnances
+              </span>
             </Link>
           </li>
           <li tabIndex={0} className="icon-Secrétaire">
             <FaUserPlus />
             <Link href="/account_secretary" passHref>
-              <span style={{ textDecoration: 'none', color: 'white' }}>Secretary</span>
+              <span style={{ textDecoration: "none", color: "white" }}>
+                Secretary
+              </span>
             </Link>
           </li>
           <li tabIndex={0} className="icon-settings">
             <RiLogoutCircleFill />
-            <span onClick={logOut} style={{ cursor: 'pointer' }}>Log out</span>
+            <span onClick={logOut} style={{ cursor: "pointer" }}>
+              Log out
+            </span>
           </li>
         </ul>
       </nav>
@@ -157,7 +169,9 @@ const DashboardMedcine = () => {
             <div className="table-title">
               <div className="row">
                 <div className="col-sm-5">
-                  <h2>Account <b>Management</b></h2>
+                  <h2>
+                    Account <b>Management</b>
+                  </h2>
                 </div>
               </div>
             </div>
@@ -182,13 +196,20 @@ const DashboardMedcine = () => {
                   <td>{medecinData.login}</td>
                   <td>{medecinData.speciality}</td>
                   <td>{medecinData.city}</td>
-                  <td style={{ color: medecinData.availablity !== 'NotAvailable' ? 'green' : 'red' }}>
+                  <td
+                    style={{
+                      color:
+                        medecinData.availablity !== "NotAvailable"
+                          ? "green"
+                          : "red",
+                    }}
+                  >
                     {medecinData.availablity}
                   </td>
                   <td>
-                    <button 
-                      onClick={() => handleEditAccount(medecinData._id)} 
-                      className="edit" 
+                    <button
+                      onClick={() => handleEditAccount(medecinData._id)}
+                      className="edit"
                       title="Edit Account"
                     >
                       <i className="material-icons">&#xE254;</i>
