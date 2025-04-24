@@ -28,16 +28,18 @@ export interface Secretary {
 }
 
 export interface Appointment {
-  _id?: string;
+  _id: string;
   dateTime: string;
-  medcine: {  // Change from string to object type
-    fullName: string;
-    speciality: string;
-    // Add other medcine properties as needed
+  patient: {
+    // Change from string to object
+    _id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    telephone: string;
   };
-  patient: string;
-  loginMedcine?: string;
   status: string;
+  // ... other fields
 }
 export interface Ordonnance {
   medicamment: string;
