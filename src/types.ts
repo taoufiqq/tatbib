@@ -41,9 +41,15 @@ export interface Appointment {
   status: string;
   // ... other fields
 }
-export interface Ordonnance {
-  medicamment: string;
-  appointment: Appointment;
-  medcine: Medicine;
-  patient: Patient;
+interface Ordonnance {
+  _id: string;
+  patient: {
+    name: string;
+    age: number;
+  };
+  medications: Array<{
+    name: string;
+    dosage: string;
+  }>;
+  date: string;
 }
