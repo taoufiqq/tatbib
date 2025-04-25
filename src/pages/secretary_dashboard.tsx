@@ -1,3 +1,4 @@
+import { NextPage } from 'next';
 import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
@@ -11,139 +12,112 @@ import moment from "moment";
 import { MdDashboard, MdFolderShared } from "react-icons/md";
 import { Appointment } from "@/types";
 import { RiLogoutCircleFill } from "react-icons/ri";
-const DashboardSecretary = () => {
+
+const DashboardSecretary: NextPage = () => {
   const router = useRouter();
-
-  // const data = router.query;
-
-  const [listAppointment, setListAppointment] = useState<Appointment[] | null>(
-    null
-  );
+  const [listAppointment, setListAppointment] = useState<Appointment[] | null>(null);
+  const [login, setLogin] = useState<string>("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const id = localStorage.getItem("login_medcine");
-
-    axios
-      .get(
-        `https://tatbib-api.onrender.com/appointment/getAppointmentSecretary/${id}`
-      )
-      .then(function (response) {
-        setListAppointment(response.data);
-      })
-      .catch(function (err) {
-        console.log(err);
-      });
+    if (typeof window !== 'undefined') {
+      setLogin(localStorage.getItem("LoginSecretary") || "");
+      const id = localStorage.getItem("login_medcine");
+      
+      axios.get(`https://tatbib-api.onrender.com/appointment/getAppointmentSecretary/${id}`)
+        .then(response => {
+          setListAppointment(response.data);
+          setLoading(false);
+        })
+        .catch(err => {
+          console.error(err);
+          toast.error("Failed to load appointments");
+          setLoading(false);
+        });
+    }
   }, []);
 
-  if (typeof window !== "undefined") {
-    const login = localStorage.getItem("LoginSecretary");
-    // delete My Account
-    const deleteAppointment = (id: any) => {
-      var msgConfirmation = window.confirm(
-        "Are You Sure Yo want to delete this Appointment ?"
-      );
-      if (msgConfirmation) {
-        axios
-          .delete(
-            `https://tatbib-api.onrender.com/secretary/deleteAppointment/${id}`
-          )
-          .then(function (response) {
-            window.location.reload();
-            console.log("item was deleted Succesfully ... ");
-            toast("Appointment was deleted SuccessFully", {
-              hideProgressBar: true,
-              autoClose: 2000,
-              type: "success",
-              position: "top-right",
-            });
+  const deleteAppointment = (id: string) => {
+    if (window.confirm("Are you sure you want to delete this appointment?")) {
+      axios.delete(`https://tatbib-api.onrender.com/secretary/deleteAppointment/${id}`)
+        .then(() => {
+          setListAppointment(prev => prev?.filter(app => app._id !== id) || null);
+          toast.success("Appointment deleted successfully");
+        })
+        .catch(err => {
+          console.error(err);
+          toast.error("Failed to delete appointment");
+        });
+    }
+  };
 
-            // toastr.success(' Appointment was deleted SuccessFully')
-          });
-      }
-    };
-    const getIdAppointment = (id: any) => {
-      localStorage.setItem("idAppointment", id);
-      router.push("/confirm_appointment", undefined, { shallow: true });
-    };
+  const handleAction = (id: string, path: string) => {
+    localStorage.setItem("idAppointment", id);
+    router.push(path);
+  };
 
-    const alertAppointment = (id: any) => {
-      localStorage.setItem("idAppointment", id);
-      router.push("/alert_appointment", undefined, { shallow: true });
-    };
+  const logOut = () => {
+    ['tokenSecretary', 'LoginSecretary', 'id_secretary'].forEach(item => {
+      localStorage.removeItem(item);
+    });
+    router.push("/login_secretary");
+    toast.success("Logged out successfully");
+  };
 
-    const logOut = () => {
-      // Remove only secretary-related items from localStorage
-      const itemsToRemove = [
-        'tokenSecretary',
-        'LoginSecretary',
-        'id_secretary',
-        // Add any other secretary-specific items here
-      ];
-    
-      itemsToRemove.forEach(item => {
-        localStorage.removeItem(item);
-      });
-    
-      router.push("/login_secretary");
-      toast.success("Logged out successfully", {
-        position: "top-left",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,  // Changed to true for better UX
-        pauseOnHover: true,  // Changed to true for better UX
-        draggable: true,     // Changed to true for better UX
-        progress: undefined,
-        theme: "colored",
-      });
-    };
-
-    return (
-      <div className="Container">
-        <nav className="menu" tabIndex={0}>
-          <div className="smartphone-menu-trigger" />
-          <header className="avatar">
-            <Image
-              alt=""
-              src={logo}
-              style={{ borderRadius: "50%", width: "150px" }}
-            />
-            <h6>Welcome</h6>
-            <h5 style={{ color: "white" }}>{login}</h5>
-          </header>
-          <ul>
-            <li tabIndex={0} className="icon-customers">
+  return (
+    <div className="Container">
+      <nav className="menu" tabIndex={0}>
+        <div className="smartphone-menu-trigger" />
+        <header className="avatar">
+          <Image
+            alt="Secretary"
+            src={logo}
+            width={150}
+            height={150}
+            style={{ borderRadius: "50%", width: "150px" }}
+            priority
+          />
+          <h6>Welcome</h6>
+          <h5 style={{ color: "white" }}>{login}</h5>
+        </header>
+        <ul>
+          <li tabIndex={0} className="icon-customers">
             <MdDashboard />
-              <Link href="" style={{ textDecoration: "none", color: "white" }}>
-                <span>Appointment</span>
-              </Link>
-            </li>
-            <li tabIndex={0} className="icon-folder">
-              <MdFolderShared/>
-              <Link href="" style={{ textDecoration: "none", color: "white" }}>
-                <span>Patient Record</span>
-              </Link>
-            </li>
-            <li tabIndex={0} className="icon-settings">
-                  <RiLogoutCircleFill />
-              <span onClick={logOut}>Log out</span>
-            </li>
-          </ul>
-        </nav>
-        <main>
-          <div className="helper">
-            Appointemnt<span> Management | Appointemnt</span>
-          </div>
+            <Link href="" style={{ textDecoration: "none", color: "white" }}>
+              <span>Appointment</span>
+            </Link>
+          </li>
+          <li tabIndex={0} className="icon-folder">
+            <MdFolderShared/>
+            <Link href="" style={{ textDecoration: "none", color: "white" }}>
+              <span>Patient Record</span>
+            </Link>
+          </li>
+          <li tabIndex={0} className="icon-settings">
+            <RiLogoutCircleFill />
+            <span onClick={logOut}>Log out</span>
+          </li>
+        </ul>
+      </nav>
+      
+      <main>
+        <div className="helper">
+          Appointment<span> Management | Appointment</span>
+        </div>
+        
+        {loading ? (
+          <div className="loading-spinner">Loading appointments...</div>
+        ) : (
           <div className="table-responsive">
             <div className="table-wrapper">
               <div className="table-title">
                 <div className="row">
                   <div className="col-sm-5">
-                    <h2>
-                      Appointemnt <b>list</b>
-                    </h2>
+                    <h2>Appointment <b>list</b></h2>
                   </div>
                 </div>
               </div>
+              
               <table className="table table-striped table-hover">
                 <thead>
                   <tr>
@@ -157,76 +131,50 @@ const DashboardSecretary = () => {
                     <th>Action</th>
                   </tr>
                 </thead>
-                {listAppointment &&
-                  listAppointment.map((item: any, index: any) => (
-                    <tbody key={index}>
-                      <tr>
-                        <td>{item.patient.firstName}</td>
-                        <td>{item.patient.lastName}</td>
-                        <td>{item.patient.email}</td>
-                        <td>{item.patient.telephone}</td>
-                        <td>{moment(item.dateTime).format(`MMMM DD YYYY`)}</td>
-                        <td>{moment(item.dateTime).format(`HH:MM`)}</td>
-                        <td
-                          style={{
-                            color:
-                              item.status !== "Unconfirmed" ? "color" : "red",
-                          }}
+                <tbody>
+                  {listAppointment?.map((item) => (
+                    <tr key={item._id}>
+                      <td>{item.patient.lastName}</td>
+                      <td>{item.patient.firstName}</td>
+                      <td>{item.patient.email}</td>
+                      <td>{item.patient.telephone}</td>
+                      <td>{moment(item.dateTime).format("MMMM DD YYYY")}</td>
+                      <td>{moment(item.dateTime).format("HH:mm")}</td>
+                      <td style={{ color: item.status === "Unconfirmed" ? "red" : "green" }}>
+                        {item.status}
+                      </td>
+                      <td>
+                        <button 
+                          onClick={() => handleAction(item._id, "/alert_appointment")}
+                          className="btn-action"
                         >
-                          {item.status}
-                        </td>
-
-                        <td>
-                          <Link
-                            href=""
-                            onClick={() => alertAppointment(item._id)}
-                            className="edit"
-                            title="Alert Appointment"
-                            data-toggle="tooltip"
-                          >
-                            {" "}
-                            <i className="material-icons add_alert">&#xe003;</i>
-                            <ToastContainer />
-                          </Link>
-                          <Link
-                            href=""
-                            onClick={() => getIdAppointment(item._id)}
-                            className="confirm"
-                            title="Confirm Appointment"
-                            data-toggle="tooltip"
-                          >
-                            <i className="material-icons done_outline">
-                              &#xe92f;
-                            </i>
-                            <ToastContainer />
-                          </Link>
-                          <Link
-                            href=""
-                            className="edit"
-                            title="Edit Appointment"
-                            data-toggle="tooltip"
-                          >
-                            <i className="material-icons">&#xE254;</i>
-                          </Link>
-                          <Link
-                            href=""
-                            onClick={() => deleteAppointment(item._id)}
-                            className="delete"
-                            title="Delete Appointment"
-                            data-toggle="tooltip"
-                          >
-                            <i className="material-icons">&#xE872;</i>
-                          </Link>
-                        </td>
-                      </tr>
-                    </tbody>
+                          Alert
+                        </button>
+                        <button 
+                          onClick={() => handleAction(item._id, "/confirm_appointment")}
+                          className="btn-action"
+                        >
+                          Confirm
+                        </button>
+                        <button 
+                          onClick={() => deleteAppointment(item._id)}
+                          className="btn-action delete"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
                   ))}
+                </tbody>
               </table>
             </div>
           </div>
-        </main>
-      </div>
-    );
-  }
+        )}
+      </main>
+      
+      <ToastContainer />
+    </div>
+  );
 };
-export default withAuth(DashboardSecretary);
+
+export default withAuth(DashboardSecretary, { role: 'secretary' });

@@ -8,32 +8,19 @@ import "react-toastify/dist/ReactToastify.css";
 import logo from "../../public/images/ss.jpg";
 import withAuth from "@/components/withPrivateRoute";
 import alert from "../../public/images/alert.svg";
+
 const AlertAppointment = () => {
   const router = useRouter();
-
-  //   const [status, setStatus] = useState("");
-  //   const [updatedStatus, setUpdatedStatus] = useState("");
   const [email, setEmail] = useState("");
   const [dateTime, setDateTime] = useState("");
-  const [calledPush, setCalledPush] = useState(false); // <- add this state
-
-  //   if (!redirectTo) return;
-  //   if (
-  //     (redirectTo && !redirectIfFound && !hasUser) ||
-  //     (redirectIfFound && hasUser)
-  //   ) {
-  //       // check if we have previously called router.push() before redirecting
-  //     if (calledPush) {
-  //       return; // no need to call router.push() again
-  //     }
-
-  //     Router.push(redirectTo);
-  //     setCalledPush(true); // <-- toggle 'true' after first redirect
-  //   }
-  // }, [redirectTo, redirectIfFound, hasUser]);
 
   useEffect(() => {
     const id_Appointment = localStorage.getItem("idAppointment");
+
+    if (!id_Appointment) {
+      toast.error("No appointment ID found");
+      return;
+    }
 
     axios
       .get(
@@ -42,16 +29,21 @@ const AlertAppointment = () => {
       .then(function (response) {
         setEmail(response.data.patient.email);
         setDateTime(response.data.dateTime);
-        console.log(response.data.patient.email);
       })
       .catch(function (err) {
         console.log(err);
+        toast.error("Failed to fetch appointment details");
       });
-  });
+  }, []); // Added empty dependency array to run only once
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const id_Appointment = localStorage.getItem("idAppointment");
+
+    if (!id_Appointment) {
+      toast.error("No appointment ID found");
+      return;
+    }
 
     const data = { email, dateTime };
 
@@ -61,10 +53,8 @@ const AlertAppointment = () => {
         data
       )
       .then((res) => {
-        if (res.data.message) {
-          return false;
-        } else {
-          router.push("/secretary_dashboard", undefined, { shallow: true });
+        if (!res.data.message) {
+          router.push("/secretary_dashboard");
           toast.success("Alert has been sent successfully", {
             position: "top-left",
             autoClose: 5000,
@@ -76,6 +66,10 @@ const AlertAppointment = () => {
             theme: "colored",
           });
         }
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Failed to send alert");
       });
   };
 
@@ -100,7 +94,13 @@ const AlertAppointment = () => {
           <form onSubmit={handleSubmit}>
             <div className="col-12">
               <div className="input-icons mb-4">
-                <Image alt="" src={alert} style={{ width: "60%" }} />
+                <Image 
+                  alt="Alert icon" 
+                  src={alert} 
+                  width={300} 
+                  height={300}
+                  style={{ width: "60%", height: "auto" }} 
+                />
               </div>
             </div>
             <div className="d-grid">
@@ -113,14 +113,17 @@ const AlertAppointment = () => {
                   backgroundColor: "red",
                 }}
               >
-                <ToastContainer />
                 Reminder
               </button>
             </div>
           </form>
         </div>
       </main>
+      <ToastContainer />
     </div>
   );
 };
-export default withAuth(AlertAppointment);
+
+// Export with withAuth separately to avoid potential export issues
+const AlertAppointmentWithAuth = withAuth(AlertAppointment);
+export default AlertAppointmentWithAuth;
