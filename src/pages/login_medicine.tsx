@@ -7,7 +7,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import logo from "../../public/images/logo.png";
 import Imglogin from "../../public/images/login3.svg";
-
+import { normalizeRole } from "@/utils/roles";
 export default function LoginMedcine() {
   const router = useRouter();
   const [login, setLogin] = useState("");
@@ -31,16 +31,19 @@ export default function LoginMedcine() {
             toast.warn("Please verify your account first via email");
           } else {
             if (typeof window !== "undefined") {
-              // Now we can trust the backend returns "medicine"
+              const normalizedRole = normalizeRole(res.data.role);
+              console.log("Normalized role:", normalizedRole);
+              
               localStorage.setItem("tokenMedicine", res.data.token);
               localStorage.setItem("LoginMedicine", login);
-              localStorage.setItem("role", res.data.role); // Will be "medicine"
+              localStorage.setItem("role", normalizedRole);
               localStorage.setItem("id_medcine", res.data.id);
-              
+          
+              // Verify storage
               console.log("Stored auth data:", {
-                token: res.data.token,
-                role: res.data.role,
-                id: res.data.id
+                token: localStorage.getItem("tokenMedicine"),
+                role: localStorage.getItem("role"),
+                login: localStorage.getItem("LoginMedicine")
               });
             }
             router.push("/list_appointments_medicine");
