@@ -1,450 +1,700 @@
-import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import axios from "axios";
-import logo from "../../public/images/logo.png";
-import health from "../../public/images/healthh.svg";
-import icon1 from "../../public/images/map-doctor.png";
-import icon2 from "../../public/images/bell.png";
-import icon3 from "../../public/images/phone-alt.png";
-import icon4 from "../../public/images/clipboard-list.png";
-import Medicin from "../../public/images/doctor.png";
-import wiqaytna from "../../public/images/wiqaytna.png";
-import { Medicine } from "@/types";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Image from "next/image";
+import doctor from "../../public/images/doctor.png";
+import withAuth from "@/components/withPrivateRoute";
+import { MdDashboard } from "react-icons/md";
+import { FaNotesMedical, FaUserEdit, FaUserPlus } from "react-icons/fa";
+import { RiLogoutCircleFill } from "react-icons/ri";
 
-export default function Home() {
-  const [speciality, setSpeciality] = useState("");
-  // const [fullName, setFullName] = useState("");
+interface Medication {
+  name: string;
+  dosage: string;
+  duration: string;
+  instructions?: string;
+}
 
+interface Patient {
+  _id: string;
+  firstName: string;
+  lastName: string;
+}
+
+interface Ordonnance {
+  _id: string;
+  patient: Patient;
+  medications: Medication[];
+  date: string;
+}
+
+const OrdonnancesByMedicine = () => {
   const router = useRouter();
+  const [state, setState] = useState<{
+    ordonnances: Ordonnance[];
+    loading: boolean;
+    error: string | null;
+  }>({
+    ordonnances: [],
+    loading: true,
+    error: null,
+  });
 
-  const [medcine, setMedcine] = useState<Medicine[] | null>(null);
+  const [selectedOrdonnance, setSelectedOrdonnance] =
+    useState<Ordonnance | null>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    axios
-      .get(`https://tatbib-api.onrender.com/medcine/getAllMedcine`)
-      .then(function (response) {
-        setMedcine(response.data);
-        setSpeciality(response.data.speciality);
-        console.log("all medcine", response.data);
-      })
-      .catch(function (err) {
-        console.log(err);
-      });
+    setIsClient(true);
   }, []);
 
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
-    // console.log(speciality);
+  useEffect(() => {
+    if (!isClient) return;
 
-    axios
-      .get(
-        `https://tatbib-api.onrender.com/medcine/searchMedcine/${speciality}`
-      )
-      .then((res) => {
-        if (!res.data) {
-          return false;
-        } else {
-          localStorage.setItem("medcine", JSON.stringify(res.data));
-          router.push("/search_medicine");
+    const fetchOrdonnances = async () => {
+      try {
+        const doctorId = localStorage.getItem("id_medcine");
+        if (!doctorId) {
+          throw new Error("Doctor authentication required");
         }
-      });
+
+        const response = await axios.get<Ordonnance[]>(
+          `https://tatbib-api.onrender.com/medcine/getOrdonnanceByMedcine/${doctorId}`
+        );
+
+        if (!response?.data || !Array.isArray(response.data)) {
+          throw new Error("Invalid data format received from server");
+        }
+
+        setState({
+          ordonnances: response.data,
+          loading: false,
+          error: null,
+        });
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to load ordonnances";
+        setState({
+          ordonnances: [],
+          loading: false,
+          error: errorMessage,
+        });
+        toast.error(errorMessage);
+        console.error("API Error:", err);
+      }
+    };
+
+    fetchOrdonnances();
+  }, [isClient]);
+
+  const handleViewDetails = (ordonnanceId: string) => {
+    const ordonnance = state.ordonnances.find((o) => o._id === ordonnanceId);
+    if (ordonnance) {
+      setSelectedOrdonnance(ordonnance);
+      setIsDetailsModalOpen(true);
+    }
   };
 
-  return (
-    <div className="" style={{ overflow: "auto" }}>
-      <section className="header-page">
-        <div className="container">
-          <div className="py-3 row justify-content-between align-items-center">
-            <div className="py-2 col-12 col-sm-3 col-lg-4 d-flex justify-content-center justify-content-lg-start py-lg-0">
-              <Image alt="" src={logo} width="100" />
-            </div>
-            <div className="col-12 col-sm-9 col-lg-6 col-xl-4">
-              <div className="row justify-content-center">
-                <div className="col-6 col-md-4 col-lg-5 col-xl-6 d-flex justify-content-end">
-                  <Link
-                    className="btn_Espace_Professionnels"
-                    href="/professional_space"
-                  >
-                    <i className="fas fa-user-injured"></i> Professional Spaces
-                  </Link>
-                </div>
-                <div className="col-6 col-md-4 col-lg-5 d-flex justify-content-center">
-                  <Link className="btn_Espace_Patients" href="/patient_space">
-                    <i className="fas fa-user-injured"></i> Patient Spaces
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <nav className="social">
-          <ul>
-            <li>
-              <Link href="#">
-                Twitter <i className="fa fa-twitter twitter"></i>
-              </Link>
-            </li>
-            <li>
-              <Link href="#">
-                Linkedin <i className="fa fa-linkedin"></i>
-              </Link>
-            </li>
-            <li>
-              <Link href="#">
-                Google+ <i className="fa fa-google-plus"></i>
-              </Link>
-            </li>
-            <li>
-              <Link href="#">
-                Facebook <i className="fa fa-facebook"></i>
-              </Link>
-            </li>
-          </ul>
-        </nav>
-        <div className="container">
-          <div className="row align-items-center">
-            <div
-              className="px-5 py-4 col-12 col-md-6 col-lg-6 formSearch"
-              style={{ background: "white", borderRadius: "7px" }}
-            >
-              <h2 className="h2" style={{ textAlign: "center" }}>
-                Find your doctor and make an appointment or teleConsiel
-              </h2>
-              <form className="py-5" onSubmit={handleSubmit}>
-                <div className="col-12">
-                  <div className="mb-4 input-icons">
-                    <select
-                      className="p-3 select"
-                      defaultValue="Choisir Un Medcine"
-                    >
-                      <option defaultValue="Choisir Un Medcine">
-                        Choose the name of Medcine
-                      </option>
-                      {medcine &&
-                        medcine.map((element, i: any) => (
-                          <option key={i} value={element.fullName}>
-                            {element.fullName}
-                          </option>
-                        ))}
-                    </select>
-                  </div>
-                  <div className="mb-4 input-icons">
-                    <select
-                      className="p-3 select"
-                      defaultValue="Choisir Une Spécialité"
-                      onChange={(e) => setSpeciality(e.target.value)}
-                    >
-                      <option defaultValue="Choisir Une Spécialité">
-                        Choose A Specialty
-                      </option>
-                      {medcine &&
-                        medcine.map((item, indexSpeciality: any) => (
-                          <option key={indexSpeciality} value={item.speciality}>
-                            {item.speciality}
-                          </option>
-                        ))}
-                    </select>
-                  </div>
-                  <div className="mb-4 input-icons">
-                    <select
-                      className="p-3 select"
-                      defaultValue="Choisir Une Ville"
-                    >
-                      <option defaultValue="Choisir Une Ville">
-                        Choose a city
-                      </option>
-                      {medcine &&
-                        medcine.map((itemCity, index: any) => (
-                          <option key={index} value={itemCity.city}>
-                            {itemCity.city}
-                          </option>
-                        ))}
-                    </select>
-                  </div>
-                </div>
-                <div className="d-grid">
-                  <button type="submit" className="py-3 button1">
-                    Search
-                  </button>
-                </div>
-              </form>
-            </div>
-            <div className="col-12 col-md-6 col-lg-6 ">
-              <Image alt="" id="health" className="health-img" src={health} />
-            </div>
-          </div>
-        </div>
-      </section>
-      <div className="py-5 container-fluid" style={{ background: "#2CA5B8" }}>
-        <h3 className="text-center fw-bold fs-2" style={{ color: "white" }}>
-          Why choose TATBIB Connect software ?
-        </h3>
-        <div className="py-3 row justify-content-center">
-          <div className="text-center col-12 col-md-2">
-            <Image alt="" src={icon1} />
-            <span
-              className="py-2 mb-0 text-center fw-bold fs-5"
-              style={{ color: "white" }}
-            >
-              Smart and ergonomic agenda
-            </span>
-          </div>
-          <div className="text-center col-12 col-md-2">
-            <Image alt="" src={icon2} />
-            <span
-              className="py-2 mb-0 text-center fw-bold fs-5"
-              style={{ color: "white" }}
-            >
-              Digital medical record
-            </span>
-          </div>
-          <div className="text-center col-12 col-md-2">
-            <Image alt="" src={icon3} />
-            <span
-              className="py-2 mb-0 text-center fw-bold fs-5"
-              style={{ color: "white" }}
-            >
-              TeleConsiel
-            </span>
-          </div>
-          <div className="text-center col-12 col-md-2">
-            <Image alt="" src={icon4} />
-            <span
-              className="py-2 mb-0 text-center fw-bold fs-5"
-              style={{ color: "white" }}
-            >
-              Highly secure access and data
-            </span>
-          </div>
-        </div>
-      </div>
-      <div className="container py-5 cardMedcine">
-        <h4
-          className="py-3 text-center fs-2 fw-bold"
-          style={{ color: "#2CA5B8" }}
-        >
-          Our practitioners
-        </h4>
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return isNaN(date.getTime())
+        ? "Invalid date"
+        : date.toLocaleDateString("en-US", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          });
+    } catch {
+      return "Invalid date";
+    }
+  };
 
-        <div className="row justify-content-evenly">
-          {medcine &&
-            medcine.map((item: any) => (
-              <div
-                key={item}
-                className="m-2 text-center col-12 col-sm-6 col-md-2 "
-                style={{
-                  backgroundColor: "#E5E5E5",
-                  borderRadius: "20px",
-                  width: "30%",
-                }}
-              >
-                <Image
-                  alt=""
-                  src={Medicin}
-                  style={{ width: "70%", height: "80%" }}
-                />
-                <h4>{item.fullName}</h4>
-                <h5>{item.speciality}</h5>
-              </div>
-            ))}
-        </div>
+  const logOut = () => {
+    if (typeof window !== "undefined") {
+      const medicineItems = ["tokenMedicine", "LoginMedicine", "id_medcine"];
+
+      medicineItems.forEach((item) => localStorage.removeItem(item));
+    }
+
+    router.push("/login_medicine");
+    toast.success("Logged out successfully");
+  };
+
+  if (!isClient) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+        }}
+      >
+        <div
+          style={{
+            border: "4px solid rgba(0, 0, 0, 0.1)",
+            width: "36px",
+            height: "36px",
+            borderRadius: "50%",
+            borderLeftColor: "#09f",
+            animation: "spin 1s linear infinite",
+          }}
+        ></div>
+        <p>Loading....</p>
       </div>
-      {/* ---------------------- start slide-----------------------  */}
-      {/* <div id="slider">
-<input type="radio" name="slider" id="slide1" checked/>
-<input type="radio" name="slider" id="slide2"/>
-<input type="radio" name="slider" id="slide3"/>
-<input type="radio" name="slider" id="slide4"/>
-<div id="slides">
-  <div id="overflow">
-     <div className="inner">
-     { medcine && medcine.map((item) =>(
-        <div className="slide slide_1">           
-           <div className="slide-content">
-          <Image alt=""  src={Medicine} style={{width:'100%'}}/>
-              <h2>{item.fullName}</h2>
-              <span>{item.speciality}</span>
-           </div>
-       
-        </div>
-         ))}
-     </div>
-  </div>
-</div>
-<div id="controls">
-  <label for="slide1"></label>
-  <label for="slide2"></label>
-  <label for="slide3"></label>
-  <label for="slide4"></label>
-</div>
-<div id="bullets">
-  <label for="slide1"></label>
-  <label for="slide2"></label>
-  <label for="slide3"></label>
-  <label for="slide4"></label>
-</div>
-</div> */}
-      {/* ---------------------- end slide-----------------------  */}
-      <div className="nav-elements"></div>{" "}
-      <div className="container">
-        <div className="row align-items-center">
-          <div className="col-12 col-md-6 col-lg-8">
-            <h1 className="py-2">
-              Together, s protect ourselves to limit the spread of the
-              Coronavirus « COVID-19 »
-            </h1>
-            <span className="fs-4">
-              Download Wiqaytna and help stop the spread of the virus.
-            </span>
+    );
+  }
+
+  if (state.loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+        }}
+      >
+        <div
+          style={{
+            border: "4px solid rgba(0, 0, 0, 0.1)",
+            width: "36px",
+            height: "36px",
+            borderRadius: "50%",
+            borderLeftColor: "#09f",
+            animation: "spin 1s linear infinite",
+          }}
+        ></div>
+        <p>Loading ordonnances...</p>
+        <style jsx>{`
+          @keyframes spin {
+            0% {
+              transform: rotate(0deg);
+            }
+            100% {
+              transform: rotate(360deg);
+            }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
+  if (state.error) {
+    return (
+      <div style={{ padding: "2rem", textAlign: "center" }}>
+        <p style={{ color: "#dc3545", marginBottom: "1rem" }}>{state.error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          style={{
+            padding: "0.5rem 1rem",
+            background: "#dc3545",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  if (state.ordonnances.length === 0) {
+    return (
+      <div style={{ textAlign: "center", padding: "2rem" }}>
+        <p>No ordonnances found</p>
+        <Link href="/create-ordonnance">
+          <button
+            style={{
+              padding: "0.75rem 1.5rem",
+              background: "#28a745",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              marginTop: "1rem",
+              cursor: "pointer",
+            }}
+          >
+            Create New Ordonnance
+          </button>
+        </Link>
+      </div>
+    );
+  }
+
+  const login = isClient
+    ? localStorage.getItem("LoginMedcine") || "Doctor"
+    : "Doctor";
+
+  return (
+    <div className="Container">
+      <nav className="menu" tabIndex={0}>
+        <div className="smartphone-menu-trigger" />
+        <header className="avatar">
+          <Image
+            alt="Doctor profile"
+            src={doctor}
+            width={150}
+            height={150}
+            style={{ borderRadius: "50%" }}
+            priority
+          />
+          <h6>Welcome</h6>
+          <h5 style={{ color: "white" }}>{login}</h5>
+        </header>
+        <ul>
+          <li tabIndex={0} className="icon-customers">
+            <MdDashboard />
             <Link
-              href={{ pathname: "https://www.wiqaytna.ma/" }}
-              target="_blank"
-              className="px-4 py-3 btn btn-primary fs-5"
+              href="/list_appointments_medicine"
+              style={{ textDecoration: "none", color: "white" }}
+            >
+              <span>ListAppointments</span>
+            </Link>
+            <ToastContainer />
+          </li>
+          <li tabIndex={0} className="icon-profil">
+            <FaUserEdit />
+            <Link
+              href="/medicine_dashboard"
+              style={{ textDecoration: "none", color: "white" }}
+            >
+              <span>MyAccount</span>
+            </Link>
+            <ToastContainer />
+          </li>
+          <li tabIndex={0} className="icon-users">
+            <FaNotesMedical />
+            <Link
+              href="/ordonnances_by_medicine"
+              style={{ textDecoration: "none", color: "white" }}
+            >
+              <span>Ordonnances</span>
+            </Link>
+          </li>
+          <li tabIndex={0} className="icon-Secrétaire">
+            <FaUserPlus />
+            <Link
+              href="/account_secretary"
+              style={{ textDecoration: "none", color: "white" }}
+            >
+              <span>Secretary</span>
+            </Link>
+            <ToastContainer />
+          </li>
+          <li tabIndex={0} className="icon-settings">
+            <RiLogoutCircleFill />
+            <span onClick={logOut}>Log out</span>
+            <ToastContainer />
+          </li>
+        </ul>
+      </nav>
+
+      <main>
+        <div className="helper">
+          Ordonnances Management<span>View and manage patient prescriptions</span>
+        </div>
+
+        <div className="table-responsive">
+          <div className="table-wrapper">
+            <div className="table-title">
+              <div className="row">
+                <div className="col-sm-5">
+                  <h2>
+                    Ordonnances <b>List</b>
+                  </h2>
+                </div>
+              </div>
+            </div>
+            <table className="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Patient</th>
+                  <th>Date</th>
+                  <th>Medications</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {state.ordonnances.map((ordonnance) => (
+                  <tr key={ordonnance._id}>
+                    <td>
+                      {ordonnance.patient?.firstName || "Unknown"}{" "}
+                      {ordonnance.patient?.lastName || ""}
+                    </td>
+                    <td>{formatDate(ordonnance.date)}</td>
+                    <td>
+                      <ul className="medication-list">
+                        {ordonnance.medications?.slice(0, 2).map((med, idx) => (
+                          <li key={idx}>
+                            <strong>{med.name}</strong> - {med.dosage} (
+                            {med.duration})
+                          </li>
+                        ))}
+                        {ordonnance.medications?.length > 2 && (
+                          <li>
+                            + {ordonnance.medications.length - 2} more medications
+                          </li>
+                        )}
+                      </ul>
+                    </td>
+                    <td>
+                      <button
+                        onClick={() => handleViewDetails(ordonnance._id)}
+                        className="view-button"
+                      >
+                        View Details
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+
+      {/* Details Modal */}
+      {isDetailsModalOpen && selectedOrdonnance && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              padding: "24px",
+              borderRadius: "8px",
+              maxWidth: "600px",
+              width: "90%",
+              maxHeight: "80vh",
+              overflowY: "auto",
+            }}
+          >
+            <div
               style={{
-                background: "#1AA9E9",
-                border: "none",
-                width: "215px",
-                height: "50px",
-                lineHeight: 1,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "16px",
               }}
             >
-              More information
-            </Link>
-          </div>
-          <div className="col-12 col-md-6 col-lg-4">
-            <Image
-              src={wiqaytna}
-              alt=""
-              style={{ width: "100%", height: "100%" }}
-            />
-          </div>
-        </div>
-      </div>
-      <div className="footer">
-        <div className="container">
-          <div className="row">
-            <div className="col-lg-4 col-sm-4 col-xs-12">
-              <div className="single_footer">
-                <h4>The specialties</h4>
-                <ul>
-                  <li>
-                    <Link className="list-item" href="#">
-                      Cardiologist
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="list-item" href="#">
-                      Dermatologist
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="list-item" href="#">
-                      Gastroenterology
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="list-item" href="#">
-                      Dentiste
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="list-item" href="#">
-                      General Medicine
-                    </Link>
-                  </li>
-                </ul>
-              </div>
+              <h2 style={{ color: "#2b6cb0", margin: 0 }}>
+                Ordonnance Details
+              </h2>
+              <button
+                onClick={() => setIsDetailsModalOpen(false)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: "1.5rem",
+                  cursor: "pointer",
+                  color: "#718096",
+                }}
+              >
+                &times;
+              </button>
             </div>
-            <div className="col-md-4 col-sm-4 col-xs-12">
-              <div className="single_footer single_footer_address">
-                <h4>Popular searches</h4>
-                <ul>
-                  <li>
-                    <Link className="list-item" href="#">
-                      General doctor in casablanca
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="list-item" href="#">
-                      Dentiste doctor in casablanca
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="list-item" href="#">
-                      Dentiste doctor in rabat
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="list-item" href="#">
-                      Dentiste doctor in agadir
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="list-item" href="#">
-                      Dentiste doctor in Marrakech
-                    </Link>
-                  </li>
-                </ul>
-              </div>
+
+            <div style={{ marginBottom: "16px" }}>
+              <h3 style={{ color: "#4a5568", marginBottom: "8px" }}>
+                Patient:
+              </h3>
+              <p>
+                {selectedOrdonnance.patient?.firstName}{" "}
+                {selectedOrdonnance.patient?.lastName}
+              </p>
             </div>
-            <div className="col-md-4 col-sm-4 col-xs-12">
-              <div className="single_footer single_footer_address">
-                <h4>Subscribe today</h4>
-                <div className="signup_form">
-                  <form action="#" className="subscribe">
-                    <input
-                      type="text"
-                      className="subscribe__input"
-                      placeholder="Enter Email Address"
-                    />
-                    <button type="button" className="subscribe__btn">
-                      <i className="fa fa-paper-plane"></i>
-                    </button>
-                  </form>
-                </div>
-              </div>
-              <div className="social_profile">
-                <ul>
-                  <li>
-                    <Link href="#">
-                      <i className="fa fa-twitter twitter"></i>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="#">
-                      <i className="fa fa-linkedin"></i>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="#">
-                      <i className="fa fa-google-plus"></i>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="#">
-                      <i className="fa fa-facebook"></i>
-                    </Link>
-                  </li>
-                </ul>
-              </div>
+
+            <div style={{ marginBottom: "16px" }}>
+              <h3 style={{ color: "#4a5568", marginBottom: "8px" }}>Date:</h3>
+              <p>{formatDate(selectedOrdonnance.date)}</p>
             </div>
-          </div>
-          <div className="row">
-            <div className="col-lg-12 col-sm-12 col-xs-12">
-              <span className="copyright">
-                {" "}
-                © 2023 TATBIB.ma . All rights reserved{" "}
-                <Link href="#" className="">
-                  Terms of Service
-                </Link>
-                .
-              </span>
+
+            <div style={{ marginBottom: "16px" }}>
+              <h3 style={{ color: "#4a5568", marginBottom: "8px" }}>
+                Medications:
+              </h3>
+              <ul style={{ listStyleType: "none", paddingLeft: 0 }}>
+                {selectedOrdonnance.medications?.map((med, idx) => (
+                  <li
+                    key={idx}
+                    style={{
+                      padding: "12px",
+                      backgroundColor: idx % 2 === 0 ? "#f7fafc" : "white",
+                      borderRadius: "4px",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    <strong style={{ color: "#2b6cb0" }}>{med.name}</strong>
+                    <div>Dosage: {med.dosage}</div>
+                    <div>Duration: {med.duration}</div>
+                    {med.instructions && (
+                      <div>Instructions: {med.instructions}</div>
+                    )}
+                  </li>
+                ))}
+              </ul>
             </div>
+
+            <button
+              onClick={() => setIsDetailsModalOpen(false)}
+              style={{
+                backgroundColor: "#4299e1",
+                color: "white",
+                border: "none",
+                padding: "10px 20px",
+                borderRadius: "4px",
+                cursor: "pointer",
+                marginTop: "16px",
+              }}
+            >
+              Close
+            </button>
           </div>
         </div>
-      </div>
+      )}
+
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
+
+      <style jsx global>{`
+        body {
+          font-family: 'Varela Round', sans-serif;
+        }
+
+        .Container {
+          display: flex;
+          min-height: 100vh;
+        }
+
+        .menu {
+          width: 250px;
+          background: #2b2b2b;
+          position: fixed;
+          height: 100%;
+          transition: all 0.3s;
+          z-index: 100;
+        }
+
+        .avatar {
+          text-align: center;
+          padding: 20px 0;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .avatar h5,
+        .avatar h6 {
+          margin: 10px 0;
+          color: white;
+        }
+
+        ul {
+          list-style: none;
+          padding: 0;
+          margin-top: 20px;
+        }
+
+        li {
+          padding: 15px;
+          cursor: pointer;
+          transition: background 0.3s;
+        }
+
+        li:hover {
+          background: #3a3a3a;
+        }
+
+        main {
+          flex: 1;
+          padding: 20px;
+          margin-left: 250px;
+          background: #f5f5f5;
+          min-height: 100vh;
+        }
+
+        .helper {
+          background: #fff;
+          padding: 15px 20px;
+          margin: 0 0 30px;
+          border-radius: 3px;
+          box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .helper h1 {
+          font-size: 24px;
+          margin: 0 0 5px;
+          color: #333;
+        }
+
+        .helper span {
+          font-size: 13px;
+          color: #888;
+        }
+
+        .table-responsive {
+          margin: 30px 0;
+        }
+
+        .table-wrapper {
+          background: #fff;
+          padding: 20px;
+          border-radius: 3px;
+          box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-title {
+          padding-bottom: 15px;
+          background: #2b6cb0;
+          color: #fff;
+          padding: 16px 30px;
+          margin: -20px -20px 10px;
+          border-radius: 3px 3px 0 0;
+        }
+
+        .table-title h2 {
+          margin: 5px 0 0;
+          font-size: 24px;
+        }
+
+        .table-title .row {
+          display: flex;
+          align-items: center;
+        }
+
+        .table-title .col-sm-5 {
+          flex: 1;
+        }
+
+        table.table {
+          width: 100%;
+          max-width: 100%;
+          margin-bottom: 20px;
+          background-color: transparent;
+          border-spacing: 0;
+          border-collapse: collapse;
+        }
+
+        table.table tr th, table.table tr td {
+          border-color: #e9e9e9;
+          padding: 12px 15px;
+          vertical-align: middle;
+        }
+
+        table.table tr th:first-child {
+          width: 60px;
+        }
+
+        table.table tr th:last-child {
+          width: 100px;
+        }
+
+        table.table-striped tbody tr:nth-of-type(odd) {
+          background-color: #f9f9f9;
+        }
+
+        table.table-striped.table-hover tbody tr:hover {
+          background: #f5f5f5;
+        }
+
+        table.table th {
+          font-weight: bold;
+          color: #444;
+          background: #f5f5f5;
+        }
+
+        table.table td a {
+          font-weight: bold;
+          color: #566787;
+          display: inline-block;
+          text-decoration: none;
+        }
+
+        table.table td a:hover {
+          color: #2196F3;
+        }
+
+        .view-button {
+          color: #fff;
+          background: #2b6cb0;
+          border: none;
+          border-radius: 2px;
+          padding: 6px 12px;
+          cursor: pointer;
+          font-size: 13px;
+          transition: all 0.3s;
+        }
+
+        .view-button:hover {
+          background: #1e4e8c;
+        }
+
+        .medication-list {
+          margin: 0;
+          padding: 0;
+          list-style: none;
+        }
+
+        .medication-list li {
+          padding: 5px 0;
+          margin: 0;
+        }
+
+        @media (max-width: 768px) {
+          .menu {
+            width: 70px;
+          }
+
+          .menu .avatar h5,
+          .menu li span {
+            display: none;
+          }
+
+          .menu li {
+            text-align: center;
+            padding: 15px 5px;
+          }
+
+          main {
+            margin-left: 70px;
+          }
+
+          .table-responsive {
+            overflow-x: auto;
+          }
+        }
+      `}</style>
     </div>
   );
-}
+};
+
+export default withAuth(OrdonnancesByMedicine);
