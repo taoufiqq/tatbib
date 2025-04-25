@@ -18,6 +18,7 @@ export default function SecretaryCompte() {
   // const login = localStorage.getItem('LoginMedcine') || " "
 
   const [listSecretary, setListSecretary] = useState<Secretary[] | null>(null);
+  const [loading, setLoading] = useState(true);
   if (typeof window !== "undefined") {
     const loginMedcine = localStorage.getItem("LoginMedcine") || " ";
 
@@ -27,9 +28,12 @@ export default function SecretaryCompte() {
       )
       .then(function (response) {
         setListSecretary(response.data);
+        setLoading(false);
       })
       .catch(function (err) {
         console.log(err);
+        setLoading(false);
+        toast.error("Failed to load account secretary");
       });
 
     const getIdSecretary = (id: any) => {
@@ -70,24 +74,105 @@ export default function SecretaryCompte() {
         theme: "colored",
       });
     };
-
+    if (loading) {
+      return (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100vh",
+          }}
+        >
+          <div
+            style={{
+              border: "4px solid rgba(0, 0, 0, 0.1)",
+              width: "36px",
+              height: "36px",
+              borderRadius: "50%",
+              borderLeftColor: "#09f",
+              animation: "spin 1s linear infinite",
+            }}
+          ></div>
+          <p>Loading Account Secretary...</p>
+          <style jsx>{`
+            @keyframes spin {
+              0% {
+                transform: rotate(0deg);
+              }
+              100% {
+                transform: rotate(360deg);
+              }
+            }
+          `}</style>
+        </div>
+      );
+    }
     return (
       <div className="Container">
         <nav className="menu" tabIndex={0}>
           <div className="smartphone-menu-trigger" />
           <header className="avatar">
-            <Image alt="" src={logo} style={{ borderRadius: "50%", width: "150px" }}/>
+            <Image
+              alt=""
+              src={logo}
+              style={{ borderRadius: "50%", width: "150px" }}
+            />
             <h6>Welcome</h6>
             <h5 style={{ color: "white" }}>{loginMedcine}</h5>
           </header>
           <ul>
-    <li tabIndex={0} className="icon-customers">    <MdDashboard /><Link href='/list_appointments_medicine' style={{textDecoration:"none",color:"white"}}><span>ListAppointments</span></Link><ToastContainer /></li>
+            <li tabIndex={0} className="icon-customers">
+              {" "}
+              <MdDashboard />
+              <Link
+                href="/list_appointments_medicine"
+                style={{ textDecoration: "none", color: "white" }}
+              >
+                <span>ListAppointments</span>
+              </Link>
+              <ToastContainer />
+            </li>
 
-    <li tabIndex={0} className="icon-profil">   <FaUserEdit /><Link href='/medicine_dashboard' style={{textDecoration:"none",color:"white"}}><span>MyAccount</span></Link><ToastContainer /></li>
-      <li tabIndex={0} className="icon-users"> <FaNotesMedical /><Link href='/ordonnances_by_medicine' style={{textDecoration:"none",color:"white"}}><span>Ordonnances</span></Link></li>
-      <li tabIndex={0} className="icon-Secrétaire"><FaUserPlus/><Link href='/account_secretary' style={{textDecoration:"none",color:"white"}}><span>Secretary</span></Link><ToastContainer /></li>    
-      <li tabIndex={0} className="icon-settings">  <RiLogoutCircleFill /><span onClick={logOut}>Log out</span><ToastContainer /></li>
-    </ul>
+            <li tabIndex={0} className="icon-profil">
+              {" "}
+              <FaUserEdit />
+              <Link
+                href="/medicine_dashboard"
+                style={{ textDecoration: "none", color: "white" }}
+              >
+                <span>MyAccount</span>
+              </Link>
+              <ToastContainer />
+            </li>
+            <li tabIndex={0} className="icon-users">
+              {" "}
+              <FaNotesMedical />
+              <Link
+                href="/ordonnances_by_medicine"
+                style={{ textDecoration: "none", color: "white" }}
+              >
+                <span>Ordonnances</span>
+              </Link>
+            </li>
+            <li tabIndex={0} className="icon-Secrétaire">
+              <FaUserPlus />
+              <Link
+                href="/account_secretary"
+                style={{ textDecoration: "none", color: "white" }}
+              >
+                <span>Secretary</span>
+              </Link>
+              <ToastContainer />
+            </li>
+            <li tabIndex={0} className="icon-settings">
+              {" "}
+              <RiLogoutCircleFill />
+              <span onClick={logOut}>Log out</span>
+              <ToastContainer />
+            </li>
+          </ul>
         </nav>
         <main>
           <div className="helper">
