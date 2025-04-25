@@ -61,15 +61,25 @@ export default function SecretaryCompte() {
 
     //-----------------------log out-----------------
     const logOut = () => {
-      localStorage.clear();
+      if (typeof window !== "undefined") {
+        // Remove only medicine-related items from localStorage
+        const medicineItems = [
+          "tokenMedicine",
+          "LoginMedicine",
+          "id_medcine",
+        ];
+
+        medicineItems.forEach((item) => localStorage.removeItem(item));
+      }
+
       router.push("/login_medicine");
-      toast.success("Log out SuccessFully", {
-        position: "top-left",
+      toast.success("Logged out successfully", {
+        position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: false,
-        draggable: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
         progress: undefined,
         theme: "colored",
       });
