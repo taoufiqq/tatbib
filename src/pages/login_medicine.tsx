@@ -10,11 +10,10 @@ import Imglogin from "../../public/images/login3.svg";
 
 export default function LoginMedcine() {
   const router = useRouter();
-
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     const medcine = { login, password };
@@ -22,54 +21,30 @@ export default function LoginMedcine() {
     axios
       .post(`https://tatbib-api.onrender.com/medcine/login`, medcine)
       .then((res) => {
-        // console.log(res.data)
         if (!res.data.message) {
           let verifier = res.data.verified;
           let medcine = res.data.medcine;
-          //  localStorage.setItem("ValidateCompte", verifier);
+          
           localStorage.setItem("medcine", JSON.stringify(medcine));
 
-          //  console.log(res.data)
           if (verifier === false) {
-            console.log(
-              "Please Verifier You Accout First by Click on URL In Your Email Box"
-            );
+            toast.warn("Please verify your account first via email");
           } else {
             if (typeof window !== "undefined") {
-              let token = res.data.token;
-              let role = res.data.role;
-              localStorage.setItem("token", token);
-              localStorage.setItem("LoginMedcine", login);
-              localStorage.setItem("role", role);
+              localStorage.setItem("tokenMedicine", res.data.token);
+              localStorage.setItem("LoginMedicine", login);
+              localStorage.setItem("role", "medicine");
               localStorage.setItem("id_medcine", res.data.id);
             }
             router.push("/list_appointments_medicine");
-            toast.success("authenticated SuccessFully", {
-              position: "top-right",
-              autoClose: 5000,
-              hideProgressBar: false,
-              closeOnClick: false,
-              pauseOnHover: false,
-              draggable: false,
-              progress: undefined,
-              theme: "colored",
-            });
+            toast.success("Authenticated successfully");
           }
         } else {
-          // Calling toast method by passing string
-          console.log("Username Or password invalid !!!! Please try again !");
-
-          toast.warn("Login Or password invalid !!!! Please try again !", {
-            position: "top-center",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: false,
-            draggable: false,
-            progress: undefined,
-            theme: "colored",
-          });
+          toast.error("Login or password invalid");
         }
+      })
+      .catch((err) => {
+        toast.error("Login failed. Please try again.");
       });
   };
   return (

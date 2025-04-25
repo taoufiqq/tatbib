@@ -4,7 +4,6 @@ import { NextComponentType, NextPageContext } from "next";
 import LoginMedcine from "@/pages/login_medicine";
 import LoginPatient from "@/pages/login_patient";
 import LoginSecretary from "@/pages/login_secretary";
-import Home from "@/pages";
 
 type AuthProps = {
   isLoggedIn?: boolean;
@@ -12,7 +11,7 @@ type AuthProps = {
 
 const withAuth = <P extends {}>(
   Component: NextComponentType<NextPageContext, AuthProps, P>,
-  options?: { role?: "patient" | "medcine" | "secretary" } // Fixed typo here
+  options?: { role?: "patient" | "medicine" | "secretary" }
 ) => {
   const AuthComponent: NextComponentType<
     NextPageContext,
@@ -28,7 +27,7 @@ const withAuth = <P extends {}>(
       let tokenKey, loginKey;
       
       switch(options?.role) {
-        case "medcine":
+        case "medicine":
           tokenKey = "tokenMedicine";
           loginKey = "LoginMedicine";
           break;
@@ -43,7 +42,9 @@ const withAuth = <P extends {}>(
 
       const token = localStorage.getItem(tokenKey);
       const login = localStorage.getItem(loginKey);
-      return !!token && !!login;
+      const role = localStorage.getItem("role");
+      
+      return !!token && !!login && role === options?.role;
     };
 
     useEffect(() => {
@@ -52,21 +53,21 @@ const withAuth = <P extends {}>(
       
       if (!authStatus) {
         const redirectPath =
-          options?.role === "medcine"
+          options?.role === "medicine"
             ? "/login_medicine"
             : options?.role === "secretary"
             ? "/login_secretary"
             : "/login_patient";
         router.push(redirectPath);
       }
-    }, [router, options?.role]); // Added dependencies
+    }, [router, options?.role]);
 
     if (isAuthenticated === null) {
-      return <div>Loading...</div>; // Add a loading state
+      return <div>Loading...</div>;
     }
 
     if (!isAuthenticated) {
-      return options?.role === "medcine" ? (
+      return options?.role === "medicine" ? (
         <LoginMedcine />
       ) : options?.role === "secretary" ? (
         <LoginSecretary />
