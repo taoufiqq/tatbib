@@ -29,8 +29,8 @@ const DashboardPatient = () => {
     AppointmentWithMedcine[] | null
   >(null);
   const [loading, setLoading] = useState(true);
-  const [login] = useLocalStorage<string | null>("LoginPatient", null); // Removed setLogin since we're not using it
-  console.log("ghhhhhhhhhhhhh", login);
+  // const [login] = useLocalStorage<string | null>("LoginPatient", null); // Removed setLogin since we're not using it
+  // console.log("ghhhhhhhhhhhhh", login);
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -58,7 +58,7 @@ const DashboardPatient = () => {
 
     fetchAppointments();
   }, [router]);
-  // const login = localStorage.getItem("LoginSecretary");
+ const login = localStorage.getItem("LoginSecretary") ;
   const logOut = () => {
     if (typeof window !== "undefined") {
       // Remove only patient-related items from localStorage
