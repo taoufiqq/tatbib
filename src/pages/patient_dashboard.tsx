@@ -29,9 +29,9 @@ const DashboardPatient = () => {
     AppointmentWithMedcine[] | null
   >(null);
   const [loading, setLoading] = useState(true);
-  // const [login] = useLocalStorage<string | null>("LoginPatient", null); // Removed setLogin since we're not using it
-  // console.log("ghhhhhhhhhhhhh", login);
-
+  const [login] = useLocalStorage<string | null>("LoginPatient", null); // Removed setLogin since we're not using it
+  console.log("ghhhhhhhhhhhhh", login);
+  const nameP = localStorage.getItem("LoginPatient");
   useEffect(() => {
     const fetchAppointments = async () => {
       if (typeof window !== "undefined") {
@@ -58,7 +58,7 @@ const DashboardPatient = () => {
 
     fetchAppointments();
   }, [router]);
- const login = localStorage.getItem("LoginSecretary") ;
+
   const logOut = () => {
     if (typeof window !== "undefined") {
       // Remove only patient-related items from localStorage
@@ -103,7 +103,7 @@ const DashboardPatient = () => {
             style={{ borderRadius: "50%" }}
           />
           <h6>Welcome</h6>
-          <h5 style={{ color: "white" }}>{login}</h5>
+          <h5 style={{ color: "white" }}>{nameP}</h5>
         </header>
         <ul>
           <li tabIndex={0} className="icon-customers">
