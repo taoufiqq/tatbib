@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useEffect, ReactElement } from "react";
+import { useEffect, ReactElement, useState } from "react";
 import { NextComponentType, NextPageContext } from "next";
 import LoginMedcine from "@/pages/login_medicine";
 import LoginPatient from "@/pages/login_patient";
@@ -12,7 +12,7 @@ type AuthProps = {
 
 const withAuth = <P extends {}>(
   Component: NextComponentType<NextPageContext, AuthProps, P>,
-  options?: { role?: "patient" | "medcine" | "secretary" }
+  options?: { role?: "patient" | "medicine" | "secretary" } // Fixed typo here
 ) => {
   const AuthComponent: NextComponentType<
     NextPageContext,
@@ -20,39 +20,53 @@ const withAuth = <P extends {}>(
     P & AuthProps
   > = (props: P & AuthProps): ReactElement | null => {
     const router = useRouter();
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
     const checkAuth = () => {
       if (typeof window === "undefined") return false;
 
-      if (options?.role === "medcine") {
-        const token = localStorage.getItem("tokenMedicine");
-        const login = localStorage.getItem("LoginMedicine");
-        return !!token && !!login;
-      } else if (options?.role === "secretary") {
-        const token = localStorage.getItem("tokenSecretary");
-        const login = localStorage.getItem("LoginSecretary");
-        return !!token && !!login;
-      } else {
-        const token = localStorage.getItem("tokenPatient");
-        const login = localStorage.getItem("LoginPatient");
-        return !!token && !!login;
+      let tokenKey, loginKey;
+      
+      switch(options?.role) {
+        case "medicine":
+          tokenKey = "tokenMedicine";
+          loginKey = "LoginMedicine";
+          break;
+        case "secretary":
+          tokenKey = "tokenSecretary";
+          loginKey = "LoginSecretary";
+          break;
+        default: // patient
+          tokenKey = "tokenPatient";
+          loginKey = "LoginPatient";
       }
+
+      const token = localStorage.getItem(tokenKey);
+      const login = localStorage.getItem(loginKey);
+      return !!token && !!login;
     };
 
     useEffect(() => {
-      if (!checkAuth()) {
+      const authStatus = checkAuth();
+      setIsAuthenticated(authStatus);
+      
+      if (!authStatus) {
         const redirectPath =
-          options?.role === "medcine"
+          options?.role === "medicine"
             ? "/login_medicine"
             : options?.role === "secretary"
             ? "/login_secretary"
             : "/login_patient";
         router.push(redirectPath);
       }
-    }, []);
+    }, [router, options?.role]); // Added dependencies
 
-    if (!checkAuth()) {
-      return options?.role === "medcine" ? (
+    if (isAuthenticated === null) {
+      return <div>Loading...</div>; // Add a loading state
+    }
+
+    if (!isAuthenticated) {
+      return options?.role === "medicine" ? (
         <LoginMedcine />
       ) : options?.role === "secretary" ? (
         <LoginSecretary />
@@ -64,7 +78,6 @@ const withAuth = <P extends {}>(
     return <Component {...props} />;
   };
 
-  // Type-safe handling of getInitialProps
   if (
     "getInitialProps" in Component &&
     typeof Component.getInitialProps === "function"
