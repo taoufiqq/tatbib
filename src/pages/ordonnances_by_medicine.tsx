@@ -6,7 +6,6 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Image from "next/image";
 import doctor from "../../public/images/doctor.png";
-import logo from "../../public/images/logo.png";
 import withAuth from "@/components/withPrivateRoute";
 import { MdDashboard } from "react-icons/md";
 import { FaNotesMedical, FaUserEdit, FaUserPlus } from "react-icons/fa";
@@ -47,12 +46,17 @@ const OrdonnancesByMedicine = () => {
   const [selectedOrdonnance, setSelectedOrdonnance] =
     useState<Ordonnance | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isClient) return;
+
     const fetchOrdonnances = async () => {
       try {
-        if (typeof window === "undefined") return;
-
         const doctorId = localStorage.getItem("id_medcine");
         if (!doctorId) {
           throw new Error("Doctor authentication required");
@@ -85,7 +89,7 @@ const OrdonnancesByMedicine = () => {
     };
 
     fetchOrdonnances();
-  }, []);
+  }, [isClient]);
 
   const handleViewDetails = (ordonnanceId: string) => {
     const ordonnance = state.ordonnances.find((o) => o._id === ordonnanceId);
@@ -112,27 +116,39 @@ const OrdonnancesByMedicine = () => {
 
   const logOut = () => {
     if (typeof window !== "undefined") {
-      // Remove only medicine-related items from localStorage
       const medicineItems = ["tokenMedicine", "LoginMedicine", "id_medcine"];
 
       medicineItems.forEach((item) => localStorage.removeItem(item));
     }
 
     router.push("/login_medicine");
-    toast.success("Logged out successfully", {
-      position: "top-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
+    toast.success("Logged out successfully");
   };
-  const login = localStorage.getItem("LoginMedcine");
-  if (typeof window === "undefined") {
-    return null;
+
+  if (!isClient) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+        }}
+      >
+        <div
+          style={{
+            border: "4px solid rgba(0, 0, 0, 0.1)",
+            width: "36px",
+            height: "36px",
+            borderRadius: "50%",
+            borderLeftColor: "#09f",
+            animation: "spin 1s linear infinite",
+          }}
+        ></div>
+        <p>Loading...</p>
+      </div>
+    );
   }
 
   if (state.loading) {
@@ -157,16 +173,6 @@ const OrdonnancesByMedicine = () => {
           }}
         ></div>
         <p>Loading ordonnances...</p>
-        <style jsx>{`
-          @keyframes spin {
-            0% {
-              transform: rotate(0deg);
-            }
-            100% {
-              transform: rotate(360deg);
-            }
-          }
-        `}</style>
       </div>
     );
   }
@@ -215,17 +221,22 @@ const OrdonnancesByMedicine = () => {
     );
   }
 
+  const login = isClient
+    ? localStorage.getItem("LoginMedcine") || "Doctor"
+    : "Doctor";
+
   return (
     <div className="Container">
       <nav className="menu" tabIndex={0}>
         <div className="smartphone-menu-trigger" />
         <header className="avatar">
           <Image
-            alt=""
-            src={logo}
+            alt="Doctor profile"
+            src={doctor}
             width={150}
             height={150}
-            style={{ borderRadius: "50%", width: "150px" }}
+            style={{ borderRadius: "50%" }}
+            priority
           />
           <h6>Welcome</h6>
           <h5 style={{ color: "white" }}>{login}</h5>
