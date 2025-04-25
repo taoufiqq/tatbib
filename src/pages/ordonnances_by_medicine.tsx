@@ -121,6 +121,7 @@ const OrdonnancesByMedicine = () => {
         "LoginMedicine",
         "id_medcine",
         "role",
+        "login_medcine",
       ];
 
       medicineItems.forEach((item) => localStorage.removeItem(item));

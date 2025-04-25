@@ -171,22 +171,28 @@ const DashboardSecretary: NextPage = () => {
                             handleAction(item._id, "/alert_appointment")
                           }
                           className="btn-action"
+                          title="Alert"
+                          aria-label="Alert"
                         >
-                          Alert
+                          <i className="fas fa-bell" />
                         </button>
                         <button
                           onClick={() =>
                             handleAction(item._id, "/confirm_appointment")
                           }
                           className="btn-action"
+                          title="Confirm"
+                          aria-label="Confirm"
                         >
-                          Confirm
+                          <i className="fas fa-check-circle" />
                         </button>
                         <button
                           onClick={() => deleteAppointment(item._id)}
                           className="btn-action delete"
+                          title="Delete"
+                          aria-label="Delete"
                         >
-                          Delete
+                          <i className="fas fa-trash-alt" />
                         </button>
                       </td>
                     </tr>

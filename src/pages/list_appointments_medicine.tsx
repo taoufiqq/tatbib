@@ -15,7 +15,9 @@ import { RiLogoutCircleFill } from "react-icons/ri";
 
 const ListAppointments = () => {
   const router = useRouter();
-  const [listAppointment, setListAppointment] = useState<Appointment[] | null>(null);
+  const [listAppointment, setListAppointment] = useState<Appointment[] | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -37,26 +39,34 @@ const ListAppointments = () => {
 
   if (loading) {
     return (
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh'
-      }}>
-        <div style={{
-          border: '4px solid rgba(0, 0, 0, 0.1)',
-          width: '36px',
-          height: '36px',
-          borderRadius: '50%',
-          borderLeftColor: '#09f',
-          animation: 'spin 1s linear infinite'
-        }}></div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+        }}
+      >
+        <div
+          style={{
+            border: "4px solid rgba(0, 0, 0, 0.1)",
+            width: "36px",
+            height: "36px",
+            borderRadius: "50%",
+            borderLeftColor: "#09f",
+            animation: "spin 1s linear infinite",
+          }}
+        ></div>
         <p>Loading appointments...</p>
         <style jsx>{`
           @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+              transform: rotate(0deg);
+            }
+            100% {
+              transform: rotate(360deg);
+            }
           }
         `}</style>
       </div>
@@ -81,7 +91,8 @@ const ListAppointments = () => {
           "tokenMedicine",
           "LoginMedicine",
           "id_medcine",
-          "role"
+          "role",
+          "login_medcine",
         ];
 
         medicineItems.forEach((item) => localStorage.removeItem(item));
@@ -105,38 +116,56 @@ const ListAppointments = () => {
         <nav className="menu" tabIndex={0}>
           <div className="smartphone-menu-trigger" />
           <header className="avatar">
-            <Image alt="" src={logo} width={150} height={150} style={{ borderRadius: "50%", width: "150px" }} />
+            <Image
+              alt=""
+              src={logo}
+              width={150}
+              height={150}
+              style={{ borderRadius: "50%", width: "150px" }}
+            />
             <h6>Welcome</h6>
             <h5 style={{ color: "white" }}>{login}</h5>
           </header>
           <ul>
             <li tabIndex={0} className="icon-customers">
               <MdDashboard />
-              <Link href='/list_appointments_medicine' style={{textDecoration:"none",color:"white"}}>
+              <Link
+                href="/list_appointments_medicine"
+                style={{ textDecoration: "none", color: "white" }}
+              >
                 <span>ListAppointments</span>
               </Link>
               <ToastContainer />
             </li>
             <li tabIndex={0} className="icon-profil">
               <FaUserEdit />
-              <Link href='/medicine_dashboard' style={{textDecoration:"none",color:"white"}}>
+              <Link
+                href="/medicine_dashboard"
+                style={{ textDecoration: "none", color: "white" }}
+              >
                 <span>MyAccount</span>
               </Link>
               <ToastContainer />
             </li>
             <li tabIndex={0} className="icon-users">
               <FaNotesMedical />
-              <Link href='/ordonnances_by_medicine' style={{textDecoration:"none",color:"white"}}>
+              <Link
+                href="/ordonnances_by_medicine"
+                style={{ textDecoration: "none", color: "white" }}
+              >
                 <span>Ordonnances</span>
               </Link>
             </li>
             <li tabIndex={0} className="icon-Secrétaire">
-              <FaUserPlus/>
-              <Link href='/account_secretary' style={{textDecoration:"none",color:"white"}}>
+              <FaUserPlus />
+              <Link
+                href="/account_secretary"
+                style={{ textDecoration: "none", color: "white" }}
+              >
                 <span>Secretary</span>
               </Link>
               <ToastContainer />
-            </li>    
+            </li>
             <li tabIndex={0} className="icon-settings">
               <RiLogoutCircleFill />
               <span onClick={logOut}>Log out</span>
@@ -182,9 +211,12 @@ const ListAppointments = () => {
                         <td>{item.patient.telephone}</td>
                         <td>{moment(item.dateTime).format(`MMMM DD YYYY`)}</td>
                         <td>{moment(item.dateTime).format(`HH:MM`)}</td>
-                        <td style={{
-                          color: item.status !== "Unconfirmed" ? "color" : "red",
-                        }}>
+                        <td
+                          style={{
+                            color:
+                              item.status !== "Unconfirmed" ? "color" : "red",
+                          }}
+                        >
                           {item.status}
                         </td>
                         <td>
@@ -198,10 +230,15 @@ const ListAppointments = () => {
                             title="Writing a Ordonnance"
                             data-toggle="tooltip"
                             style={{
-                              visibility: item.status !== "Unconfirmed" ? "visible" : "hidden",
+                              visibility:
+                                item.status !== "Unconfirmed"
+                                  ? "visible"
+                                  : "hidden",
                             }}
                           >
-                            <i className="material-icons border_color">&#xe22b;</i>
+                            <i className="material-icons border_color">
+                              &#xe22b;
+                            </i>
                           </Link>
                         </td>
                       </tr>
@@ -210,7 +247,10 @@ const ListAppointments = () => {
                 ) : (
                   <tbody>
                     <tr>
-                      <td colSpan={8} style={{ textAlign: 'center', padding: '20px' }}>
+                      <td
+                        colSpan={8}
+                        style={{ textAlign: "center", padding: "20px" }}
+                      >
                         No appointments found
                       </td>
                     </tr>
@@ -227,4 +267,4 @@ const ListAppointments = () => {
   return null;
 };
 
-export default withAuth(ListAppointments);
+export default withAuth(ListAppointments, { role: "medcine" });
