@@ -183,7 +183,7 @@ const ListOrdonnances = () => {
                               readOnly
                               style={{
                                 height: "100px",
-                                width: "450px",
+                                width: "100%",
                                 border: "none",
                               }}
                               value={item.medicamment}
