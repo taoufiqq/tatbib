@@ -60,12 +60,27 @@ const DashboardPatient = () => {
 
   const logOut = () => {
     if (typeof window !== "undefined") {
-      localStorage.clear();
+      // Remove only patient-related items from localStorage
+      const patientItems = [
+        "tokenPatient",
+        "LoginPatient",
+        "id_patient",
+        "id_appointment",
+        // Add any other patient-specific items here
+      ];
+
+      patientItems.forEach((item) => localStorage.removeItem(item));
     }
+
     router.push("/login_patient");
     toast.success("Logged out successfully", {
       position: "top-left",
       autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
       theme: "colored",
     });
   };

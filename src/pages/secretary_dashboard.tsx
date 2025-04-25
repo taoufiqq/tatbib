@@ -72,15 +72,26 @@ const DashboardSecretary = () => {
     };
 
     const logOut = () => {
-      localStorage.clear();
+      // Remove only secretary-related items from localStorage
+      const itemsToRemove = [
+        'tokenSecretary',
+        'LoginSecretary',
+        'id_secretary',
+        // Add any other secretary-specific items here
+      ];
+    
+      itemsToRemove.forEach(item => {
+        localStorage.removeItem(item);
+      });
+    
       router.push("/login_secretary");
-      toast.success("Log out SuccessFully", {
+      toast.success("Logged out successfully", {
         position: "top-left",
         autoClose: 5000,
         hideProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: false,
-        draggable: false,
+        closeOnClick: true,  // Changed to true for better UX
+        pauseOnHover: true,  // Changed to true for better UX
+        draggable: true,     // Changed to true for better UX
         progress: undefined,
         theme: "colored",
       });
