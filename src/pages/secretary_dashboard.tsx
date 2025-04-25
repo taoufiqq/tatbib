@@ -73,6 +73,7 @@ const DashboardSecretary: NextPage = () => {
       "id_secretary",
       "roleSecretary",
       "login_medcine",
+      "status",
     ].forEach((item) => {
       localStorage.removeItem(item);
     });
