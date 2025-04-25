@@ -98,21 +98,21 @@ const OrdonnancesByMedicine = () => {
     try {
       const date = new Date(dateString);
       return isNaN(date.getTime()) 
-        ? 'Date invalide' 
-        : date.toLocaleDateString('fr-FR', {
+        ? 'Invalid date' 
+        : date.toLocaleDateString('en-US', {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric'
           });
     } catch {
-      return 'Date invalide';
+      return 'Invalid date';
     }
   };
 
   const logOut = () => {
     localStorage.clear();
     router.push('/login_medicine');
-    toast.success('Déconnexion réussie');
+    toast.success('Logged out successfully');
   };
 
   if (typeof window === 'undefined') {
@@ -136,7 +136,7 @@ const OrdonnancesByMedicine = () => {
           borderLeftColor: '#09f',
           animation: 'spin 1s linear infinite'
         }}></div>
-        <p>Chargement des ordonnances...</p>
+        <p>Loading ordonnances...</p>
       </div>
     );
   }
@@ -156,7 +156,7 @@ const OrdonnancesByMedicine = () => {
             cursor: 'pointer'
           }}
         >
-          Réessayer
+          Retry
         </button>
       </div>
     );
@@ -165,7 +165,7 @@ const OrdonnancesByMedicine = () => {
   if (state.ordonnances.length === 0) {
     return (
       <div style={{ textAlign: 'center', padding: '2rem' }}>
-        <p>Aucune ordonnance trouvée</p>
+        <p>No ordonnances found</p>
         <Link href="/create-ordonnance">
           <button style={{
             padding: '0.75rem 1.5rem',
@@ -176,7 +176,7 @@ const OrdonnancesByMedicine = () => {
             marginTop: '1rem',
             cursor: 'pointer'
           }}>
-            Créer une nouvelle ordonnance
+            Create New Ordonnance
           </button>
         </Link>
       </div>
@@ -196,9 +196,9 @@ const OrdonnancesByMedicine = () => {
             style={{ borderRadius: '50%' }}
             priority
           />
-          <h6>Bienvenue</h6>
+          <h6>Welcome</h6>
           <h5 style={{ color: 'white' }}>
-            {localStorage.getItem("LoginMedcine") || "Docteur"}
+            {localStorage.getItem("LoginMedcine") || "Doctor"}
           </h5>
         </header>
 
@@ -207,7 +207,7 @@ const OrdonnancesByMedicine = () => {
             <MdDashboard />
             <Link href="/list_appointments_medicine" passHref>
               <span style={{ textDecoration: 'none', color: 'white' }}>
-                Rendez-vous
+                Appointments
               </span>
             </Link>
           </li>
@@ -215,7 +215,7 @@ const OrdonnancesByMedicine = () => {
             <FaUserEdit />
             <Link href="/medicine_dashboard" passHref>
               <span style={{ textDecoration: 'none', color: 'white' }}>
-                Profil
+                Profile
               </span>
             </Link>
           </li>
@@ -231,7 +231,7 @@ const OrdonnancesByMedicine = () => {
             <FaUserPlus />
             <Link href="/account_secretary" passHref>
               <span style={{ textDecoration: 'none', color: 'white' }}>
-                Secrétaire
+                Secretary
               </span>
             </Link>
           </li>
@@ -241,7 +241,7 @@ const OrdonnancesByMedicine = () => {
               onClick={logOut} 
               style={{ cursor: 'pointer' }}
             >
-              Déconnexion
+              Logout
             </span>
           </li>
         </ul>
@@ -249,8 +249,8 @@ const OrdonnancesByMedicine = () => {
 
       <main>
         <div className="helper noPrint">
-          <h1>Gestion des ordonnances</h1>
-          <span>Visualiser et gérer les prescriptions des patients</span>
+          <h1>Ordonnances Management</h1>
+          <span>View and manage patient prescriptions</span>
         </div>
 
         <div className="table-container">
@@ -259,7 +259,7 @@ const OrdonnancesByMedicine = () => {
               <tr>
                 <th>Patient</th>
                 <th>Date</th>
-                <th>Médicaments</th>
+                <th>Medications</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -267,7 +267,7 @@ const OrdonnancesByMedicine = () => {
               {state.ordonnances.map((ordonnance) => (
                 <tr key={ordonnance._id}>
                   <td>
-                    {ordonnance.patient?.firstName || 'Inconnu'} {ordonnance.patient?.lastName || ''}
+                    {ordonnance.patient?.firstName || 'Unknown'} {ordonnance.patient?.lastName || ''}
                   </td>
                   <td>
                     {formatDate(ordonnance.date)}
@@ -280,7 +280,7 @@ const OrdonnancesByMedicine = () => {
                         </li>
                       ))}
                       {ordonnance.medications?.length > 2 && (
-                        <li>+ {ordonnance.medications.length - 2} autres médicaments</li>
+                        <li>+ {ordonnance.medications.length - 2} more medications</li>
                       )}
                     </ul>
                   </td>
@@ -289,7 +289,7 @@ const OrdonnancesByMedicine = () => {
                       onClick={() => handleViewDetails(ordonnance._id)}
                       className="view-button"
                     >
-                      Voir détails
+                      View Details
                     </button>
                   </td>
                 </tr>
@@ -299,7 +299,7 @@ const OrdonnancesByMedicine = () => {
         </div>
       </main>
 
-      {/* Modale de détails */}
+      {/* Details Modal */}
       {isDetailsModalOpen && selectedOrdonnance && (
         <div style={{
           position: 'fixed',
@@ -328,7 +328,7 @@ const OrdonnancesByMedicine = () => {
               alignItems: 'center',
               marginBottom: '16px'
             }}>
-              <h2 style={{ color: '#2b6cb0', margin: 0 }}>Détails de l'ordonnance</h2>
+              <h2 style={{ color: '#2b6cb0', margin: 0 }}>Ordonnance Details</h2>
               <button 
                 onClick={() => setIsDetailsModalOpen(false)}
                 style={{
@@ -344,17 +344,17 @@ const OrdonnancesByMedicine = () => {
             </div>
             
             <div style={{ marginBottom: '16px' }}>
-              <h3 style={{ color: '#4a5568', marginBottom: '8px' }}>Patient :</h3>
+              <h3 style={{ color: '#4a5568', marginBottom: '8px' }}>Patient:</h3>
               <p>{selectedOrdonnance.patient?.firstName} {selectedOrdonnance.patient?.lastName}</p>
             </div>
             
             <div style={{ marginBottom: '16px' }}>
-              <h3 style={{ color: '#4a5568', marginBottom: '8px' }}>Date :</h3>
+              <h3 style={{ color: '#4a5568', marginBottom: '8px' }}>Date:</h3>
               <p>{formatDate(selectedOrdonnance.date)}</p>
             </div>
             
             <div style={{ marginBottom: '16px' }}>
-              <h3 style={{ color: '#4a5568', marginBottom: '8px' }}>Médicaments :</h3>
+              <h3 style={{ color: '#4a5568', marginBottom: '8px' }}>Medications:</h3>
               <ul style={{ listStyleType: 'none', paddingLeft: 0 }}>
                 {selectedOrdonnance.medications?.map((med, idx) => (
                   <li key={idx} style={{ 
@@ -364,9 +364,9 @@ const OrdonnancesByMedicine = () => {
                     marginBottom: '8px'
                   }}>
                     <strong style={{ color: '#2b6cb0' }}>{med.name}</strong>
-                    <div>Dosage : {med.dosage}</div>
-                    <div>Durée : {med.duration}</div>
-                    {med.instructions && <div>Instructions : {med.instructions}</div>}
+                    <div>Dosage: {med.dosage}</div>
+                    <div>Duration: {med.duration}</div>
+                    {med.instructions && <div>Instructions: {med.instructions}</div>}
                   </li>
                 ))}
               </ul>
@@ -384,7 +384,7 @@ const OrdonnancesByMedicine = () => {
                 marginTop: '16px'
               }}
             >
-              Fermer
+              Close
             </button>
           </div>
         </div>
