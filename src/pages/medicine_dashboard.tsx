@@ -98,10 +98,28 @@ const DashboardMedcine = () => {
     return null; // Skip rendering during SSR
   }
 
-  if (loading) {
-    return <div className="loading">Loading doctor data...</div>;
-  }
 
+  if (loading) {
+    return (
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh'
+      }}>
+        <div style={{
+          border: '4px solid rgba(0, 0, 0, 0.1)',
+          width: '36px',
+          height: '36px',
+          borderRadius: '50%',
+          borderLeftColor: '#09f',
+          animation: 'spin 1s linear infinite'
+        }}></div>
+        <p>Loading doctor data...</p>
+      </div>
+    );
+  }
   if (error) {
     return <div className="error">{error}</div>;
   }
