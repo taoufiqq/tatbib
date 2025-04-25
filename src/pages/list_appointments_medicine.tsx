@@ -267,4 +267,4 @@ const ListAppointments = () => {
   return null;
 };
 
-export default withAuth(ListAppointments, { role: "medicine" });
+export default withAuth(ListAppointments, { role: "medcine" });

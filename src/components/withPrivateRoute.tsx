@@ -12,7 +12,7 @@ type AuthProps = {
 
 const withAuth = <P extends {}>(
   Component: NextComponentType<NextPageContext, AuthProps, P>,
-  options?: { role?: "patient" | "medicine" | "secretary" } // Fixed typo here
+  options?: { role?: "patient" | "medcine" | "secretary" } // Fixed typo here
 ) => {
   const AuthComponent: NextComponentType<
     NextPageContext,
@@ -28,7 +28,7 @@ const withAuth = <P extends {}>(
       let tokenKey, loginKey;
       
       switch(options?.role) {
-        case "medicine":
+        case "medcine":
           tokenKey = "tokenMedicine";
           loginKey = "LoginMedicine";
           break;
@@ -52,7 +52,7 @@ const withAuth = <P extends {}>(
       
       if (!authStatus) {
         const redirectPath =
-          options?.role === "medicine"
+          options?.role === "medcine"
             ? "/login_medicine"
             : options?.role === "secretary"
             ? "/login_secretary"
@@ -66,7 +66,7 @@ const withAuth = <P extends {}>(
     }
 
     if (!isAuthenticated) {
-      return options?.role === "medicine" ? (
+      return options?.role === "medcine" ? (
         <LoginMedcine />
       ) : options?.role === "secretary" ? (
         <LoginSecretary />
