@@ -12,24 +12,35 @@ import withAuth from "@/components/withPrivateRoute";
 import { MdDashboard } from "react-icons/md";
 import { FaNotesMedical, FaUserEdit } from "react-icons/fa";
 import { RiLogoutCircleFill } from "react-icons/ri";
-const ListOrdonnances = () => {
-  const router = useRouter();
 
-  const [listOrdonnance, setListOrdonnance] = useState<Ordonnance[] | null>(
-    null
-  );
+const ListOrdonnances = () => {
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [itemsPerPage] = useState<number>(3); // Nombre d'items par page
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const [listOrdonnance, setListOrdonnance] = useState<Ordonnance[] | null>(null);
+
+  // Calcul des éléments à afficher
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = listOrdonnance?.slice(indexOfFirstItem, indexOfLastItem) || [];
+
+  // Changement de page
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   useEffect(() => {
     const id = localStorage.getItem("id_patient");
     axios
-      .get(
-        `https://tatbib-api.onrender.com/medcine/getOrdonnanceByPatient/${id}`
-      )
+      .get(`https://tatbib-api.onrender.com/medcine/getOrdonnanceByPatient/${id}`)
       .then(function (response) {
         setListOrdonnance(response.data);
+        setLoading(false);
       })
       .catch(function (err) {
         console.log(err);
+        setError("Failed to load ordonnances");
+        setLoading(false);
       });
   }, []);
 
@@ -62,7 +73,7 @@ const ListOrdonnances = () => {
           </header>
           <ul>
             <li tabIndex={0} className="icon-customers">
-            <MdDashboard />
+              <MdDashboard />
               <Link
                 href="/patient_dashboard"
                 style={{ textDecoration: "none", color: "white" }}
@@ -71,13 +82,13 @@ const ListOrdonnances = () => {
               </Link>
             </li>
             <li tabIndex={0} className="icon-users">
-            <FaNotesMedical />
+              <FaNotesMedical />
               <Link href="" style={{ textDecoration: "none", color: "white" }}>
                 <span>Ordonnances</span>
               </Link>
             </li>
             <li tabIndex={0} className="icon-profil">
-            <FaUserEdit />
+              <FaUserEdit />
               <Link
                 href="/account_patient"
                 style={{ textDecoration: "none", color: "white" }}
@@ -86,7 +97,7 @@ const ListOrdonnances = () => {
               </Link>
             </li>
             <li tabIndex={0} className="icon-settings">
-            <RiLogoutCircleFill />
+              <RiLogoutCircleFill />
               <span onClick={logOut}>Log out</span>
               <ToastContainer />
             </li>
@@ -96,7 +107,6 @@ const ListOrdonnances = () => {
           <div className="helper noPrint">
             Ordonnances<span> Ordonnances | List</span>
           </div>
-          {/* <p className="listRDV">Appointemnt list</p> */}
           <div className="table-responsive">
             <div className="table-wrapper">
               <div className="table-title noPrint">
@@ -106,62 +116,120 @@ const ListOrdonnances = () => {
                       Ordonnances <b>list</b>
                     </h2>
                   </div>
-                  {/* <div className="col-sm-7">
-          <a href="#" className="btn btn-secondary"><i className="material-icons"></i> <span>Add New User</span></a>
-          <a href="#" className="btn btn-secondary"><i className="material-icons"></i> <span>Export to Excel</span></a>						
-        </div> */}
                 </div>
               </div>
-              {listOrdonnance &&
-                listOrdonnance.map((item: any, index: any) => (
-                  <div
-                    className="blog-slider mt-5 "
-                    style={{ height: "500px" }}
-                    key={index}
-                  >
-                    <div className="blog-slider__wrp swiper-wrapper ">
-                      <div className="blog-slider__item swiper-slide">
-                        <div className="blog-slider__img">
-                          <Image src={logo} alt="" />
-                        </div>
-                        <div className="blog-slider__content">
-                          <div className="blog-slider__title">
-                            <h4>
-                              <span style={{ color: "red" }}>Dr: </span>
-                              {item.medcine.fullName}
-                            </h4>
-                          </div>
-                          <div className="blog-slider__code">
-                            <h4>{item.medcine.speciality}</h4>
-                          </div>
-                          <span className="blog-slider__code">
-                            <span style={{ color: "red" }}>Mr/Mme: </span>
-                            {item.patient.firstName} {item.patient.lastName}
-                          </span>
-                          {/* <div className="blog-slider__code"><span style={{color:'red'}}>date: </span> {item.dateTime}</div> */}
 
-                          <div className="blog-slider__code">
-                            <span style={{ color: "red" }}>medicamment: </span>
-                            <textarea
-                              style={{
-                                height: "100px",
-                                width: "450px",
-                                border: "none",
-                              }}
-                            >
-                              {item.medicamment}
-                            </textarea>
-                          </div>
-                          <Link href="" className="blog-slider__button noPrint">
-                            print
-                          </Link>
+              {loading && (
+                <div className="text-center py-5">
+                  <p>Loading ordonnances...</p>
+                </div>
+              )}
+
+              {error && (
+                <div className="alert alert-danger text-center">
+                  {error}
+                </div>
+              )}
+
+              {!loading && !error && currentItems.map((item: any, index: any) => (
+                <div
+                  className="blog-slider mt-5"
+                  style={{ height: "500px" }}
+                  key={index}
+                >
+                  <div className="blog-slider__wrp swiper-wrapper">
+                    <div className="blog-slider__item swiper-slide">
+                      <div className="blog-slider__img">
+                        <Image src={logo} alt="" />
+                      </div>
+                      <div className="blog-slider__content">
+                        <div className="blog-slider__title">
+                          <h4>
+                            <span style={{ color: "red" }}>Dr: </span>
+                            {item.medcine.fullName}
+                          </h4>
                         </div>
+                        <div className="blog-slider__code">
+                          <h4>{item.medcine.speciality}</h4>
+                        </div>
+                        <span className="blog-slider__code">
+                          <span style={{ color: "red" }}>Mr/Mme: </span>
+                          {item.patient.firstName} {item.patient.lastName}
+                        </span>
+                        <div className="blog-slider__code">
+                          <span style={{ color: "red" }}>medicamment: </span>
+                          <textarea
+                            readOnly
+                            style={{
+                              height: "100px",
+                              width: "450px",
+                              border: "none",
+                            }}
+                            value={item.medicamment}
+                          />
+                        </div>
+                        <Link href="" className="blog-slider__button noPrint">
+                          print
+                        </Link>
                       </div>
                     </div>
-
-                    {/* <div className="blog-slider__pagination"></div> */}
                   </div>
-                ))}
+                </div>
+              ))}
+
+              {/* Pagination */}
+              {listOrdonnance && listOrdonnance.length > itemsPerPage && (
+                <div className="pagination noPrint" style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  margin: '20px 0',
+                  gap: '10px'
+                }}>
+                  <button
+                    onClick={() => paginate(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    style={{
+                      padding: '5px 10px',
+                      border: '1px solid #ddd',
+                      backgroundColor: 'white',
+                      cursor: 'pointer',
+                      borderRadius: '4px'
+                    }}
+                  >
+                    Précédent
+                  </button>
+
+                  {Array.from({ length: Math.ceil(listOrdonnance.length / itemsPerPage) }).map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => paginate(index + 1)}
+                      style={{
+                        padding: '5px 10px',
+                        border: currentPage === index + 1 ? '2px solid red' : '1px solid #ddd',
+                        backgroundColor: currentPage === index + 1 ? '#f8f8f8' : 'white',
+                        cursor: 'pointer',
+                        borderRadius: '4px'
+                      }}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+
+                  <button
+                    onClick={() => paginate(currentPage + 1)}
+                    disabled={currentPage === Math.ceil(listOrdonnance.length / itemsPerPage)}
+                    style={{
+                      padding: '5px 10px',
+                      border: '1px solid #ddd',
+                      backgroundColor: 'white',
+                      cursor: 'pointer',
+                      borderRadius: '4px'
+                    }}
+                  >
+                    Suivant
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </main>
