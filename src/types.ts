@@ -43,8 +43,6 @@ export interface Appointment {
 }
 // In your component file
 export interface Ordonnance {
-  medcine: any;
-  medicamment: string;
   _id: string;
   patient: {
     _id: string;
