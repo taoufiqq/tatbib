@@ -43,7 +43,6 @@ const OrdonnancesByMedicine = () => {
     loading: true,
     error: null,
   });
-
   const [selectedOrdonnance, setSelectedOrdonnance] =
     useState<Ordonnance | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
@@ -89,13 +88,13 @@ const OrdonnancesByMedicine = () => {
     fetchOrdonnances();
   }, []);
 
-  const handleViewDetails = (ordonnanceId: string) => {
-    const ordonnance = state.ordonnances.find((o) => o._id === ordonnanceId);
-    if (ordonnance) {
-      setSelectedOrdonnance(ordonnance);
-      setIsDetailsModalOpen(true);
-    }
+  // Add this function to handle viewing details
+  const handleViewDetails = (ordonnance: Ordonnance) => {
+    setSelectedOrdonnance(ordonnance);
+    setIsDetailsModalOpen(true);
   };
+
+  // Update your View Details button in the table:
 
   const formatDate = (dateString: string) => {
     try {
@@ -262,7 +261,7 @@ const OrdonnancesByMedicine = () => {
                   </td>
                   <td>
                     <button
-                      onClick={() => handleViewDetails(ordonnance._id)}
+                      onClick={() => handleViewDetails(ordonnance)}
                       className="view-button"
                     >
                       View Details
@@ -277,69 +276,125 @@ const OrdonnancesByMedicine = () => {
 
       {/* Details Modal */}
       {isDetailsModalOpen && selectedOrdonnance && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h2>Ordonnance Details</h2>
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              padding: "24px",
+              borderRadius: "8px",
+              maxWidth: "600px",
+              width: "90%",
+              maxHeight: "80vh",
+              overflowY: "auto",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "16px",
+              }}
+            >
+              <h2 style={{ color: "#2b6cb0", margin: 0 }}>
+                Ordonnance Details
+              </h2>
               <button
                 onClick={() => setIsDetailsModalOpen(false)}
-                className="close-button"
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: "1.5rem",
+                  cursor: "pointer",
+                  color: "#718096",
+                }}
               >
                 &times;
               </button>
             </div>
 
-            <div className="modal-body">
-              <div className="detail-section">
-                <h3>Patient Information</h3>
-                <p>
-                  <strong>Name:</strong> {selectedOrdonnance.patient?.firstName}{" "}
-                  {selectedOrdonnance.patient?.lastName}
-                </p>
-              </div>
-
-              <div className="detail-section">
-                <h3>Date</h3>
-                <p>{formatDate(selectedOrdonnance.date)}</p>
-              </div>
-
-              <div className="detail-section">
-                <h3>Medications</h3>
-                <ul className="medication-details-list">
-                  {selectedOrdonnance.medications?.map((med, idx) => (
-                    <li key={idx} className="medication-item">
-                      <div className="medication-header">
-                        <strong>{med.name}</strong>
-                      </div>
-                      <div>
-                        <strong>Dosage:</strong> {med.dosage}
-                      </div>
-                      <div>
-                        <strong>Duration:</strong> {med.duration}
-                      </div>
-                      {med.instructions && (
-                        <div>
-                          <strong>Instructions:</strong> {med.instructions}
-                        </div>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+            <div style={{ marginBottom: "16px" }}>
+              <h3 style={{ color: "#4a5568", marginBottom: "8px" }}>
+                Patient:
+              </h3>
+              <p>
+                {selectedOrdonnance.patient?.firstName}{" "}
+                {selectedOrdonnance.patient?.lastName}
+              </p>
             </div>
 
-            <div className="modal-footer">
-              <button
-                onClick={() => setIsDetailsModalOpen(false)}
-                className="close-modal-button"
-              >
-                Close
-              </button>
+            <div style={{ marginBottom: "16px" }}>
+              <h3 style={{ color: "#4a5568", marginBottom: "8px" }}>Date:</h3>
+              <p>
+                {selectedOrdonnance.date
+                  ? new Date(selectedOrdonnance.date).toLocaleDateString(
+                      "fr-FR",
+                      {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                      }
+                    )
+                  : "N/A"}
+              </p>
             </div>
+
+            <div style={{ marginBottom: "16px" }}>
+              <h3 style={{ color: "#4a5568", marginBottom: "8px" }}>
+                Medications:
+              </h3>
+              <ul style={{ listStyleType: "none", paddingLeft: 0 }}>
+                {selectedOrdonnance.medications?.map((med, idx) => (
+                  <li
+                    key={idx}
+                    style={{
+                      padding: "12px",
+                      backgroundColor: idx % 2 === 0 ? "#f7fafc" : "white",
+                      borderRadius: "4px",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    <strong style={{ color: "#2b6cb0" }}>{med.name}</strong>
+                    <div>Dosage: {med.dosage}</div>
+                    <div>Duration: {med.duration}</div>
+                    {med.instructions && (
+                      <div>Instructions: {med.instructions}</div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <button
+              onClick={() => setIsDetailsModalOpen(false)}
+              style={{
+                backgroundColor: "#4299e1",
+                color: "white",
+                border: "none",
+                padding: "10px 20px",
+                borderRadius: "4px",
+                cursor: "pointer",
+                marginTop: "16px",
+              }}
+            >
+              Close
+            </button>
           </div>
         </div>
       )}
-
       <ToastContainer
         position="top-right"
         autoClose={5000}
