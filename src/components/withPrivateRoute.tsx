@@ -4,6 +4,7 @@ import { NextComponentType, NextPageContext } from "next";
 import LoginMedcine from "@/pages/login_medicine";
 import LoginPatient from "@/pages/login_patient";
 import LoginSecretary from "@/pages/login_secretary";
+import { ROLES } from "@/utils/roles";
 
 type AuthProps = {
   isLoggedIn?: boolean;
@@ -11,7 +12,7 @@ type AuthProps = {
 
 const withAuth = <P extends {}>(
   Component: NextComponentType<NextPageContext, AuthProps, P>,
-  options?: { role?: "patient" | "medicine" | "secretary" }
+  options?: { role?: typeof ROLES[keyof typeof ROLES] }
 ) => {
   const AuthComponent: NextComponentType<
     NextPageContext,
@@ -27,11 +28,11 @@ const withAuth = <P extends {}>(
       let tokenKey, loginKey;
       
       switch(options?.role) {
-        case "medicine":
+        case ROLES.MEDICINE:
           tokenKey = "tokenMedicine";
           loginKey = "LoginMedicine";
           break;
-        case "secretary":
+        case ROLES.SECRETARY:
           tokenKey = "tokenSecretary";
           loginKey = "LoginSecretary";
           break;
@@ -53,9 +54,9 @@ const withAuth = <P extends {}>(
       
       if (!authStatus) {
         const redirectPath =
-          options?.role === "medicine"
+          options?.role === ROLES.MEDICINE
             ? "/login_medicine"
-            : options?.role === "secretary"
+            : options?.role === ROLES.SECRETARY
             ? "/login_secretary"
             : "/login_patient";
         router.push(redirectPath);
@@ -67,9 +68,9 @@ const withAuth = <P extends {}>(
     }
 
     if (!isAuthenticated) {
-      return options?.role === "medicine" ? (
+      return options?.role === ROLES.MEDICINE ? (
         <LoginMedcine />
-      ) : options?.role === "secretary" ? (
+      ) : options?.role === ROLES.SECRETARY ? (
         <LoginSecretary />
       ) : (
         <LoginPatient />

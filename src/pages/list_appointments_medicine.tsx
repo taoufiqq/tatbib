@@ -12,7 +12,7 @@ import { Appointment } from "@/types";
 import { MdDashboard } from "react-icons/md";
 import { FaNotesMedical, FaUserEdit, FaUserPlus } from "react-icons/fa";
 import { RiLogoutCircleFill } from "react-icons/ri";
-
+import { ROLES } from "@/utils/roles";
 const ListAppointments = () => {
   const router = useRouter();
   const [listAppointment, setListAppointment] = useState<Appointment[] | null>(null);
@@ -323,4 +323,4 @@ const ListAppointments = () => {
   );
 };
 
-export default withAuth(ListAppointments, { role: "medicine" });
+export default withAuth(ListAppointments, { role: ROLES.MEDICINE });

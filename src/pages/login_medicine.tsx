@@ -31,13 +31,19 @@ export default function LoginMedcine() {
             toast.warn("Please verify your account first via email");
           } else {
             if (typeof window !== "undefined") {
+              // Now we can trust the backend returns "medicine"
               localStorage.setItem("tokenMedicine", res.data.token);
               localStorage.setItem("LoginMedicine", login);
-              localStorage.setItem("role", "medicine");
+              localStorage.setItem("role", res.data.role); // Will be "medicine"
               localStorage.setItem("id_medcine", res.data.id);
+              
+              console.log("Stored auth data:", {
+                token: res.data.token,
+                role: res.data.role,
+                id: res.data.id
+              });
             }
             router.push("/list_appointments_medicine");
-            toast.success("Authenticated successfully");
           }
         } else {
           toast.error("Login or password invalid");
