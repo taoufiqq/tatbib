@@ -15,29 +15,82 @@ import { RiLogoutCircleFill } from "react-icons/ri";
 
 const ListOrdonnances = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [itemsPerPage] = useState<number>(1); // Nombre d'items par page
+  const [itemsPerPage] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const [listOrdonnance, setListOrdonnance] = useState<Ordonnance[] | null>(
-    null
-  );
+  const [listOrdonnance, setListOrdonnance] = useState<Ordonnance[] | null>(null);
 
-  // Calcul des éléments à afficher
+  // Calculate items to display
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems =
-    listOrdonnance?.slice(indexOfFirstItem, indexOfLastItem) || [];
+  const currentItems = listOrdonnance?.slice(indexOfFirstItem, indexOfLastItem) || [];
 
-  // Changement de page
+  // Change page
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  // Print function for a specific ordonnance
+  const printOrdonnance = (index: number) => {
+    const printElement = document.getElementById(`ordonnance-${index}`);
+    if (!printElement) return;
+
+    const printWindow = window.open('', '', 'width=800,height=600');
+    if (!printWindow) return;
+
+    const styles = `
+      <style>
+        @media print {
+          body { 
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+          }
+          .blog-slider {
+            width: 100% !important;
+            height: auto !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+          }
+          .blog-slider__content {
+            padding: 20px !important;
+          }
+          textarea {
+            border: 1px solid #ddd !important;
+            padding: 8px !important;
+            font-family: Arial, sans-serif !important;
+            white-space: pre-wrap;
+          }
+          .noPrint {
+            display: none !important;
+          }
+        }
+      </style>
+    `;
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Ordonnance</title>
+          ${styles}
+        </head>
+        <body>
+          ${printElement.innerHTML}
+          <script>
+            setTimeout(() => {
+              window.print();
+              window.close();
+            }, 200);
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
 
   useEffect(() => {
     const id = localStorage.getItem("id_patient");
     axios
-      .get(
-        `https://tatbib-api.onrender.com/medcine/getOrdonnanceByPatient/${id}`
-      )
+      .get(`https://tatbib-api.onrender.com/medcine/getOrdonnanceByPatient/${id}`)
       .then(function (response) {
         setListOrdonnance(response.data);
         setLoading(false);
@@ -53,19 +106,14 @@ const ListOrdonnances = () => {
     const login = localStorage.getItem("LoginPatient") || "{}";
 
     const logOut = () => {
-      if (typeof window !== "undefined") {
-        // Remove only patient-related items from localStorage
-        const patientItems = [
-          "tokenPatient",
-          "LoginPatient",
-          "id_patient",
-          "id_appointment",
-          // Add any other patient-specific items here
-        ];
-
-        patientItems.forEach((item) => localStorage.removeItem(item));
-      }
-
+      const patientItems = [
+        "tokenPatient",
+        "LoginPatient",
+        "id_patient",
+        "id_appointment",
+      ];
+      patientItems.forEach((item) => localStorage.removeItem(item));
+      
       router.push("/login_patient");
       toast.success("Logged out successfully", {
         position: "top-left",
@@ -87,6 +135,8 @@ const ListOrdonnances = () => {
             <Image
               alt=""
               src={user}
+              width={150}
+              height={150}
               style={{ borderRadius: "50%", width: "150px" }}
             />
             <h6>Welcome</h6>
@@ -150,53 +200,69 @@ const ListOrdonnances = () => {
                 <div className="alert alert-danger text-center">{error}</div>
               )}
 
-              {!loading &&
-                !error &&
-                currentItems.map((item: any, index: any) => (
-                  <div
-                    className="blog-slider mt-5"
-                    style={{ height: "500px" }}
-                    key={index}
-                  >
-                    <div className="blog-slider__wrp swiper-wrapper">
-                      <div className="blog-slider__item swiper-slide">
-                        <div className="blog-slider__img">
-                          <Image src={logo} alt="" />
+              {!loading && !error && currentItems.map((item: any, index: any) => (
+                <div
+                  id={`ordonnance-${index}`}
+                  className="blog-slider mt-5"
+                  style={{ height: "500px" }}
+                  key={index}
+                >
+                  <div className="blog-slider__wrp swiper-wrapper">
+                    <div className="blog-slider__item swiper-slide">
+                      <div className="blog-slider__img">
+                        <Image 
+                          src={logo} 
+                          alt=""
+                          width={150}
+                          height={150}
+                        />
+                      </div>
+                      <div className="blog-slider__content">
+                        <div className="blog-slider__title">
+                          <h4>
+                            <span style={{ color: "red" }}>Dr: </span>
+                            {item.medcine.fullName}
+                          </h4>
                         </div>
-                        <div className="blog-slider__content">
-                          <div className="blog-slider__title">
-                            <h4>
-                              <span style={{ color: "red" }}>Dr: </span>
-                              {item.medcine.fullName}
-                            </h4>
-                          </div>
-                          <div className="blog-slider__code">
-                            <h4>{item.medcine.speciality}</h4>
-                          </div>
-                          <span className="blog-slider__code">
-                            <span style={{ color: "red" }}>Mr/Mme: </span>
-                            {item.patient.firstName} {item.patient.lastName}
-                          </span>
-                          <div className="blog-slider__code">
-                            <span style={{ color: "red" }}>medicamment: </span>
-                            <textarea
-                              readOnly
-                              style={{
-                                height: "100px",
-                                width: "100%",
-                                border: "none",
-                              }}
-                              value={item.medicamment}
-                            />
-                          </div>
-                          <Link href="" className="blog-slider__button noPrint">
-                            print
-                          </Link>
+                        <div className="blog-slider__code">
+                          <h4>{item.medcine.speciality}</h4>
                         </div>
+                        <span className="blog-slider__code">
+                          <span style={{ color: "red" }}>Mr/Mme: </span>
+                          {item.patient.firstName} {item.patient.lastName}
+                        </span>
+                        <div className="blog-slider__code">
+                          <span style={{ color: "red" }}>medicamment: </span>
+                          <textarea
+                            readOnly
+                            style={{
+                              height: "100px",
+                              width: "100%",
+                              border: "none",
+                            }}
+                            value={item.medicamment}
+                          />
+                        </div>
+                        <button 
+                          onClick={() => printOrdonnance(index)}
+                          className="blog-slider__button noPrint"
+                          style={{
+                            padding: "8px 16px",
+                            background: "#4CAF50",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "4px",
+                            cursor: "pointer",
+                            marginTop: "10px"
+                          }}
+                        >
+                          Print
+                        </button>
                       </div>
                     </div>
                   </div>
-                ))}
+                </div>
+              ))}
 
               {/* Pagination */}
               {listOrdonnance && listOrdonnance.length > itemsPerPage && (
