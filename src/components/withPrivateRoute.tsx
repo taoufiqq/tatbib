@@ -57,7 +57,7 @@ const withAuth = <P extends {}>(
       ) : options?.role === "secretary" ? (
         <LoginSecretary />
       ) : (
-        <Home />
+        <LoginPatient />
       );
     }
 
