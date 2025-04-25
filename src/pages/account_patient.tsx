@@ -284,6 +284,7 @@ const AccountPatient = () => {
         "LoginPatient",
         "id_patient",
         "id_appointment",
+        "rolePatient"
         // Add any other patient-specific items here
       ];
 

@@ -116,7 +116,12 @@ const OrdonnancesByMedicine = () => {
 
   const logOut = () => {
     if (typeof window !== "undefined") {
-      const medicineItems = ["tokenMedicine", "LoginMedicine", "id_medcine"];
+      const medicineItems = [
+        "tokenMedicine",
+        "LoginMedicine",
+        "id_medcine",
+        "role",
+      ];
 
       medicineItems.forEach((item) => localStorage.removeItem(item));
     }

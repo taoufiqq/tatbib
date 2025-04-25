@@ -75,6 +75,7 @@ const DashboardMedcine = () => {
         "tokenMedicine",
         "LoginMedicine",
         "id_medcine",
+        "role"
         // Add any other medicine-specific items here
       ];
 

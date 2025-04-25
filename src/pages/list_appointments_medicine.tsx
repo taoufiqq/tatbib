@@ -81,6 +81,7 @@ const ListAppointments = () => {
           "tokenMedicine",
           "LoginMedicine",
           "id_medcine",
+          "role"
         ];
 
         medicineItems.forEach((item) => localStorage.removeItem(item));

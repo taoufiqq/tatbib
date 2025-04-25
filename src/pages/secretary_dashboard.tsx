@@ -1,4 +1,4 @@
-import { NextPage } from 'next';
+import { NextPage } from "next";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
@@ -15,21 +15,26 @@ import { RiLogoutCircleFill } from "react-icons/ri";
 
 const DashboardSecretary: NextPage = () => {
   const router = useRouter();
-  const [listAppointment, setListAppointment] = useState<Appointment[] | null>(null);
+  const [listAppointment, setListAppointment] = useState<Appointment[] | null>(
+    null
+  );
   const [login, setLogin] = useState<string>("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       setLogin(localStorage.getItem("LoginSecretary") || "");
       const id = localStorage.getItem("login_medcine");
-      
-      axios.get(`https://tatbib-api.onrender.com/appointment/getAppointmentSecretary/${id}`)
-        .then(response => {
+
+      axios
+        .get(
+          `https://tatbib-api.onrender.com/appointment/getAppointmentSecretary/${id}`
+        )
+        .then((response) => {
           setListAppointment(response.data);
           setLoading(false);
         })
-        .catch(err => {
+        .catch((err) => {
           console.error(err);
           toast.error("Failed to load appointments");
           setLoading(false);
@@ -39,12 +44,17 @@ const DashboardSecretary: NextPage = () => {
 
   const deleteAppointment = (id: string) => {
     if (window.confirm("Are you sure you want to delete this appointment?")) {
-      axios.delete(`https://tatbib-api.onrender.com/secretary/deleteAppointment/${id}`)
+      axios
+        .delete(
+          `https://tatbib-api.onrender.com/secretary/deleteAppointment/${id}`
+        )
         .then(() => {
-          setListAppointment(prev => prev?.filter(app => app._id !== id) || null);
+          setListAppointment(
+            (prev) => prev?.filter((app) => app._id !== id) || null
+          );
           toast.success("Appointment deleted successfully");
         })
-        .catch(err => {
+        .catch((err) => {
           console.error(err);
           toast.error("Failed to delete appointment");
         });
@@ -57,7 +67,12 @@ const DashboardSecretary: NextPage = () => {
   };
 
   const logOut = () => {
-    ['tokenSecretary', 'LoginSecretary', 'id_secretary'].forEach(item => {
+    [
+      "tokenSecretary",
+      "LoginSecretary",
+      "id_secretary",
+      "roleSecretary",
+    ].forEach((item) => {
       localStorage.removeItem(item);
     });
     router.push("/login_secretary");
@@ -88,7 +103,7 @@ const DashboardSecretary: NextPage = () => {
             </Link>
           </li>
           <li tabIndex={0} className="icon-folder">
-            <MdFolderShared/>
+            <MdFolderShared />
             <Link href="" style={{ textDecoration: "none", color: "white" }}>
               <span>Patient Record</span>
             </Link>
@@ -99,12 +114,12 @@ const DashboardSecretary: NextPage = () => {
           </li>
         </ul>
       </nav>
-      
+
       <main>
         <div className="helper">
           Appointment<span> Management | Appointment</span>
         </div>
-        
+
         {loading ? (
           <div className="loading-spinner">Loading appointments...</div>
         ) : (
@@ -113,11 +128,13 @@ const DashboardSecretary: NextPage = () => {
               <div className="table-title">
                 <div className="row">
                   <div className="col-sm-5">
-                    <h2>Appointment <b>list</b></h2>
+                    <h2>
+                      Appointment <b>list</b>
+                    </h2>
                   </div>
                 </div>
               </div>
-              
+
               <table className="table table-striped table-hover">
                 <thead>
                   <tr>
@@ -140,23 +157,32 @@ const DashboardSecretary: NextPage = () => {
                       <td>{item.patient.telephone}</td>
                       <td>{moment(item.dateTime).format("MMMM DD YYYY")}</td>
                       <td>{moment(item.dateTime).format("HH:mm")}</td>
-                      <td style={{ color: item.status === "Unconfirmed" ? "red" : "green" }}>
+                      <td
+                        style={{
+                          color:
+                            item.status === "Unconfirmed" ? "red" : "green",
+                        }}
+                      >
                         {item.status}
                       </td>
                       <td>
-                        <button 
-                          onClick={() => handleAction(item._id, "/alert_appointment")}
+                        <button
+                          onClick={() =>
+                            handleAction(item._id, "/alert_appointment")
+                          }
                           className="btn-action"
                         >
                           Alert
                         </button>
-                        <button 
-                          onClick={() => handleAction(item._id, "/confirm_appointment")}
+                        <button
+                          onClick={() =>
+                            handleAction(item._id, "/confirm_appointment")
+                          }
                           className="btn-action"
                         >
                           Confirm
                         </button>
-                        <button 
+                        <button
                           onClick={() => deleteAppointment(item._id)}
                           className="btn-action delete"
                         >
@@ -171,10 +197,10 @@ const DashboardSecretary: NextPage = () => {
           </div>
         )}
       </main>
-      
+
       <ToastContainer />
     </div>
   );
 };
 
-export default withAuth(DashboardSecretary, { role: 'secretary' });
+export default withAuth(DashboardSecretary, { role: "secretary" });
