@@ -44,8 +44,29 @@ const ListAppointments = () => {
 
     const login = localStorage.getItem("LoginMedcine");
     const logOut = () => {
-      localStorage.clear();
+      if (typeof window !== "undefined") {
+        // Remove only medicine-related items from localStorage
+        const medicineItems = [
+          "tokenMedicine",
+          "LoginMedicine",
+          "id_medcine",
+          // Add any other medicine-specific items here
+        ];
+  
+        medicineItems.forEach((item) => localStorage.removeItem(item));
+      }
+  
       router.push("/login_medicine");
+      toast.success("Logged out successfully", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true, // Enabled for better UX
+        pauseOnHover: true, // Enabled for better UX
+        draggable: true, // Enabled for better UX
+        progress: undefined,
+        theme: "colored",
+      });
     };
 
     return (

@@ -15,16 +15,19 @@ import { RiLogoutCircleFill } from "react-icons/ri";
 
 const ListOrdonnances = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [itemsPerPage] = useState<number>(3); // Nombre d'items par page
+  const [itemsPerPage] = useState<number>(1); // Nombre d'items par page
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const [listOrdonnance, setListOrdonnance] = useState<Ordonnance[] | null>(null);
+  const [listOrdonnance, setListOrdonnance] = useState<Ordonnance[] | null>(
+    null
+  );
 
   // Calcul des éléments à afficher
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = listOrdonnance?.slice(indexOfFirstItem, indexOfLastItem) || [];
+  const currentItems =
+    listOrdonnance?.slice(indexOfFirstItem, indexOfLastItem) || [];
 
   // Changement de page
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
@@ -32,7 +35,9 @@ const ListOrdonnances = () => {
   useEffect(() => {
     const id = localStorage.getItem("id_patient");
     axios
-      .get(`https://tatbib-api.onrender.com/medcine/getOrdonnanceByPatient/${id}`)
+      .get(
+        `https://tatbib-api.onrender.com/medcine/getOrdonnanceByPatient/${id}`
+      )
       .then(function (response) {
         setListOrdonnance(response.data);
         setLoading(false);
@@ -48,15 +53,27 @@ const ListOrdonnances = () => {
     const login = localStorage.getItem("LoginPatient") || "{}";
 
     const logOut = () => {
-      localStorage.clear();
+      if (typeof window !== "undefined") {
+        // Remove only patient-related items from localStorage
+        const patientItems = [
+          "tokenPatient",
+          "LoginPatient",
+          "id_patient",
+          "id_appointment",
+          // Add any other patient-specific items here
+        ];
+
+        patientItems.forEach((item) => localStorage.removeItem(item));
+      }
+
       router.push("/login_patient");
-      toast.success("Log out SuccessFully", {
-        position: "top-right",
+      toast.success("Logged out successfully", {
+        position: "top-left",
         autoClose: 5000,
         hideProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: false,
-        draggable: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
         progress: undefined,
         theme: "colored",
       });
@@ -67,7 +84,11 @@ const ListOrdonnances = () => {
         <nav className="menu noPrint" tabIndex={0}>
           <div className="smartphone-menu-trigger" />
           <header className="avatar">
-            <Image alt="" src={user} style={{ borderRadius: "50%", width: "150px" }} />
+            <Image
+              alt=""
+              src={user}
+              style={{ borderRadius: "50%", width: "150px" }}
+            />
             <h6>Welcome</h6>
             <h5 style={{ color: "white" }}>{login}</h5>
           </header>
@@ -126,89 +147,98 @@ const ListOrdonnances = () => {
               )}
 
               {error && (
-                <div className="alert alert-danger text-center">
-                  {error}
-                </div>
+                <div className="alert alert-danger text-center">{error}</div>
               )}
 
-              {!loading && !error && currentItems.map((item: any, index: any) => (
-                <div
-                  className="blog-slider mt-5"
-                  style={{ height: "500px" }}
-                  key={index}
-                >
-                  <div className="blog-slider__wrp swiper-wrapper">
-                    <div className="blog-slider__item swiper-slide">
-                      <div className="blog-slider__img">
-                        <Image src={logo} alt="" />
-                      </div>
-                      <div className="blog-slider__content">
-                        <div className="blog-slider__title">
-                          <h4>
-                            <span style={{ color: "red" }}>Dr: </span>
-                            {item.medcine.fullName}
-                          </h4>
+              {!loading &&
+                !error &&
+                currentItems.map((item: any, index: any) => (
+                  <div
+                    className="blog-slider mt-5"
+                    style={{ height: "500px" }}
+                    key={index}
+                  >
+                    <div className="blog-slider__wrp swiper-wrapper">
+                      <div className="blog-slider__item swiper-slide">
+                        <div className="blog-slider__img">
+                          <Image src={logo} alt="" />
                         </div>
-                        <div className="blog-slider__code">
-                          <h4>{item.medcine.speciality}</h4>
+                        <div className="blog-slider__content">
+                          <div className="blog-slider__title">
+                            <h4>
+                              <span style={{ color: "red" }}>Dr: </span>
+                              {item.medcine.fullName}
+                            </h4>
+                          </div>
+                          <div className="blog-slider__code">
+                            <h4>{item.medcine.speciality}</h4>
+                          </div>
+                          <span className="blog-slider__code">
+                            <span style={{ color: "red" }}>Mr/Mme: </span>
+                            {item.patient.firstName} {item.patient.lastName}
+                          </span>
+                          <div className="blog-slider__code">
+                            <span style={{ color: "red" }}>medicamment: </span>
+                            <textarea
+                              readOnly
+                              style={{
+                                height: "100px",
+                                width: "450px",
+                                border: "none",
+                              }}
+                              value={item.medicamment}
+                            />
+                          </div>
+                          <Link href="" className="blog-slider__button noPrint">
+                            print
+                          </Link>
                         </div>
-                        <span className="blog-slider__code">
-                          <span style={{ color: "red" }}>Mr/Mme: </span>
-                          {item.patient.firstName} {item.patient.lastName}
-                        </span>
-                        <div className="blog-slider__code">
-                          <span style={{ color: "red" }}>medicamment: </span>
-                          <textarea
-                            readOnly
-                            style={{
-                              height: "100px",
-                              width: "450px",
-                              border: "none",
-                            }}
-                            value={item.medicamment}
-                          />
-                        </div>
-                        <Link href="" className="blog-slider__button noPrint">
-                          print
-                        </Link>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
 
               {/* Pagination */}
               {listOrdonnance && listOrdonnance.length > itemsPerPage && (
-                <div className="pagination noPrint" style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  margin: '20px 0',
-                  gap: '10px'
-                }}>
+                <div
+                  className="pagination noPrint"
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    margin: "20px 0",
+                    gap: "10px",
+                  }}
+                >
                   <button
                     onClick={() => paginate(currentPage - 1)}
                     disabled={currentPage === 1}
                     style={{
-                      padding: '5px 10px',
-                      border: '1px solid #ddd',
-                      backgroundColor: 'white',
-                      cursor: 'pointer',
-                      borderRadius: '4px'
+                      padding: "5px 10px",
+                      border: "1px solid #ddd",
+                      backgroundColor: "white",
+                      cursor: "pointer",
+                      borderRadius: "4px",
                     }}
                   >
                     Précédent
                   </button>
 
-                  {Array.from({ length: Math.ceil(listOrdonnance.length / itemsPerPage) }).map((_, index) => (
+                  {Array.from({
+                    length: Math.ceil(listOrdonnance.length / itemsPerPage),
+                  }).map((_, index) => (
                     <button
                       key={index}
                       onClick={() => paginate(index + 1)}
                       style={{
-                        padding: '5px 10px',
-                        border: currentPage === index + 1 ? '2px solid red' : '1px solid #ddd',
-                        backgroundColor: currentPage === index + 1 ? '#f8f8f8' : 'white',
-                        cursor: 'pointer',
-                        borderRadius: '4px'
+                        padding: "5px 10px",
+                        border:
+                          currentPage === index + 1
+                            ? "2px solid red"
+                            : "1px solid #ddd",
+                        backgroundColor:
+                          currentPage === index + 1 ? "#f8f8f8" : "white",
+                        cursor: "pointer",
+                        borderRadius: "4px",
                       }}
                     >
                       {index + 1}
@@ -217,13 +247,16 @@ const ListOrdonnances = () => {
 
                   <button
                     onClick={() => paginate(currentPage + 1)}
-                    disabled={currentPage === Math.ceil(listOrdonnance.length / itemsPerPage)}
+                    disabled={
+                      currentPage ===
+                      Math.ceil(listOrdonnance.length / itemsPerPage)
+                    }
                     style={{
-                      padding: '5px 10px',
-                      border: '1px solid #ddd',
-                      backgroundColor: 'white',
-                      cursor: 'pointer',
-                      borderRadius: '4px'
+                      padding: "5px 10px",
+                      border: "1px solid #ddd",
+                      backgroundColor: "white",
+                      cursor: "pointer",
+                      borderRadius: "4px",
                     }}
                   >
                     Suivant
