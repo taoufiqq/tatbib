@@ -29,7 +29,7 @@ export default function LoginSecretary() {
         throw new Error(response.data.message);
       }
 
-      const { status, tokenSecretary, roleSecretary, loginMedcine } =
+      const { status, tokenSecretary, role, loginMedcine } =
         response.data;
 
       // Handle account status
@@ -55,7 +55,7 @@ export default function LoginSecretary() {
       }
 
       // Normalize and store auth data
-      const normalizedRole = normalizeRole(roleSecretary);
+      const normalizedRole = normalizeRole(role);
       localStorage.setItem("tokenSecretary", tokenSecretary);
       localStorage.setItem("LoginSecretary", login);
       localStorage.setItem("role", normalizedRole); // Using consistent 'role' key
