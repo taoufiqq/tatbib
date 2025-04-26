@@ -13,6 +13,7 @@ import withAuth from "@/components/withPrivateRoute";
 import { MdDashboard } from "react-icons/md";
 import { FaNotesMedical, FaUserEdit } from "react-icons/fa";
 import { RiLogoutCircleFill } from "react-icons/ri";
+import { ROLES } from "@/utils/roles";
 
 const ListOrdonnances: NextPage = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -218,4 +219,4 @@ const ListOrdonnances: NextPage = () => {
 };
 
 // In your component
-export default withAuth(ListOrdonnances, { role: "PATIENT" });
+export default withAuth(ListOrdonnances, { role: ROLES.PATIENT });
