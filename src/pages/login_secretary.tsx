@@ -29,8 +29,7 @@ export default function LoginSecretary() {
         throw new Error(response.data.message);
       }
 
-      const { status, tokenSecretary, role, loginMedcine } =
-        response.data;
+      const { status, tokenSecretary, roleSecretary, loginMedcine } = response.data;
 
       // Handle account status
       if (status === "InActive") {
@@ -55,7 +54,7 @@ export default function LoginSecretary() {
       }
 
       // Normalize and store auth data
-      const normalizedRole = normalizeRole(role);
+      const normalizedRole = normalizeRole(roleSecretary);
       localStorage.setItem("tokenSecretary", tokenSecretary);
       localStorage.setItem("LoginSecretary", login);
       localStorage.setItem("role", normalizedRole); // Using consistent 'role' key
@@ -64,7 +63,7 @@ export default function LoginSecretary() {
 
       console.log("Login successful", {
         role: normalizedRole,
-        storedRole: localStorage.getItem("role"),
+        storedRole: localStorage.getItem("role")
       });
 
       router.push("/secretary_dashboard");
@@ -73,13 +72,13 @@ export default function LoginSecretary() {
         autoClose: 3000,
         theme: "colored",
       });
+
     } catch (error: any) {
       console.error("Login error:", error);
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "Login failed. Please try again.";
-
+      const errorMessage = error.response?.data?.message || 
+                         error.message || 
+                         "Login failed. Please try again.";
+      
       toast.error(errorMessage, {
         position: "top-right",
         autoClose: 5000,
@@ -119,10 +118,7 @@ export default function LoginSecretary() {
         </div>
         <div className="card EspacePatient">
           <div className="row">
-            <div
-              className="col-12 col-md-12 col-lg-6"
-              style={{ marginTop: "5%" }}
-            >
+            <div className="col-12 col-md-12 col-lg-6" style={{ marginTop: "5%" }}>
               <form className="row" onSubmit={handleSubmit}>
                 <label className="form-label">Login as a Secretary</label>
                 <div className="fromlogin">
@@ -152,11 +148,7 @@ export default function LoginSecretary() {
                     disabled={isLoading}
                   >
                     {isLoading ? (
-                      <span
-                        className="spinner-border spinner-border-sm"
-                        role="status"
-                        aria-hidden="true"
-                      ></span>
+                      <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                     ) : (
                       "Log in"
                     )}
