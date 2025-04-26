@@ -10,6 +10,7 @@ import withAuth from "@/components/withPrivateRoute";
 import { MdDashboard } from "react-icons/md";
 import { FaNotesMedical, FaUserEdit, FaUserPlus } from "react-icons/fa";
 import { RiLogoutCircleFill } from "react-icons/ri";
+import { ROLES, getRoleTokens } from "@/utils/roles";
 
 interface MedecinData {
   _id: string;
@@ -25,125 +26,106 @@ const DashboardMedcine = () => {
   const router = useRouter();
   const [medecinData, setMedecinData] = useState<MedecinData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+
+  // Get role-specific tokens
+  const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.MEDICINE);
 
   useEffect(() => {
     const fetchMedecinData = async () => {
       try {
-        // First check if we're on client-side
-        if (typeof window === "undefined") return;
-
-        // Safely get doctor ID
-        const doctorId = localStorage.getItem("id_medcine");
-        console.log("hhhhhhhhhhhhhhhh", doctorId);
-        // Validate ID before making API call
+        const doctorId = localStorage.getItem(idKey);
         if (!doctorId) {
-          setError("Doctor ID not found");
           toast.error("Doctor ID not found");
           router.push("/login_medicine");
           return;
         }
 
-        // Make API request
+        const token = localStorage.getItem(tokenKey);
+        if (!token) {
+          throw new Error("No authentication token found");
+        }
+
         const response = await axios.get<MedecinData>(
-          `https://tatbib-api.onrender.com/medcine/getMedcineById/${doctorId}`
+          `https://tatbib-api.onrender.com/medcine/getMedcineById/${doctorId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
         );
 
         setMedecinData(response.data);
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Failed to load doctor data";
-        setError(errorMessage);
-        toast.error(errorMessage);
+      } catch (err: unknown) {
+        console.error("Error fetching doctor data:", err);
+        
+        if (axios.isAxiosError(err)) {
+          if (err.response?.status === 401) {
+            toast.error("Session expired. Please login again.");
+            handleLogout();
+          } else {
+            toast.error(err.response?.data?.message || "Failed to load doctor data");
+          }
+        } else if (err instanceof Error) {
+          toast.error(err.message);
+        } else {
+          toast.error("An unexpected error occurred");
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchMedecinData();
-  }, [router]);
+  }, [router, idKey, tokenKey]);
 
   const handleEditAccount = (id: string) => {
-    localStorage.setItem("id_medcine", id);
+    localStorage.setItem(idKey, id);
     router.push("/availability_medicine");
   };
 
-  const logOut = () => {
-    if (typeof window !== "undefined") {
-      // Remove only medicine-related items from localStorage
-      const medicineItems = [
-        "tokenMedicine",
-        "LoginMedicine",
-        "id_medcine",
-        "role",
-        "login_medcine",
-        // Add any other medicine-specific items here
-      ];
-
-      medicineItems.forEach((item) => localStorage.removeItem(item));
-    }
-
+  const handleLogout = () => {
+    const medicineItems = [tokenKey, loginKey, idKey, "role"];
+    medicineItems.forEach(item => localStorage.removeItem(item));
+    
     router.push("/login_medicine");
     toast.success("Logged out successfully", {
       position: "top-right",
       autoClose: 5000,
       hideProgressBar: false,
-      closeOnClick: true, // Enabled for better UX
-      pauseOnHover: true, // Enabled for better UX
-      draggable: true, // Enabled for better UX
-      progress: undefined,
-      theme: "colored",
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      theme: "colored"
     });
   };
 
-  if (typeof window === "undefined") {
-    return null; // Skip rendering during SSR
-  }
+  if (typeof window === "undefined") return null;
 
   if (loading) {
     return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "100vh",
-        }}
-      >
-        <div
-          style={{
-            border: "4px solid rgba(0, 0, 0, 0.1)",
-            width: "36px",
-            height: "36px",
-            borderRadius: "50%",
-            borderLeftColor: "#09f",
-            animation: "spin 1s linear infinite",
-          }}
-        ></div>
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh'
+      }}>
+        <div style={{
+          border: '4px solid rgba(0, 0, 0, 0.1)',
+          width: '36px',
+          height: '36px',
+          borderRadius: '50%',
+          borderLeftColor: '#09f',
+          animation: 'spin 1s linear infinite'
+        }}></div>
         <p>Loading doctor data...</p>
         <style jsx>{`
           @keyframes spin {
-            0% {
-              transform: rotate(0deg);
-            }
-            100% {
-              transform: rotate(360deg);
-            }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
           }
         `}</style>
       </div>
     );
   }
-  if (error) {
-    return <div className="error">{error}</div>;
-  }
 
-  if (!medecinData) {
-    return <div className="error">No doctor data found</div>;
-  }
-
-  const loginMedcine = localStorage.getItem("LoginMedcine") || "";
+  const loginMedcine = localStorage.getItem(loginKey) || "";
 
   return (
     <div className="Container" style={{ overflow: "hidden" }}>
@@ -196,7 +178,7 @@ const DashboardMedcine = () => {
           </li>
           <li tabIndex={0} className="icon-settings">
             <RiLogoutCircleFill />
-            <span onClick={logOut} style={{ cursor: "pointer" }}>
+            <span onClick={handleLogout} style={{ cursor: "pointer" }}>
               Log out
             </span>
           </li>
@@ -234,24 +216,21 @@ const DashboardMedcine = () => {
 
               <tbody>
                 <tr>
-                  <td>{medecinData.fullName}</td>
-                  <td>{medecinData.email}</td>
-                  <td>{medecinData.login}</td>
-                  <td>{medecinData.speciality}</td>
-                  <td>{medecinData.city}</td>
-                  <td
-                    style={{
-                      color:
-                        medecinData.availablity !== "NotAvailable"
-                          ? "green"
-                          : "red",
-                    }}
-                  >
-                    {medecinData.availablity}
+                  <td>{medecinData?.fullName}</td>
+                  <td>{medecinData?.email}</td>
+                  <td>{medecinData?.login}</td>
+                  <td>{medecinData?.speciality}</td>
+                  <td>{medecinData?.city}</td>
+                  <td style={{
+                    color: medecinData?.availablity !== "NotAvailable" 
+                      ? "green" 
+                      : "red"
+                  }}>
+                    {medecinData?.availablity}
                   </td>
                   <td>
                     <button
-                      onClick={() => handleEditAccount(medecinData._id)}
+                      onClick={() => medecinData && handleEditAccount(medecinData._id)}
                       className="edit"
                       title="Edit Account"
                     >
@@ -269,4 +248,4 @@ const DashboardMedcine = () => {
   );
 };
 
-export default withAuth(DashboardMedcine);
+export default withAuth(DashboardMedcine, { role: ROLES.MEDICINE });
