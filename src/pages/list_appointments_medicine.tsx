@@ -49,7 +49,6 @@ const ListAppointments = () => {
         throw new Error("No authentication token found");
       }
 
-      // Note: You might need to update your API endpoint to use "medicine" instead of "medcine"
       const response = await axios.get(
         `https://tatbib-api.onrender.com/appointment/getAppointmentMedcine/${id}`,
         {
@@ -57,7 +56,7 @@ const ListAppointments = () => {
             Authorization: `Bearer ${token}`,
           },
           params: {
-            populate: "patient", // Ensure patient data is fully populated
+            populate: "patient",
           },
         }
       );
@@ -66,7 +65,6 @@ const ListAppointments = () => {
     } catch (err: unknown) {
       console.error("Error fetching appointments:", err);
 
-      // Type guard to check if it's an Axios error
       if (axios.isAxiosError(err)) {
         if (err.response?.status === 401) {
           toast.error("Session expired. Please login again.");
@@ -93,286 +91,330 @@ const ListAppointments = () => {
   };
 
   const handleLogout = () => {
-    // Clear all medicine-related localStorage items using the correct keys
     const medicineStorageItems = [tokenKey, loginKey, idKey, "role", "medcine"];
-
     medicineStorageItems.forEach((item) => localStorage.removeItem(item));
-
     router.push("/login_medicine");
     toast.success("Logged out successfully");
   };
 
   if (loading) {
     return (
-      <div className="loading-container">
-        <div className="loading-spinner">
-          <div className="spinner"></div>
-          <p>Loading appointments...</p>
-        </div>
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh'
+      }}>
+        <div style={{
+          border: '4px solid rgba(0, 0, 0, 0.1)',
+          width: '36px',
+          height: '36px',
+          borderRadius: '50%',
+          borderLeftColor: '#09f',
+          animation: 'spin 1s linear infinite'
+        }}></div>
+        <p>Loading appointments...</p>
         <style jsx>{`
-          .loading-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-          }
-          .loading-spinner {
-            text-align: center;
-          }
-          .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border-left-color: #09f;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 16px;
-          }
           @keyframes spin {
-            0% {
-              transform: rotate(0deg);
-            }
-            100% {
-              transform: rotate(360deg);
-            }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
           }
         `}</style>
       </div>
     );
   }
 
-  const currentUser = localStorage.getItem(loginKey);
+  const loginMedcine = localStorage.getItem(loginKey) || "";
 
   return (
-    <div className="doctor-dashboard">
-      <nav className="sidebar">
-        <div className="sidebar-header">
+    <div className="Container" style={{ overflow: "hidden" }}>
+      <nav className="menu" tabIndex={0}>
+        <div className="smartphone-menu-trigger" />
+        <header className="avatar">
           <Image
+            alt="Doctor profile"
             src={logo}
-            alt="Doctor Profile"
             width={150}
             height={150}
-            className="profile-image"
+            style={{ borderRadius: "50%" }}
           />
           <h6>Welcome</h6>
-          <h5>{currentUser}</h5>
-        </div>
+          <h5 style={{ color: "white" }}>{loginMedcine}</h5>
+        </header>
 
-        <ul className="sidebar-menu">
-          <li>
+        <ul>
+          <li tabIndex={0} className="icon-customers">
             <MdDashboard />
-            <Link href="/list_appointments_medicine">
-              <span>Appointments</span>
+            <Link href="/list_appointments_medicine" passHref>
+              <span style={{ textDecoration: "none", color: "white" }}>
+                List Appointments
+              </span>
             </Link>
           </li>
-          <li>
+          <li tabIndex={0} className="icon-profil">
             <FaUserEdit />
-            <Link href="/medicine_dashboard">
-              <span>My Account</span>
+            <Link href="/medicine_dashboard" passHref>
+              <span style={{ textDecoration: "none", color: "white" }}>
+                My Account
+              </span>
             </Link>
           </li>
-          <li>
+          <li tabIndex={0} className="icon-users">
             <FaNotesMedical />
-            <Link href="/ordonnances_by_medicine">
-              <span>Prescriptions</span>
+            <Link href="/ordonnances_by_medicine" passHref>
+              <span style={{ textDecoration: "none", color: "white" }}>
+                Ordonnances
+              </span>
             </Link>
           </li>
-          <li>
+          <li tabIndex={0} className="icon-Secrétaire">
             <FaUserPlus />
-            <Link href="/account_secretary">
-              <span>Secretary</span>
+            <Link href="/account_secretary" passHref>
+              <span style={{ textDecoration: "none", color: "white" }}>
+                Secretary
+              </span>
             </Link>
           </li>
-          <li onClick={handleLogout}>
+          <li tabIndex={0} className="icon-settings">
             <RiLogoutCircleFill />
-            <span>Log Out</span>
+            <span onClick={handleLogout} style={{ cursor: "pointer" }}>
+              Log out
+            </span>
           </li>
         </ul>
       </nav>
 
-      <main className="content">
-        <div className="page-header">
-          <h1>Appointments List</h1>
+      <main>
+        <div className="helper">
+          Appointment List <span> Management | Appointments</span>
         </div>
+        <div className="table-responsive">
+          <div className="table-wrapper">
+            <div className="table-title">
+              <div className="row">
+                <div className="col-sm-5">
+                  <h2>
+                    Appointments <b>Management</b>
+                  </h2>
+                </div>
+              </div>
+            </div>
 
-        <div className="table-container">
-          <table className="appointments-table">
-            <thead>
-              <tr>
-                <th>Last Name</th>
-                <th>First Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {listAppointment && listAppointment.length > 0 ? (
-                listAppointment.map((appointment) => (
-                  <tr key={appointment._id}>
-                    <td>{appointment.patient?.lastName || "N/A"}</td>
-                    <td>{appointment.patient?.firstName || "N/A"}</td>
-                    <td>{appointment.patient?.email || "N/A"}</td>
-                    <td>{appointment.patient?.telephone || "N/A"}</td>
-                    <td>
-                      {moment(appointment.dateTime).format("MMMM DD YYYY")}
-                    </td>
-                    <td>{moment(appointment.dateTime).format("HH:mm")}</td>
-                    <td
-                      className={`status-${appointment.status.toLowerCase()}`}
-                    >
-                      {appointment.status}
-                    </td>
-                    <td>
-                      {appointment.status !== "Unconfirmed" && (
-                        <button
-                          onClick={() => {
-                            if (appointment.patient?._id) {
-                              handleCreateOrdonnance(
-                                appointment._id,
-                                appointment.patient._id
-                              );
-                            } else {
-                              toast.error("Patient ID is missing");
-                            }
-                          }}
-                          className="ordonnance-btn"
-                          title="Create Prescription"
-                        >
-                          <i className="material-icons">edit_document</i>
-                        </button>
-                      )}
+            <table className="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Last Name</th>
+                  <th>First Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {listAppointment && listAppointment.length > 0 ? (
+                  listAppointment.map((appointment) => (
+                    <tr key={appointment._id}>
+                      <td>{appointment.patient?.lastName || "N/A"}</td>
+                      <td>{appointment.patient?.firstName || "N/A"}</td>
+                      <td>{appointment.patient?.email || "N/A"}</td>
+                      <td>{appointment.patient?.telephone || "N/A"}</td>
+                      <td>
+                        {moment(appointment.dateTime).format("MMMM DD YYYY")}
+                      </td>
+                      <td>{moment(appointment.dateTime).format("HH:mm")}</td>
+                      <td style={{
+                        color: appointment.status === "Confirmed" ? "green" : "red"
+                      }}>
+                        {appointment.status}
+                      </td>
+                      <td>
+                        {appointment.status !== "Unconfirmed" && (
+                          <button
+                            onClick={() => {
+                              if (appointment.patient?._id) {
+                                handleCreateOrdonnance(
+                                  appointment._id,
+                                  appointment.patient._id
+                                );
+                              } else {
+                                toast.error("Patient ID is missing");
+                              }
+                            }}
+                            className="edit"
+                            title="Create Prescription"
+                          >
+                            <i className="material-icons">&#xE254;</i>
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={8} style={{ textAlign: "center" }}>
+                      No appointments found
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={8} className="no-appointments">
-                    No appointments found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </main>
-
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
+      <ToastContainer position="top-right" autoClose={5000} />
 
       <style jsx>{`
-        .doctor-dashboard {
+        .Container {
+          position: relative;
           display: flex;
-          min-height: 100vh;
+          width: 100%;
+          height: 100vh;
           background-color: #f5f5f5;
+          font-family: 'Roboto', Arial, sans-serif;
         }
 
-        .sidebar {
-          width: 250px;
+        .menu {
           background: #2c3e50;
           color: white;
-          padding: 20px 0;
+          width: 240px;
+          height: 100%;
+          box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+          display: flex;
+          flex-direction: column;
         }
 
-        .sidebar-header {
+        .avatar {
+          padding: 2em 0.5em;
           text-align: center;
-          padding: 20px;
         }
 
-        .profile-image {
-          border-radius: 50%;
-          object-fit: cover;
-          border: 3px solid #3498db;
+        .avatar h6 {
+          font-weight: 400;
+          margin: 0.5em 0;
+          color: #ccc;
         }
 
-        .sidebar-menu {
-          list-style: none;
+        .avatar h5 {
+          margin: 0.2em 0;
+          font-weight: 500;
+        }
+        
+        .menu ul {
+          list-style-type: none;
           padding: 0;
+          margin: 0;
         }
 
-        .sidebar-menu li {
-          padding: 15px 20px;
-          cursor: pointer;
+        .menu li {
+          padding: 1em 1.5em;
           display: flex;
           align-items: center;
           gap: 10px;
-          transition: background 0.3s;
+          cursor: pointer;
+          transition: background 0.3s ease;
         }
 
-        .sidebar-menu li:hover {
+        .menu li:hover {
           background: #34495e;
         }
 
-        .content {
+        .menu span {
+          margin-left: 0.5em;
+        }
+
+        main {
           flex: 1;
           padding: 30px;
+          overflow-y: auto;
         }
 
-        .page-header {
-          margin-bottom: 30px;
+        .helper {
+          margin-bottom: 20px;
+          font-size: 1.1em;
+          color: #555;
         }
 
-        .table-container {
-          background: white;
-          border-radius: 8px;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-          overflow: hidden;
+        .helper span {
+          color: #999;
+          font-size: 0.9em;
         }
 
-        .appointments-table {
+        .table-responsive {
+          margin: 30px 0;
+        }
+
+        .table-wrapper {
+          background: #fff;
+          padding: 20px 25px;
+          border-radius: 3px;
+          min-width: 1000px;
+          box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+        }
+
+        .table-title {
+          padding-bottom: 15px;
+          background: #fff;
+          color: #333;
+          padding: 16px 30px;
+          margin: -20px -25px 10px;
+          border-radius: 3px 3px 0 0;
+        }
+
+        .table-title h2 {
+          margin: 5px 0 0;
+          font-size: 24px;
+        }
+
+        .table-title .row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        .col-sm-5 {
+          width: 50%;
+        }
+        
+        table.table-striped.table-hover {
           width: 100%;
           border-collapse: collapse;
         }
 
-        .appointments-table th,
-        .appointments-table td {
+        table.table-striped.table-hover th,
+        table.table-striped.table-hover td {
           padding: 12px 15px;
           text-align: left;
-          border-bottom: 1px solid #eee;
+          border-bottom: 1px solid #ddd;
         }
 
-        .appointments-table th {
+        table.table-striped.table-hover th {
           background: #f8f9fa;
           font-weight: 600;
         }
 
-        .status-confirmed {
-          color: #28a745;
+        table.table-striped.table-hover tbody tr:nth-of-type(odd) {
+          background-color: #fcfcfc;
         }
 
-        .status-unconfirmed {
-          color: #dc3545;
+        table.table-striped.table-hover tbody tr:hover {
+          background: #f5f5f5;
         }
 
-        .ordonnance-btn {
+        .edit {
           background: none;
           border: none;
           color: #17a2b8;
           cursor: pointer;
           font-size: 1.2rem;
         }
-
-        .no-appointments {
-          text-align: center;
-          padding: 20px;
-          color: #6c757d;
-        }
       `}</style>
     </div>
   );
 };
 
-// At the bottom of list_appointments_medicine.tsx
+// Export with withAuth HOC
 export default withAuth(ListAppointments, { role: ROLES.MEDICINE });
