@@ -535,14 +535,14 @@ const SecretaryDashboard: NextPage = () => {
                         <td>{item.patient.telephone}</td>
                         <td>{moment(item.dateTime).format("MMMM DD YYYY")}</td>
                         <td>{moment(item.dateTime).format("HH:mm")}</td>
-                        <td
+                        {/* <td
                           style={{
                             color:
                               item.status === "Unconfirmed" ? "red" : "green",
                           }}
                         >
                           {item.status}
-                        </td>
+                        </td> */}
                         <td>
                           <button
                             onClick={() =>
