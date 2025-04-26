@@ -1,80 +1,90 @@
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import logo from "../../public/images/logo.png";
 import Imglogin from "../../public/images/login.svg";
-import { Patient } from "@/types";
+import { normalizeRole } from "@/utils/roles";
 
 export default function LoginPatient() {
   const router = useRouter();
-
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
-    const patient = { login, password };
+    try {
+      const response = await axios.post(
+        `https://tatbib-api.onrender.com/patient/login`,
+        { login, password }
+      );
 
-    axios
-      .post(`https://tatbib-api.onrender.com/patient/login`, patient)
-      .then((res) => {
-        console.log(res);
-        if (!res.data.message) {
-          let verifier = res.data.verified;
-          //  localStorage.setItem("ValidateComptePatient", verifier);
-          if (verifier === false) {
-            console.log(
-              "Please Verifier You Accout First by Click on URL In Your Email Box"
-            );
-          } else {
-            if (typeof window !== "undefined") {
-              let token = res.data.token;
-              let role = res.data.role;
-              localStorage.setItem("tokenPatient", token);
-              localStorage.setItem("LoginPatient", login);
-              localStorage.setItem("rolePatient", role);
-              localStorage.setItem("id_patient", res.data.id);
-            }
-            router.push("/patient_dashboard");
-            toast.success("authenticated SuccessFully", {
-              position: "top-right",
-              autoClose: 5000,
-              hideProgressBar: false,
-              closeOnClick: false,
-              pauseOnHover: false,
-              draggable: false,
-              progress: undefined,
-              theme: "colored",
-            });
-          }
-        } else {
-          // Calling toast method by passing string
-          console.log("Username Or password invalid !!!! Please try again !");
-          toast.warn("Login Or password invalid !!!! Please try again !", {
+      if (response.data.message) {
+        throw new Error(response.data.message);
+      }
+
+      const { verified, token, role, id } = response.data;
+
+      if (verified === false) {
+        toast.info(
+          "Please verify your account first by clicking the link in your email",
+          {
             position: "top-right",
             autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: false,
-            draggable: false,
-            progress: undefined,
             theme: "colored",
-          });
-        }
+          }
+        );
+        return;
+      }
+
+      // Normalize and store auth data
+      const normalizedRole = normalizeRole(role);
+      localStorage.setItem("tokenPatient", token);
+      localStorage.setItem("LoginPatient", login);
+      localStorage.setItem("role", normalizedRole); // Using consistent 'role' key
+      localStorage.setItem("id_patient", id);
+
+      console.log("Patient login successful", {
+        role: normalizedRole,
+        storedRole: localStorage.getItem("role"),
       });
+
+      router.push("/patient_dashboard");
+      toast.success("Authenticated successfully", {
+        position: "top-right",
+        autoClose: 3000,
+        theme: "colored",
+      });
+    } catch (error: any) {
+      console.error("Login error:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Login failed. Please try again.";
+
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        theme: "colored",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
+
   return (
     <section className="header-page">
       <div className="container">
         <div className="row justify-content-between py-3 align-items-center">
           <div className="col-12 col-sm-3 col-lg-4 d-flex justify-content-center justify-content-lg-start py-2 py-lg-0">
             <Link href="/">
-              <Image alt="" src={logo} width="100" />
+              <Image alt="Logo" src={logo} width="100" priority />
             </Link>
           </div>
           <div className="col-12 col-sm-9 col-lg-6 col-xl-4">
@@ -98,7 +108,7 @@ export default function LoginPatient() {
         <div className="card EspacePatient">
           <div className="row">
             <div
-              className="col-12 col-md-12 col-lg-6 "
+              className="col-12 col-md-12 col-lg-6"
               style={{ marginTop: "2%" }}
             >
               <form className="row" onSubmit={handleSubmit}>
@@ -111,43 +121,62 @@ export default function LoginPatient() {
                     required
                     value={login}
                     onChange={(e) => setLogin(e.target.value)}
+                    disabled={isLoading}
                   />
 
                   <input
                     type="password"
                     placeholder="Password"
-                    className="form-control "
+                    className="form-control"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    disabled={isLoading}
                   />
 
                   <button
                     type="submit"
                     className="form-control mt-5 btnConnect"
+                    disabled={isLoading}
                   >
-                    log in
-                    <ToastContainer />
+                    {isLoading ? (
+                      <span
+                        className="spinner-border spinner-border-sm"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
+                    ) : (
+                      "Log in"
+                    )}
                   </button>
+
                   <Link
                     href="/sign_up_patient"
                     style={{ textDecoration: "none" }}
                   >
-                    <input
-                      type="submit"
+                    <button
+                      type="button"
                       className="form-control mt-3 btnAuth"
-                      value="Create an account"
-                    />
+                      disabled={isLoading}
+                    >
+                      Create an account
+                    </button>
                   </Link>
                 </div>
               </form>
             </div>
-            <div className="col-12 col-md-12 col-lg-6 ">
-              <Image alt="" src={Imglogin} className="imgLogin" />
+            <div className="col-12 col-md-12 col-lg-6">
+              <Image
+                alt="Login illustration"
+                src={Imglogin}
+                className="imgLogin"
+                priority
+              />
             </div>
           </div>
         </div>
       </div>
+      <ToastContainer />
     </section>
   );
 }

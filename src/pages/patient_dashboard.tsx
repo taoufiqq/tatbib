@@ -14,6 +14,7 @@ import { FaNotesMedical, FaUserEdit } from "react-icons/fa";
 import { RiLogoutCircleFill } from "react-icons/ri";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import styles from "../styles/AppointmentButton.module.css";
+import { ROLES } from "@/utils/roles";
 interface Medcine {
   fullName: string;
   speciality: string;
@@ -23,7 +24,9 @@ interface AppointmentWithMedcine extends Appointment {
   medcine: Medcine;
 }
 
-const DashboardPatient = () => {
+
+const PatientDashboard = () => {
+
   const router = useRouter();
   const [listAppointment, setListAppointment] = useState<
     AppointmentWithMedcine[] | null
@@ -218,4 +221,4 @@ const DashboardPatient = () => {
   );
 };
 
-export default withAuth(DashboardPatient);
+export default withAuth(PatientDashboard, { role: ROLES.PATIENT });

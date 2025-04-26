@@ -1,104 +1,95 @@
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import logo from "../../public/images/logo.png";
 import Imglogin from "../../public/images/Login2.svg";
-
-// import LoginMedcine from '../Médecin/LoginMedcine';
+import { normalizeRole } from "@/utils/roles";
 
 export default function LoginSecretary() {
   const router = useRouter();
-
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
-    const Secretary = { login, password };
+    try {
+      const response = await axios.post(
+        `https://tatbib-api.onrender.com/secretary/login`,
+        { login, password }
+      );
 
-    axios
-      .post(`https://tatbib-api.onrender.com/secretary/login`, Secretary)
-      .then((res) => {
-        console.log(res);
-        if (!res.data.message) {
-          let status = res.data.status;
-          if (typeof window !== "undefined") {
-            localStorage.setItem("status", status);
-          }
-          if (status === "InActive") {
-            toast.info(
-              "You cant use this Account now, Please wait for it to be activated!!!",
-              {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: false,
-                pauseOnHover: false,
-                draggable: false,
-                progress: undefined,
-                theme: "colored",
-              }
-            );
-            console.log(
-              "You can't use this Account now, Please wait for it to be activated!!!"
-            );
-          } else if (status === "Block") {
-            console.log("This Account is Blocked!!!");
+      if (response.data.message) {
+        throw new Error(response.data.message);
+      }
 
-            toast.error("This Account is Blocked!!!", {
-              position: "top-right",
-              autoClose: 5000,
-              hideProgressBar: false,
-              closeOnClick: false,
-              pauseOnHover: false,
-              draggable: false,
-              progress: undefined,
-              theme: "colored",
-            });
-          } else {
-            let tokenSecretary = res.data.tokenSecretary;
-            let roleSecretary = res.data.roleSecretary;
-            let loginMedcine = res.data.loginMedcine;
-            console.log(loginMedcine);
-            if (typeof window !== "undefined") {
-              localStorage.setItem("tokenSecretary", tokenSecretary);
-              localStorage.setItem("LoginSecretary", login);
-              localStorage.setItem("roleSecretary", roleSecretary);
-              localStorage.setItem("login_medcine", loginMedcine);
-            }
-            router.push("/secretary_dashboard");
+      const { status, tokenSecretary, roleSecretary, loginMedcine } =
+        response.data;
 
-            toast.success("authenticated SuccessFully", {
-              position: "top-right",
-              autoClose: 5000,
-              hideProgressBar: false,
-              closeOnClick: false,
-              pauseOnHover: false,
-              draggable: false,
-              progress: undefined,
-              theme: "colored",
-            });
-          }
-        } else {
-          toast.warn("Login Or password invalid !!!! Please try again !", {
+      // Handle account status
+      if (status === "InActive") {
+        toast.info(
+          "Your account is not active yet. Please wait for activation.",
+          {
             position: "top-right",
             autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: false,
-            draggable: false,
-            progress: undefined,
             theme: "colored",
-          });
-          console.log("Username Or password invalid !!!! Please try again !");
-        }
+          }
+        );
+        return;
+      }
+
+      if (status === "Block") {
+        toast.error("This account is blocked.", {
+          position: "top-right",
+          autoClose: 5000,
+          theme: "colored",
+        });
+        return;
+      }
+
+      // Normalize and store auth data
+      const normalizedRole = normalizeRole(roleSecretary);
+      localStorage.setItem("tokenSecretary", tokenSecretary);
+      localStorage.setItem("LoginSecretary", login);
+      localStorage.setItem("role", normalizedRole); // Using consistent 'role' key
+      localStorage.setItem("login_medcine", loginMedcine);
+      localStorage.setItem("accountStatus", status);
+
+      console.log("Login successful", {
+        role: normalizedRole,
+        storedRole: localStorage.getItem("role"),
       });
+
+      router.push("/secretary_dashboard");
+      toast.success("Authenticated successfully", {
+        position: "top-right",
+        autoClose: 3000,
+        theme: "colored",
+      });
+    } catch (error: any) {
+      console.error("Login error:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Login failed. Please try again.";
+
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        theme: "colored",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
+
   return (
     <section className="header-page">
       <div className="container">
@@ -129,7 +120,7 @@ export default function LoginSecretary() {
         <div className="card EspacePatient">
           <div className="row">
             <div
-              className="col-12 col-md-12 col-lg-6 "
+              className="col-12 col-md-12 col-lg-6"
               style={{ marginTop: "5%" }}
             >
               <form className="row" onSubmit={handleSubmit}>
@@ -142,38 +133,50 @@ export default function LoginSecretary() {
                     required
                     value={login}
                     onChange={(e) => setLogin(e.target.value)}
+                    disabled={isLoading}
                   />
 
                   <input
                     type="password"
                     placeholder="Password"
-                    className="form-control "
+                    className="form-control"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    disabled={isLoading}
                   />
 
                   <button
                     type="submit"
                     className="form-control mt-5 btnConnect"
+                    disabled={isLoading}
                   >
-                    log in
-                    <ToastContainer />
+                    {isLoading ? (
+                      <span
+                        className="spinner-border spinner-border-sm"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
+                    ) : (
+                      "Log in"
+                    )}
                   </button>
                 </div>
               </form>
             </div>
-            <div className="col-12 col-md-12 col-lg-6 ">
+            <div className="col-12 col-md-12 col-lg-6">
               <Image
-                alt=""
+                alt="Login illustration"
                 src={Imglogin}
                 style={{ width: "70%", marginLeft: "60px" }}
                 className="imgLogin"
+                priority
               />
             </div>
           </div>
         </div>
       </div>
+      <ToastContainer />
     </section>
   );
 }

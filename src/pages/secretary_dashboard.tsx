@@ -12,8 +12,8 @@ import moment from "moment";
 import { MdDashboard, MdFolderShared } from "react-icons/md";
 import { Appointment } from "@/types";
 import { RiLogoutCircleFill } from "react-icons/ri";
-
-const DashboardSecretary: NextPage = () => {
+import { ROLES } from "@/utils/roles";
+const SecretaryDashboard : NextPage = () => {
   const router = useRouter();
   const [listAppointment, setListAppointment] = useState<Appointment[] | null>(
     null
@@ -66,21 +66,12 @@ const DashboardSecretary: NextPage = () => {
     router.push(path);
   };
 
-  const logOut = () => {
-    [
-      "tokenSecretary",
-      "LoginSecretary",
-      "id_secretary",
-      "roleSecretary",
-      "login_medcine",
-      "status",
-    ].forEach((item) => {
-      localStorage.removeItem(item);
-    });
+  const handleLogout = () => {
+    ["tokenSecretary", "LoginSecretary", "role", "id_secretary"].forEach(
+      item => localStorage.removeItem(item)
+    );
     router.push("/login_secretary");
-    toast.success("Logged out successfully");
   };
-
   return (
     <div className="Container">
       <nav className="menu" tabIndex={0}>
@@ -112,7 +103,7 @@ const DashboardSecretary: NextPage = () => {
           </li>
           <li tabIndex={0} className="icon-settings">
             <RiLogoutCircleFill />
-            <span onClick={logOut}>Log out</span>
+            <span onClick={handleLogout}>Log out</span>
           </li>
         </ul>
       </nav>
@@ -211,4 +202,4 @@ const DashboardSecretary: NextPage = () => {
   );
 };
 
-export default withAuth(DashboardSecretary, { role: "secretary" });
+export default withAuth(SecretaryDashboard, { role: ROLES.SECRETARY });
