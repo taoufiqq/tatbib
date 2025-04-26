@@ -27,19 +27,17 @@ export interface Secretary {
   roleSecretary: string;
 }
 
-export interface Appointment {
-  _id: string;
-  dateTime: string;
+export type Appointment = {
+  _id: string
   patient: {
-    // Change from string to object
-    _id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    telephone: string;
-  };
-  status: string;
-  // ... other fields
+    lastName: string
+    firstName: string
+    email: string
+    telephone: string
+  }
+  dateTime: string
+  status: string
+  // Add other necessary fields
 }
 // In your component file
 export interface Ordonnance {

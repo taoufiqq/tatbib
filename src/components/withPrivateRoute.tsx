@@ -69,167 +69,163 @@
 // };
 
 // export default withAuth;
-"use client"
+"use client";
 
-import type React from "react"
+import { useRouter } from "next/router";
+import { useEffect, useState, ComponentType } from "react";
+import { normalizeRole, type AuthRole, getRoleTokens, ROLES } from "@/utils/roles";
 
-import { useRouter } from "next/router" // Using Pages Router navigation
-import { useEffect, useState } from "react"
-import { normalizeRole, type AuthRole, getRoleTokens, ROLES } from "@/utils/roles"
+interface SafeLocalStorage {
+  getItem: (key: string) => string | null;
+  setItem: (key: string, value: string) => boolean;
+  removeItem: (key: string) => boolean;
+  clear: () => boolean;
+}
 
-// Safely access localStorage with error handling
-const safeLocalStorage = {
+const safeLocalStorage: SafeLocalStorage = {
   getItem: (key: string): string | null => {
     try {
-      return typeof window !== "undefined" ? localStorage.getItem(key) : null
+      return typeof window !== "undefined" ? localStorage.getItem(key) : null;
     } catch (error) {
-      console.error(`Error getting ${key} from localStorage:`, error)
-      return null
+      console.error(`Error accessing localStorage (get ${key}):`, error);
+      return null;
     }
   },
   setItem: (key: string, value: string): boolean => {
     try {
       if (typeof window !== "undefined") {
-        localStorage.setItem(key, value)
-        return true
+        localStorage.setItem(key, value);
+        return true;
       }
-      return false
+      return false;
     } catch (error) {
-      console.error(`Error setting ${key} in localStorage:`, error)
-      return false
+      console.error(`Error accessing localStorage (set ${key}):`, error);
+      return false;
     }
   },
   removeItem: (key: string): boolean => {
     try {
       if (typeof window !== "undefined") {
-        localStorage.removeItem(key)
-        return true
+        localStorage.removeItem(key);
+        return true;
       }
-      return false
+      return false;
     } catch (error) {
-      console.error(`Error removing ${key} from localStorage:`, error)
-      return false
+      console.error(`Error accessing localStorage (remove ${key}):`, error);
+      return false;
     }
   },
   clear: (): boolean => {
     try {
       if (typeof window !== "undefined") {
-        localStorage.clear()
-        return true
+        localStorage.clear();
+        return true;
       }
-      return false
+      return false;
     } catch (error) {
-      console.error(`Error clearing localStorage:`, error)
-      return false
+      console.error("Error clearing localStorage:", error);
+      return false;
     }
-  },
-}
+  }
+};
 
-const withAuth = <P extends object>(WrappedComponent: React.ComponentType<P>, options?: { role?: AuthRole }) => {
+const withAuth = <P extends object>(
+  WrappedComponent: ComponentType<P>,
+  options?: { role?: AuthRole }
+) => {
   const AuthComponent = (props: P) => {
-    const router = useRouter()
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
-    const [isClient, setIsClient] = useState(false)
+    const router = useRouter();
+    const [authState, setAuthState] = useState<{
+      checked: boolean;
+      isValid: boolean;
+    }>({ checked: false, isValid: false });
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-      // Mark that we're on the client
-      setIsClient(true)
+      setMounted(true);
+      return () => setMounted(false);
+    }, []);
 
-      const checkAuth = () => {
-        if (typeof window === "undefined") return false
+    useEffect(() => {
+      if (!mounted) return;
 
+      const checkAuth = (): boolean => {
         try {
-          const storedRole = safeLocalStorage.getItem("role")
-
+          const storedRole = safeLocalStorage.getItem("role");
           if (!storedRole) {
-            console.log("No role found in localStorage")
-            return false
+            console.log("No role found in localStorage");
+            return false;
           }
 
-          const normalizedStoredRole = normalizeRole(storedRole)
-          const requiredRole = options?.role
+          const normalizedRole = normalizeRole(storedRole);
+          
+          // Type guard to ensure normalizedRole is AuthRole
+          const isAuthRole = (role: string): role is AuthRole => {
+            return Object.values(ROLES).includes(role as AuthRole);
+          };
 
-          // Get the correct token keys based on the stored role
-          let tokenKey, loginKey
-
-          try {
-            const keys = getRoleTokens(normalizedStoredRole as AuthRole)
-            tokenKey = keys.tokenKey
-            loginKey = keys.loginKey
-          } catch (error) {
-            console.error("Error getting role tokens:", error)
-            return false
+          if (!isAuthRole(normalizedRole)) {
+            console.log(`Invalid role: ${normalizedRole}`);
+            return false;
           }
 
-          console.log("Auth Check - localStorage:", {
-            role: normalizedStoredRole,
-            token: safeLocalStorage.getItem(tokenKey),
-            login: safeLocalStorage.getItem(loginKey),
-          })
-
-          // Check if the stored role matches the required role (if specified)
-          if (requiredRole && normalizedStoredRole !== requiredRole) {
-            console.log(`Role mismatch: stored ${normalizedStoredRole}, required ${requiredRole}`)
-            return false
+          const requiredRole = options?.role;
+          if (requiredRole && normalizedRole !== requiredRole) {
+            console.log(`Role mismatch: ${normalizedRole} vs ${requiredRole}`);
+            return false;
           }
 
-          const token = safeLocalStorage.getItem(tokenKey)
-          const login = safeLocalStorage.getItem(loginKey)
+          const { tokenKey, loginKey } = getRoleTokens(normalizedRole);
+          const token = safeLocalStorage.getItem(tokenKey);
+          const login = safeLocalStorage.getItem(loginKey);
 
           if (!token || !login) {
-            console.log("Missing token or login")
-            return false
+            console.log("Missing token or login");
+            return false;
           }
 
-          return true
+          return true;
         } catch (error) {
-          console.error("Error in checkAuth:", error)
-          return false
+          console.error("Authentication check failed:", error);
+          return false;
         }
+      };
+
+      const authStatus = checkAuth();
+      setAuthState({ checked: true, isValid: authStatus });
+
+      if (!authStatus && mounted) {
+        console.log("Not authenticated, redirecting...");
+        const redirectPath = options?.role === ROLES.MEDICINE
+          ? "/login_medicine"
+          : options?.role === ROLES.SECRETARY
+          ? "/login_secretary"
+          : "/login_patient";
+
+        router.push(redirectPath).catch((error) => {
+          console.error("Redirect failed:", error);
+          window.location.href = redirectPath;
+        });
       }
+    }, [mounted, router, options?.role]);
 
-      const authStatus = checkAuth()
-      setIsAuthenticated(authStatus)
+    if (!mounted) return null;
 
-      if (!authStatus) {
-        console.log("Not authenticated, redirecting...")
-
-        try {
-          const redirectPath =
-            options?.role === ROLES.MEDICINE
-              ? "/login_medicine"
-              : options?.role === ROLES.SECRETARY
-                ? "/login_secretary"
-                : "/login_patient"
-
-          // Use window.location for more reliable redirects
-          window.location.href = redirectPath
-        } catch (error) {
-          console.error("Error during redirect:", error)
-          // Fallback to router.push if window.location fails
-          router.push("/login_secretary")
-        }
-      }
-    }, [router])
-
-    // Don't render anything until we've checked authentication on the client
-    if (!isClient) {
-      return <div>Loading...</div>
+    if (!authState.checked) {
+      return <div className="loading-overlay">Loading...</div>;
     }
 
-    if (isAuthenticated === null) {
-      return <div>Verifying authentication...</div>
+    if (!authState.isValid) {
+      return <div className="redirect-message">Redirecting to login...</div>;
     }
 
-    if (!isAuthenticated) {
-      return <div>Redirecting to login...</div>
-    }
+    return <WrappedComponent {...props} />;
+  };
 
-    return <WrappedComponent {...props} />
-  }
+  AuthComponent.displayName = `withAuth(${
+    WrappedComponent.displayName || WrappedComponent.name || "Component"
+  })`;
+  return AuthComponent;
+};
 
-  AuthComponent.displayName = `withAuth(${WrappedComponent.displayName || WrappedComponent.name || "Component"})`
-  return AuthComponent
-}
-
-export default withAuth
+export default withAuth;

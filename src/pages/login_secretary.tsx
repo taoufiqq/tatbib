@@ -217,6 +217,7 @@ import axios from "axios"
 import { ToastContainer, toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import { normalizeRole, ROLES, getRoleTokens } from "@/utils/roles"
+import logo from "../../public/images/logo.png";
 
 // Safely access localStorage with error handling
 const safeLocalStorage = {
@@ -447,9 +448,10 @@ export default function LoginSecretary() {
         <div className="row justify-content-between py-3 align-items-center">
           <div className="col-12 col-sm-3 col-lg-4 d-flex justify-content-center justify-content-lg-start py-2 py-lg-0">
             <Link href="/">
+     
               <div style={{ width: "100px", height: "auto" }}>
                 {/* Use a placeholder if logo is undefined */}
-                {isClient && <Image alt="Logo" src="/placeholder.svg" width={100} height={100} priority />}
+                {isClient && <Image alt="Logo" src={logo} width={100} height={100} priority />}
               </div>
             </Link>
           </div>

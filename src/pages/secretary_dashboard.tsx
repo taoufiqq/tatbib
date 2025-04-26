@@ -25,9 +25,9 @@
 //       // Use the utility function to get consistent key names
 //       const { loginKey } = getRoleTokens(ROLES.SECRETARY);
 //       setLogin(localStorage.getItem(loginKey) || "");
-      
+
 //       const doctorLogin = localStorage.getItem("login_medcine");
-      
+
 //       if (!doctorLogin) {
 //         toast.error("Doctor information missing. Please log in again.");
 //         handleLogout();
@@ -97,12 +97,12 @@
 //   const handleLogout = () => {
 //     // Use the utility function to get consistent key names
 //     const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.SECRETARY);
-    
+
 //     // Clear all related localStorage items
 //     [tokenKey, loginKey, "role", idKey, "login_medcine"].forEach(
 //       item => localStorage.removeItem(item)
 //     );
-    
+
 //     router.push("/login_secretary");
 //   };
 
@@ -235,7 +235,7 @@
 //         )}
 //       </main>
 
-//       <ToastContainer 
+//       <ToastContainer
 //         position="top-right"
 //         autoClose={5000}
 //         hideProgressBar={false}
@@ -248,29 +248,31 @@
 // };
 
 // export default withAuth(SecretaryDashboard, { role: ROLES.SECRETARY });
-"use client"
+"use client";
 
-import type { NextPage } from "next"
-import Image from "next/image"
-import { useRouter } from "next/router"
-import { useEffect, useState } from "react"
-import Link from "next/link"
-import axios from "axios"
-import { ToastContainer, toast } from "react-toastify"
-import "react-toastify/dist/ReactToastify.css"
-import logo from "../../public/images/Secretary_avatar.png"
-import withAuth from "@/components/withPrivateRoute"
-import moment from "moment"
-import { MdDashboard, MdFolderShared } from "react-icons/md"
-import type { Appointment } from "@/types"
-import { RiLogoutCircleFill } from "react-icons/ri"
-import { ROLES, getRoleTokens } from "@/utils/roles"
+import type { NextPage } from "next";
+import Image from "next/image";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import logo from "../../public/images/Secretary_avatar.png";
+import withAuth from "@/components/withPrivateRoute";
+import moment from "moment";
+import { MdDashboard, MdFolderShared } from "react-icons/md";
+import type { Appointment } from "@/types";
+import { RiLogoutCircleFill } from "react-icons/ri";
+import { ROLES, getRoleTokens } from "@/utils/roles";
 
 const SecretaryDashboard: NextPage = () => {
-  const router = useRouter()
-  const [listAppointment, setListAppointment] = useState<Appointment[] | null>(null)
-  const [login, setLogin] = useState<string>("")
-  const [loading, setLoading] = useState(true)
+  const router = useRouter();
+  const [listAppointment, setListAppointment] = useState<Appointment[] | null>(
+    null
+  );
+  const [login, setLogin] = useState<string>("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Check authentication on component mount
@@ -278,64 +280,76 @@ const SecretaryDashboard: NextPage = () => {
       if (typeof window !== "undefined") {
         try {
           // Use the utility function to get consistent key names
-          const { loginKey, tokenKey } = getRoleTokens(ROLES.SECRETARY)
-          const secretaryLogin = localStorage.getItem(loginKey)
-          const token = localStorage.getItem(tokenKey)
+          const { loginKey, tokenKey } = getRoleTokens(ROLES.SECRETARY);
+          const secretaryLogin = localStorage.getItem(loginKey);
+          const token = localStorage.getItem(tokenKey);
 
           // Verify we have the necessary auth data
           if (!secretaryLogin || !token) {
-            console.error("Missing secretary authentication data")
-            toast.error("Authentication error. Please log in again.")
-            handleLogout()
-            return
+            console.error("Missing secretary authentication data");
+            toast.error("Authentication error. Please log in again.");
+            handleLogout();
+            return;
           }
 
-          setLogin(secretaryLogin)
+          setLogin(secretaryLogin);
 
-          const doctorLogin = localStorage.getItem("login_medcine")
+          const doctorLogin = localStorage.getItem("login_medcine");
 
           if (!doctorLogin) {
-            console.error("Doctor login information missing")
-            toast.error("Doctor information missing. Please log in again.")
-            handleLogout()
-            return
+            console.error("Doctor login information missing");
+            toast.error("Doctor information missing. Please log in again.");
+            handleLogout();
+            return;
           }
 
-          fetchAppointments(doctorLogin)
+          fetchAppointments(doctorLogin);
         } catch (error) {
-          console.error("Error in authentication check:", error)
-          toast.error("Authentication error. Please log in again.")
-          handleLogout()
+          console.error("Error in authentication check:", error);
+          toast.error("Authentication error. Please log in again.");
+          handleLogout();
         }
       }
-    }
+    };
 
-    checkAndLoadData()
-  }, [])
+    checkAndLoadData();
+  }, []);
 
   const fetchAppointments = (doctorLogin: string) => {
-    setLoading(true)
+    if (!doctorLogin) {
+      toast.error("Doctor information missing");
+      handleLogout();
+      return;
+    }
 
     // Get the token for authorization header
-    const { tokenKey } = getRoleTokens(ROLES.SECRETARY)
-    const token = localStorage.getItem(tokenKey)
+    const { tokenKey } = getRoleTokens(ROLES.SECRETARY);
+    const token = localStorage.getItem(tokenKey);
+    if (!token) {
+      toast.error("Session expired");
+      handleLogout();
+      return;
+    }
 
     axios
-      .get(`https://tatbib-api.onrender.com/appointment/getAppointmentSecretary/${doctorLogin}`, {
-        headers: {
-          Authorization: `Bearer ${token}`, // Add token to request if your API requires it
-        },
-      })
+      .get(
+        `https://tatbib-api.onrender.com/appointment/getAppointmentSecretary/${doctorLogin}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Add token to request if your API requires it
+          },
+        }
+      )
       .then((response) => {
         if (response.data) {
-          setListAppointment(response.data)
+          setListAppointment(response.data);
         } else {
-          setListAppointment(null)
+          setListAppointment(null);
         }
-        setLoading(false)
+        setLoading(false);
       })
       .catch((err) => {
-        console.error("Error fetching appointments:", err)
+        console.error("Error fetching appointments:", err);
 
         // Handle unauthorized errors specifically
         if (err.response && err.response.status === 401) {
@@ -343,45 +357,50 @@ const SecretaryDashboard: NextPage = () => {
             position: "top-right",
             autoClose: 5000,
             theme: "colored",
-          })
-          handleLogout()
+          });
+          handleLogout();
         } else {
           toast.error("Failed to load appointments", {
             position: "top-right",
             autoClose: 5000,
             theme: "colored",
-          })
+          });
         }
 
-        setLoading(false)
-      })
-  }
+        setLoading(false);
+      });
+  };
 
   const deleteAppointment = (id: string) => {
     if (window.confirm("Are you sure you want to delete this appointment?")) {
-      setLoading(true)
+      setLoading(true);
 
       // Get the token for authorization header
-      const { tokenKey } = getRoleTokens(ROLES.SECRETARY)
-      const token = localStorage.getItem(tokenKey)
+      const { tokenKey } = getRoleTokens(ROLES.SECRETARY);
+      const token = localStorage.getItem(tokenKey);
 
       axios
-        .delete(`https://tatbib-api.onrender.com/secretary/deleteAppointment/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`, // Add token to request if your API requires it
-          },
-        })
+        .delete(
+          `https://tatbib-api.onrender.com/secretary/deleteAppointment/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Add token to request if your API requires it
+            },
+          }
+        )
         .then(() => {
-          setListAppointment((prev) => prev?.filter((app) => app._id !== id) || null)
+          setListAppointment(
+            (prev) => prev?.filter((app) => app._id !== id) || null
+          );
           toast.success("Appointment deleted successfully", {
             position: "top-right",
             autoClose: 3000,
             theme: "colored",
-          })
-          setLoading(false)
+          });
+          setLoading(false);
         })
         .catch((err) => {
-          console.error("Error deleting appointment:", err)
+          console.error("Error deleting appointment:", err);
 
           // Handle unauthorized errors specifically
           if (err.response && err.response.status === 401) {
@@ -389,47 +408,47 @@ const SecretaryDashboard: NextPage = () => {
               position: "top-right",
               autoClose: 5000,
               theme: "colored",
-            })
-            handleLogout()
+            });
+            handleLogout();
           } else {
             toast.error("Failed to delete appointment", {
               position: "top-right",
               autoClose: 5000,
               theme: "colored",
-            })
+            });
           }
 
-          setLoading(false)
-        })
+          setLoading(false);
+        });
     }
-  }
+  };
 
   const handleAction = (id: string, path: string) => {
-    localStorage.setItem("idAppointment", id)
-    router.push(path)
-  }
+    localStorage.setItem("idAppointment", id);
+    router.push(path);
+  };
 
   const handleLogout = () => {
     try {
       // Use the utility function to get consistent key names
-      const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.SECRETARY)
+      const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.SECRETARY);
 
       // Clear all related localStorage items
-      localStorage.removeItem(tokenKey)
-      localStorage.removeItem(loginKey)
-      localStorage.removeItem("role")
-      localStorage.removeItem(idKey)
-      localStorage.removeItem("login_medcine")
-      localStorage.removeItem("idAppointment") // Also clear any appointment ID
+      localStorage.removeItem(tokenKey);
+      localStorage.removeItem(loginKey);
+      localStorage.removeItem("role");
+      localStorage.removeItem(idKey);
+      localStorage.removeItem("login_medcine");
+      localStorage.removeItem("idAppointment"); // Also clear any appointment ID
 
       // Force a complete page reload to clear any in-memory state
-      window.location.href = "/login_secretary"
+      window.location.href = "/login_secretary";
     } catch (error) {
-      console.error("Error during logout:", error)
+      console.error("Error during logout:", error);
       // If there's an error during logout, force a hard redirect anyway
-      window.location.href = "/login_secretary"
+      window.location.href = "/login_secretary";
     }
-  }
+  };
 
   return (
     <div className="Container">
@@ -438,10 +457,14 @@ const SecretaryDashboard: NextPage = () => {
         <header className="avatar">
           <Image
             alt="Secretary"
-            src={logo || "/placeholder.svg"}
+            src={logo}
             width={150}
             height={150}
             style={{ borderRadius: "50%", width: "150px" }}
+            onError={(e) => {
+              (e.target as HTMLImageElement).src =
+                "/images/avatar-fallback.png";
+            }}
             priority
           />
           <h6>Welcome</h6>
@@ -514,14 +537,17 @@ const SecretaryDashboard: NextPage = () => {
                         <td>{moment(item.dateTime).format("HH:mm")}</td>
                         <td
                           style={{
-                            color: item.status === "Unconfirmed" ? "red" : "green",
+                            color:
+                              item.status === "Unconfirmed" ? "red" : "green",
                           }}
                         >
                           {item.status}
                         </td>
                         <td>
                           <button
-                            onClick={() => handleAction(item._id, "/alert_appointment")}
+                            onClick={() =>
+                              handleAction(item._id, "/alert_appointment")
+                            }
                             className="btn-action"
                             title="Alert"
                             aria-label="Alert"
@@ -529,7 +555,9 @@ const SecretaryDashboard: NextPage = () => {
                             <i className="fas fa-bell" />
                           </button>
                           <button
-                            onClick={() => handleAction(item._id, "/confirm_appointment")}
+                            onClick={() =>
+                              handleAction(item._id, "/confirm_appointment")
+                            }
                             className="btn-action"
                             title="Confirm"
                             aria-label="Confirm"
@@ -566,7 +594,7 @@ const SecretaryDashboard: NextPage = () => {
         draggable
       />
     </div>
-  )
-}
+  );
+};
 
-export default withAuth(SecretaryDashboard, { role: ROLES.SECRETARY })
+export default withAuth(SecretaryDashboard, { role: ROLES.SECRETARY });
