@@ -1,92 +1,70 @@
 import { useRouter } from "next/router";
-import { useEffect, ReactElement, useState } from "react";
-import { NextComponentType, NextPageContext } from "next";
-import LoginMedcine from "@/pages/login_medicine";
-import LoginPatient from "@/pages/login_patient";
-import LoginSecretary from "@/pages/login_secretary";
-import { AuthRole, normalizeRole, ROLES } from "@/utils/roles";
+import { useEffect, useState } from "react";
+import { normalizeRole } from "@/utils/roles";
+import { ROLES } from "@/utils/roles";
 
-type AuthProps = {
-  isLoggedIn?: boolean;
-};
-
-const withAuth = <P extends {}>(
-  Component: NextComponentType<NextPageContext, AuthProps, P>,
-  options?: { role?: AuthRole }
+const withAuth = <P extends object>(
+  WrappedComponent: React.ComponentType<P>,
+  options?: { role?: keyof typeof ROLES }
 ) => {
-  const AuthComponent: NextComponentType<
-    NextPageContext,
-    AuthProps,
-    P & AuthProps
-  > = (props: P & AuthProps): ReactElement | null => {
+  const AuthComponent = (props: P) => {
     const router = useRouter();
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
     const checkAuth = () => {
       if (typeof window === "undefined") return false;
 
-      let tokenKey, loginKey;
-      
-      switch(options?.role) {
-        case ROLES.MEDICINE:
-          tokenKey = "tokenMedicine";
-          loginKey = "LoginMedicine";
-          break;
-        case ROLES.SECRETARY:
-          tokenKey = "tokenSecretary";
-          loginKey = "LoginSecretary";
-          break;
-        case ROLES.PATIENT:
-          tokenKey = "tokenPatient";
-          loginKey = "LoginPatient";
-          break;
-        default:
-          return false;
+      console.log("Auth Check - localStorage:", {
+        tokenMedicine: localStorage.getItem("tokenMedicine"),
+        role: localStorage.getItem("role"),
+        login: localStorage.getItem("LoginMedicine"),
+        id: localStorage.getItem("id_medcine")
+      });
+
+      const storedRole = normalizeRole(localStorage.getItem("role") || "");
+      const requiredRole = options?.role ? ROLES[options.role] : null;
+
+      if (!requiredRole || storedRole !== requiredRole) {
+        console.log(`Role mismatch: stored ${storedRole}, required ${requiredRole}`);
+        return false;
       }
 
-      const token = localStorage.getItem(tokenKey);
-      const login = localStorage.getItem(loginKey);
-      const role = normalizeRole(localStorage.getItem("role") || "");
+      const token = localStorage.getItem("tokenMedicine");
+      const login = localStorage.getItem("LoginMedicine");
 
-      console.log("Auth Check:", { token, login, role, expected: options?.role });
+      if (!token || !login) {
+        console.log("Missing token or login");
+        return false;
+      }
 
-      return !!token && !!login && role === options?.role;
+      return true;
     };
 
     useEffect(() => {
       const authStatus = checkAuth();
       setIsAuthenticated(authStatus);
-      
+
       if (!authStatus) {
-        const redirectPath =
-          options?.role === ROLES.MEDICINE
-            ? "/login_medicine"
-            : options?.role === ROLES.SECRETARY
-            ? "/login_secretary"
-            : "/login_patient";
-        console.log("Redirecting to:", redirectPath);
+        console.log("Not authenticated, redirecting...");
+        const redirectPath = "/login_medicine";
         router.push(redirectPath);
       }
-    }, [router, options?.role]);
+    }, [router]);
 
     if (isAuthenticated === null) {
       return <div>Loading...</div>;
     }
 
     if (!isAuthenticated) {
-      return options?.role === ROLES.MEDICINE ? (
-        <LoginMedcine />
-      ) : options?.role === ROLES.SECRETARY ? (
-        <LoginSecretary />
-      ) : (
-        <LoginPatient />
-      );
+      return null;
     }
 
-    return <Component {...props} />;
+    return <WrappedComponent {...props} />;
   };
 
-  // ... (keep rest of the HOC implementation)
+  // Set display name for debugging purposes
+  AuthComponent.displayName = `withAuth(${WrappedComponent.displayName || WrappedComponent.name || 'Component'})`;
+
   return AuthComponent;
 };
 

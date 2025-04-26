@@ -221,4 +221,4 @@ const PatientDashboard = () => {
   );
 };
 
-export default withAuth(PatientDashboard, { role: ROLES.PATIENT });
+export default withAuth(PatientDashboard, { role: "PATIENT" });

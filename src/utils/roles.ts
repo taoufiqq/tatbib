@@ -1,19 +1,18 @@
+// utils/roles.ts
 export const normalizeRole = (role: string): string => {
     if (!role) return "";
   
     const roleMap: Record<string, string> = {
       "medcine": "medicine",
       "Medcine": "medicine",
-      "médecin": "medicine", // French variant
-      "secretary": "secretary", 
+      "médecin": "medicine",
+      "secretary": "secretary",
       "Secretary": "secretary",
-      "secrétaire": "secretary", // French variant
       "patient": "patient",
       "Patient": "patient"
     };
   
-    // First try exact match, then lowercase match, then return lowercase
-    return roleMap[role] || roleMap[role.toLowerCase()] || role.toLowerCase();
+    return roleMap[role] || role.toLowerCase();
   };
   
   export const ROLES = {

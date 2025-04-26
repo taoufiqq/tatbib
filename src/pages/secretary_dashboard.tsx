@@ -202,4 +202,4 @@ const SecretaryDashboard : NextPage = () => {
   );
 };
 
-export default withAuth(SecretaryDashboard, { role: ROLES.SECRETARY });
+export default withAuth(SecretaryDashboard, { role: "SECRETARY" });

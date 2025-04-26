@@ -217,4 +217,5 @@ const ListOrdonnances: NextPage = () => {
   );
 };
 
-export default withAuth(ListOrdonnances, { role: "patient" });
+// In your component
+export default withAuth(ListOrdonnances, { role: "PATIENT" });

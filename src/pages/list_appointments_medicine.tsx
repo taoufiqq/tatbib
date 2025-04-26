@@ -12,34 +12,62 @@ import { Appointment } from "@/types";
 import { MdDashboard } from "react-icons/md";
 import { FaNotesMedical, FaUserEdit, FaUserPlus } from "react-icons/fa";
 import { RiLogoutCircleFill } from "react-icons/ri";
-import { ROLES } from "@/utils/roles";
+import { normalizeRole, ROLES } from "@/utils/roles";
 const ListAppointments = () => {
   const router = useRouter();
   const [listAppointment, setListAppointment] = useState<Appointment[] | null>(null);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        const id = localStorage.getItem("id_medcine");
-        if (!id) {
-          throw new Error("No medicine ID found");
-        }
-
-        const response = await axios.get(
-          `https://tatbib-api.onrender.com/appointment/getAppointmentMedcine/${id}`
-        );
-        setListAppointment(response.data);
-      } catch (err) {
-        console.error("Error fetching appointments:", err);
-        toast.error("Failed to load appointments");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAppointments();
+    console.log("Authentication Status Check:", {
+      token: localStorage.getItem("tokenMedicine"),
+      role: localStorage.getItem("role"),
+      normalizedRole: normalizeRole(localStorage.getItem("role") || ""),
+      login: localStorage.getItem("LoginMedicine")
+    });
   }, []);
+  const fetchAppointments = async () => {
+    try {
+      const id = localStorage.getItem("id_medcine");
+      console.log("Fetching appointments for medicine ID:", id);
+      
+      if (!id) {
+        throw new Error("No medicine ID found in localStorage");
+      }
+  
+      const token = localStorage.getItem("tokenMedicine");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+  
+      const response = await axios.get(
+        `https://tatbib-api.onrender.com/appointment/getAppointmentMedcine/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      
+      console.log("Appointments data:", response.data);
+      setListAppointment(response.data);
+    } catch (err: unknown) {
+      console.error("Error fetching appointments:", err);
+      
+      // Type guard to check if it's an Axios error
+      if (axios.isAxiosError(err)) {
+        if (err.response?.status === 401) {
+          toast.error("Session expired. Please login again.");
+          handleLogout();
+        } else {
+          toast.error("Failed to load appointments");
+        }
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+    }finally {
+      setLoading(false);
+    }
+  };
 
   const handleCreateOrdonnance = (appointmentId: string, patientId: string) => {
     localStorage.setItem("idAppointment", appointmentId);
@@ -323,4 +351,4 @@ const ListAppointments = () => {
   );
 };
 
-export default withAuth(ListAppointments, { role: ROLES.MEDICINE });
+export default withAuth(ListAppointments, { role: "MEDICINE" });
