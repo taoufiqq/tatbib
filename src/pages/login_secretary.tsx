@@ -33,12 +33,14 @@ export default function LoginSecretary() {
       }
 
       const { status, tokenSecretary, roleSecretary, id, loginMedcine } = response.data;
-      const normalizedRole = normalizeRole(roleSecretary);
+      console.log("Raw response role:", roleSecretary);
 
-      console.log("Normalized Role:", normalizedRole);
-      console.log("Expected Role:", ROLES.SECRETARY);
-
-      if (normalizedRole !== ROLES.SECRETARY) {
+      // Make sure we have a role string to normalize (add fallback)
+      const roleToNormalize = roleSecretary || "secretary"; // Default to secretary if missing
+      const normalizedRole = normalizeRole(roleToNormalize);
+      console.log("After normalization:", normalizedRole);
+      console.log("Expected role:", ROLES.SECRETARY);
+      if (normalizedRole && normalizedRole !== ROLES.SECRETARY) {
         throw new Error(`Invalid role ${normalizedRole} for secretary login`);
       }
 
