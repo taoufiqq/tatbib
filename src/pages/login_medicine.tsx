@@ -7,9 +7,10 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import logo from "../../public/images/logo.png";
 import Imglogin from "../../public/images/login3.svg";
-import { normalizeRole, ROLES } from "@/utils/roles";
+import { normalizeRole, ROLES, getRoleTokens } from "@/utils/roles";
 
-export default function LoginMedcine() {
+// Renamed component to have correct spelling
+export default function LoginMedicine() {
   const router = useRouter();
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
@@ -21,6 +22,7 @@ export default function LoginMedcine() {
 
     try {
       console.log("Attempting login...");
+      // Note: The API endpoint might still use "medcine" - you may need to update that on the backend
       const response = await axios.post(
         `https://tatbib-api.onrender.com/medcine/login`,
         { login, password }
@@ -47,19 +49,22 @@ export default function LoginMedcine() {
         return;
       }
 
-      // Store all auth data atomically
-      localStorage.setItem("tokenMedicine", token);
-      localStorage.setItem("LoginMedicine", login);
+      // Get the correct storage keys from our utility function
+      const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.MEDICINE);
+
+      // Store all auth data using the keys from our utility function
+      localStorage.setItem(tokenKey, token);
+      localStorage.setItem(loginKey, login);
       localStorage.setItem("role", normalizedRole); // Store normalized role
-      localStorage.setItem("id_medcine", id);
+      localStorage.setItem(idKey, id);
       localStorage.setItem("medcine", JSON.stringify(medcine));
 
       // Verify storage immediately
       console.log("Stored Auth Data:", {
-        token: localStorage.getItem("tokenMedicine"),
+        token: localStorage.getItem(tokenKey),
         role: localStorage.getItem("role"),
-        login: localStorage.getItem("LoginMedicine"),
-        id: localStorage.getItem("id_medcine")
+        login: localStorage.getItem(loginKey),
+        id: localStorage.getItem(idKey)
       });
 
       // Force reload to ensure auth state is picked up

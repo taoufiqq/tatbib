@@ -13,24 +13,24 @@ const withAuth = <P extends object>(
     const checkAuth = () => {
       if (typeof window === "undefined") return false;
 
-      console.log("Auth Check - localStorage:", {
-        token: localStorage.getItem("tokenMedicine"),
-        role: localStorage.getItem("role"),
-        login: localStorage.getItem("LoginMedicine"),
-        id: localStorage.getItem("id_medcine")
-      });
-
       const storedRole = normalizeRole(localStorage.getItem("role") || "");
       const requiredRole = options?.role;
+      const { tokenKey, loginKey, idKey } = getRoleTokens(storedRole as AuthRole);
+
+      console.log("Auth Check - localStorage:", {
+        role: storedRole,
+        token: localStorage.getItem(tokenKey),
+        login: localStorage.getItem(loginKey),
+        id: localStorage.getItem(idKey)
+      });
 
       if (requiredRole && storedRole !== requiredRole) {
         console.log(`Role mismatch: stored ${storedRole}, required ${requiredRole}`);
         return false;
       }
 
-      const { tokenKey } = getRoleTokens(storedRole as AuthRole);
       const token = localStorage.getItem(tokenKey);
-      const login = localStorage.getItem(`Login${storedRole.charAt(0).toUpperCase() + storedRole.slice(1)}`);
+      const login = localStorage.getItem(loginKey);
 
       if (!token || !login) {
         console.log("Missing token or login");
