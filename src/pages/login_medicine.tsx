@@ -7,7 +7,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import logo from "../../public/images/logo.png";
 import Imglogin from "../../public/images/login3.svg";
-import { normalizeRole } from "@/utils/roles";
+import { normalizeRole, ROLES } from "@/utils/roles";
 
 export default function LoginMedcine() {
   const router = useRouter();
@@ -36,9 +36,9 @@ export default function LoginMedcine() {
       const normalizedRole = normalizeRole(role);
 
       console.log("Normalized Role:", normalizedRole);
-      console.log("Expected Role:", "medicine");
+      console.log("Expected Role:", ROLES.MEDICINE);
 
-      if (normalizedRole !== "medicine") {
+      if (normalizedRole !== ROLES.MEDICINE) {
         throw new Error(`Invalid role ${normalizedRole} for doctor login`);
       }
 
@@ -50,7 +50,7 @@ export default function LoginMedcine() {
       // Store all auth data atomically
       localStorage.setItem("tokenMedicine", token);
       localStorage.setItem("LoginMedicine", login);
-      localStorage.setItem("role", normalizedRole);
+      localStorage.setItem("role", normalizedRole); // Store normalized role
       localStorage.setItem("id_medcine", id);
       localStorage.setItem("medcine", JSON.stringify(medcine));
 
@@ -65,9 +65,17 @@ export default function LoginMedcine() {
       // Force reload to ensure auth state is picked up
       window.location.href = "/list_appointments_medicine";
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Login Error:", error);
-      toast.error(error.message || "Login failed. Please try again.");
+      let errorMessage = "Login failed. Please try again.";
+      
+      if (axios.isAxiosError(error)) {
+        errorMessage = error.response?.data?.message || error.message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -131,7 +139,14 @@ export default function LoginMedcine() {
                     className="form-control mt-5 btnConnect"
                     disabled={isLoading}
                   >
-                    {isLoading ? "Logging in..." : "Log in"}
+                    {isLoading ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        Logging in...
+                      </>
+                    ) : (
+                      "Log in"
+                    )}
                   </button>
 
                   <Link href="/sign_up_medicine" style={{ textDecoration: "none" }}>
@@ -158,7 +173,14 @@ export default function LoginMedcine() {
           </div>
         </div>
       </div>
-      <ToastContainer position="top-right" autoClose={5000} />
+      <ToastContainer 
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+      />
     </section>
   );
 }

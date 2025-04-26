@@ -351,4 +351,5 @@ const ListAppointments = () => {
   );
 };
 
-export default withAuth(ListAppointments, { role: "MEDICINE" });
+// At the bottom of list_appointments_medicine.tsx
+export default withAuth(ListAppointments, { role: ROLES.MEDICINE }); // Now using the value

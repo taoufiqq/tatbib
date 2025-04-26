@@ -1,4 +1,3 @@
-// utils/roles.ts
 export const normalizeRole = (role: string): string => {
     if (!role) return "";
   
@@ -21,7 +20,8 @@ export const normalizeRole = (role: string): string => {
     PATIENT: "patient"
   } as const;
   
-  export type AuthRole = typeof ROLES[keyof typeof ROLES];
+  export type AuthRole = typeof ROLES[keyof typeof ROLES]; // "medicine" | "secretary" | "patient"
+  export type AuthRoleKey = keyof typeof ROLES; // "MEDICINE" | "SECRETARY" | "PATIENT"
   
   export const getRoleTokens = (role: AuthRole) => {
     switch (role) {
