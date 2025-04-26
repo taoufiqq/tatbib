@@ -392,14 +392,6 @@ import { FaNotesMedical, FaUserEdit, FaUserPlus } from "react-icons/fa";
 import { RiLogoutCircleFill } from "react-icons/ri";
 import { ROLES, getRoleTokens } from "@/utils/roles";
 
-// Define a type for appointment status to ensure consistency
-type AppointmentStatus =
-  | "Pending"
-  | "Confirmed"
-  | "Cancelled"
-  | "Completed"
-  | "Unconfirmed";
-
 const ListAppointments = () => {
   const router = useRouter();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -420,7 +412,7 @@ const ListAppointments = () => {
           `${process.env.NEXT_PUBLIC_API_URL}/appointment/getAppointmentMedicine/${doctorId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
-            params: { populate: "patient" },
+            params: { populate: "patient" }
           }
         );
 
@@ -432,9 +424,7 @@ const ListAppointments = () => {
             handleLogout();
             toast.error("Session expired. Please login again.");
           } else {
-            toast.error(
-              error.response?.data?.message || "Failed to load appointments"
-            );
+            toast.error(error.response?.data?.message || "Failed to load appointments");
           }
         } else {
           toast.error("An unexpected error occurred");
@@ -453,20 +443,17 @@ const ListAppointments = () => {
       return;
     }
 
-    localStorage.setItem(
-      "currentAppointment",
-      JSON.stringify({
-        id: appointment._id,
-        patientId: appointment.patient._id,
-        patientName: `${appointment.patient.firstName} ${appointment.patient.lastName}`,
-      })
-    );
+    localStorage.setItem("currentAppointment", JSON.stringify({
+      id: appointment._id,
+      patientId: appointment.patient._id,
+      patientName: `${appointment.patient.firstName} ${appointment.patient.lastName}`
+    }));
 
     router.push("/create_ordonnance");
   };
 
   const handleLogout = () => {
-    [tokenKey, loginKey, idKey, "role"].forEach((key) => {
+    [tokenKey, loginKey, idKey, "role"].forEach(key => {
       localStorage.removeItem(key);
     });
     router.push("/login_medicine");
@@ -513,10 +500,7 @@ const ListAppointments = () => {
           <NavItem icon={<FaUserPlus />} href="/account_secretary">
             Secretary
           </NavItem>
-          <li
-            className="flex items-center p-3 hover:bg-gray-700 rounded cursor-pointer"
-            onClick={handleLogout}
-          >
+          <li className="flex items-center p-3 hover:bg-gray-700 rounded cursor-pointer" onClick={handleLogout}>
             <RiLogoutCircleFill className="mr-3" />
             <span>Log Out</span>
           </li>
@@ -546,15 +530,12 @@ const ListAppointments = () => {
                     <tr key={appointment._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="font-medium">
-                          {appointment.patient?.firstName}{" "}
-                          {appointment.patient?.lastName}
+                          {appointment.patient?.firstName} {appointment.patient?.lastName}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>{appointment.patient?.email}</div>
-                        <div className="text-gray-500">
-                          {appointment.patient?.telephone}
-                        </div>
+                        <div className="text-gray-500">{appointment.patient?.telephone}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {moment(appointment.dateTime).format("MMM D, YYYY")}
@@ -563,18 +544,12 @@ const ListAppointments = () => {
                         {moment(appointment.dateTime).format("h:mm A")}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <StatusBadge
-                          status={appointment.status as AppointmentStatus}
-                        />
+                        <StatusBadge status={appointment.status} />
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
-                        {!["Unconfirmed", "Cancelled"].includes(
-                          appointment.status
-                        ) && (
+                        {appointment.status !== "Unconfirmed" && (
                           <button
-                            onClick={() =>
-                              handleCreatePrescription(appointment)
-                            }
+                            onClick={() => handleCreatePrescription(appointment)}
                             className="text-blue-600 hover:text-blue-900"
                             title="Create Prescription"
                           >
@@ -601,20 +576,9 @@ const ListAppointments = () => {
 };
 
 // Helper Components
-const NavItem = ({
-  icon,
-  href,
-  children,
-}: {
-  icon: React.ReactNode;
-  href: string;
-  children: React.ReactNode;
-}) => (
+const NavItem = ({ icon, href, children }: { icon: React.ReactNode, href: string, children: React.ReactNode }) => (
   <li>
-    <Link
-      href={href}
-      className="flex items-center p-3 hover:bg-gray-700 rounded"
-    >
+    <Link href={href} className="flex items-center p-3 hover:bg-gray-700 rounded">
       <span className="mr-3">{icon}</span>
       <span>{children}</span>
     </Link>
@@ -622,27 +586,21 @@ const NavItem = ({
 );
 
 const TableHeader = ({ children }: { children: React.ReactNode }) => (
-  <th
-    scope="col"
-    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-  >
+  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
     {children}
   </th>
 );
 
-const StatusBadge = ({ status }: { status: AppointmentStatus }) => {
+const StatusBadge = ({ status }: { status: string }) => {
   const statusColors = {
     Confirmed: "bg-green-100 text-green-800",
-    Pending: "bg-yellow-100 text-yellow-800",
     Unconfirmed: "bg-yellow-100 text-yellow-800",
     Cancelled: "bg-red-100 text-red-800",
-    Completed: "bg-blue-100 text-blue-800",
+    Completed: "bg-blue-100 text-blue-800"
   };
 
   return (
-    <span
-      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColors[status]}`}
-    >
+    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColors[status as keyof typeof statusColors] || 'bg-gray-100 text-gray-800'}`}>
       {status}
     </span>
   );
