@@ -10,6 +10,7 @@ import { Secretary } from "@/types";
 import { MdDashboard } from "react-icons/md";
 import { FaNotesMedical, FaUserEdit, FaUserPlus } from "react-icons/fa";
 import { RiLogoutCircleFill } from "react-icons/ri";
+import { getRoleTokens, ROLES } from "@/utils/roles";
 
 export default function SecretaryCompte() {
   const router = useRouter();
@@ -19,6 +20,8 @@ export default function SecretaryCompte() {
 
   const [listSecretary, setListSecretary] = useState<Secretary[] | null>(null);
   const [loading, setLoading] = useState(true);
+    const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.MEDICINE);
+  
   if (typeof window !== "undefined") {
     const loginMedcine = localStorage.getItem("LoginMedcine") || " ";
 
@@ -60,32 +63,21 @@ export default function SecretaryCompte() {
     };
 
     //-----------------------log out-----------------
-    const logOut = () => {
-      if (typeof window !== "undefined") {
-        // Remove only medicine-related items from localStorage
-        const medicineItems = [
-          "tokenMedicine",
-          "LoginMedicine",
-          "id_medcine",
-          "role",
-          "login_medcine",
-        ];
-
-        medicineItems.forEach((item) => localStorage.removeItem(item));
-      }
-
-      router.push("/login_medicine");
-      toast.success("Logged out successfully", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      });
-    };
+  const handleLogout = () => {
+    const medicineItems = [tokenKey, loginKey, idKey, "role"];
+    medicineItems.forEach(item => localStorage.removeItem(item));
+    
+    router.push("/login_medicine");
+    toast.success("Logged out successfully", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      theme: "colored"
+    });
+  };
     if (loading) {
       return (
         <div
@@ -123,69 +115,61 @@ export default function SecretaryCompte() {
     }
     return (
       <div className="Container">
-        <nav className="menu" tabIndex={0}>
-          <div className="smartphone-menu-trigger" />
-          <header className="avatar">
-            <Image
-              alt=""
-              src={logo}
-              style={{ borderRadius: "50%", width: "150px" }}
-            />
-            <h6>Welcome</h6>
-            <h5 style={{ color: "white" }}>{loginMedcine}</h5>
-          </header>
-          <ul>
-            <li tabIndex={0} className="icon-customers">
-              {" "}
-              <MdDashboard />
-              <Link
-                href="/list_appointments_medicine"
-                style={{ textDecoration: "none", color: "white" }}
-              >
-                <span>ListAppointments</span>
-              </Link>
-              <ToastContainer />
-            </li>
+          <nav className="menu" tabIndex={0}>
+        <div className="smartphone-menu-trigger" />
+        <header className="avatar">
+          <Image
+            alt="Doctor profile"
+            src={logo}
+            width={150}
+            height={150}
+            style={{ borderRadius: "50%" }}
+          />
+          <h6>Welcome</h6>
+          <h5 style={{ color: "white" }}>{loginMedcine}</h5>
+        </header>
 
-            <li tabIndex={0} className="icon-profil">
-              {" "}
-              <FaUserEdit />
-              <Link
-                href="/medicine_dashboard"
-                style={{ textDecoration: "none", color: "white" }}
-              >
-                <span>MyAccount</span>
-              </Link>
-              <ToastContainer />
-            </li>
-            <li tabIndex={0} className="icon-users">
-              {" "}
-              <FaNotesMedical />
-              <Link
-                href="/ordonnances_by_medicine"
-                style={{ textDecoration: "none", color: "white" }}
-              >
-                <span>Ordonnances</span>
-              </Link>
-            </li>
-            <li tabIndex={0} className="icon-Secrétaire">
-              <FaUserPlus />
-              <Link
-                href="/account_secretary"
-                style={{ textDecoration: "none", color: "white" }}
-              >
-                <span>Secretary</span>
-              </Link>
-              <ToastContainer />
-            </li>
-            <li tabIndex={0} className="icon-settings">
-              {" "}
-              <RiLogoutCircleFill />
-              <span onClick={logOut}>Log out</span>
-              <ToastContainer />
-            </li>
-          </ul>
-        </nav>
+        <ul>
+          <li tabIndex={0} className="icon-customers">
+            <MdDashboard />
+            <Link href="/list_appointments_medicine" passHref>
+              <span style={{ textDecoration: "none", color: "white" }}>
+                List Appointments
+              </span>
+            </Link>
+          </li>
+          <li tabIndex={0} className="icon-profil">
+            <FaUserEdit />
+            <Link href="/medicine_dashboard" passHref>
+              <span style={{ textDecoration: "none", color: "white" }}>
+                My Account
+              </span>
+            </Link>
+          </li>
+          <li tabIndex={0} className="icon-users">
+            <FaNotesMedical />
+            <Link href="/ordonnances_by_medicine" passHref>
+              <span style={{ textDecoration: "none", color: "white" }}>
+                Ordonnances
+              </span>
+            </Link>
+          </li>
+          <li tabIndex={0} className="icon-Secrétaire">
+            <FaUserPlus />
+            <Link href="/account_secretary" passHref>
+              <span style={{ textDecoration: "none", color: "white" }}>
+                Secretary
+              </span>
+            </Link>
+          </li>
+          <li tabIndex={0} className="icon-settings">
+            <RiLogoutCircleFill />
+            <span onClick={handleLogout} style={{ cursor: "pointer" }}>
+              Log out
+            </span>
+          </li>
+        </ul>
+      </nav>
         <main>
           <div className="helper">
             Secretary Account<span> Secretary | Management</span>
