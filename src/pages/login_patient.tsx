@@ -20,65 +20,64 @@ export default function LoginPatient() {
     setIsLoading(true);
 
     try {
+      console.log("Attempting patient login...");
       const response = await axios.post(
         `https://tatbib-api.onrender.com/patient/login`,
         { login, password }
       );
+
+      console.log("API Response:", response.data);
 
       if (response.data.message) {
         throw new Error(response.data.message);
       }
 
       const { verified, token, role, id } = response.data;
+      const normalizedRole = normalizeRole(role);
+
+      console.log("Normalized Role:", normalizedRole);
+      console.log("Expected Role:", ROLES.PATIENT);
+
+      if (normalizedRole !== ROLES.PATIENT) {
+        throw new Error(`Invalid role ${normalizedRole} for patient login`);
+      }
 
       if (verified === false) {
-        toast.info(
-          "Please verify your account first by clicking the link in your email",
-          {
-            position: "top-right",
-            autoClose: 5000,
-            theme: "colored",
-          }
-        );
+        toast.warn("Please verify your account first via email");
         return;
       }
 
-      // Normalize role and get the correct storage keys
-      const normalizedRole = normalizeRole(role);
+      // Get patient-specific storage keys
       const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.PATIENT);
 
-      // Store auth data using the dynamic keys
+      // Store auth data using dynamic keys
       localStorage.setItem(tokenKey, token);
       localStorage.setItem(loginKey, login);
-      localStorage.setItem("role", normalizedRole); // Using consistent 'role' key
+      localStorage.setItem("role", normalizedRole);
       localStorage.setItem(idKey, id);
 
-      console.log("Patient login successful", {
-        role: normalizedRole,
+      // Verify storage immediately
+      console.log("Stored Patient Auth Data:", {
         token: localStorage.getItem(tokenKey),
+        role: localStorage.getItem("role"),
         login: localStorage.getItem(loginKey),
-        id: localStorage.getItem(idKey),
-        storedRole: localStorage.getItem("role"),
+        id: localStorage.getItem(idKey)
       });
 
-      router.push("/patient_dashboard");
-      toast.success("Authenticated successfully", {
-        position: "top-right",
-        autoClose: 3000,
-        theme: "colored",
-      });
-    } catch (error: any) {
-      console.error("Login error:", error);
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "Login failed. Please try again.";
+      // Force reload to ensure auth state is picked up
+      window.location.href = "/patient_dashboard";
 
-      toast.error(errorMessage, {
-        position: "top-right",
-        autoClose: 5000,
-        theme: "colored",
-      });
+    } catch (error: unknown) {
+      console.error("Login Error:", error);
+      let errorMessage = "Login failed. Please try again.";
+      
+      if (axios.isAxiosError(error)) {
+        errorMessage = error.response?.data?.message || error.message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -146,11 +145,10 @@ export default function LoginPatient() {
                     disabled={isLoading}
                   >
                     {isLoading ? (
-                      <span
-                        className="spinner-border spinner-border-sm"
-                        role="status"
-                        aria-hidden="true"
-                      ></span>
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        Logging in...
+                      </>
                     ) : (
                       "Log in"
                     )}
@@ -182,7 +180,14 @@ export default function LoginPatient() {
           </div>
         </div>
       </div>
-      <ToastContainer />
+      <ToastContainer 
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+      />
     </section>
   );
 }
