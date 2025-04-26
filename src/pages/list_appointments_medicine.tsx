@@ -129,7 +129,7 @@ const ListAppointments = () => {
 
   return (
     <div className="Container" style={{ overflow: "hidden" }}>
-      <nav className="menu" tabIndex={0}>
+        <nav className="menu" tabIndex={0}>
         <div className="smartphone-menu-trigger" />
         <header className="avatar">
           <Image
@@ -267,7 +267,7 @@ const ListAppointments = () => {
       </main>
       <ToastContainer position="top-right" autoClose={5000} />
 
-      <style jsx>{`
+      {/* <style jsx>{`
         .Container {
           position: relative;
           display: flex;
@@ -411,7 +411,7 @@ const ListAppointments = () => {
           cursor: pointer;
           font-size: 1.2rem;
         }
-      `}</style>
+      `}</style> */}
     </div>
   );
 };
