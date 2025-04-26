@@ -6,6 +6,8 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import logo from "../../public/images/logo.png";
+import withAuth from "@/components/withPrivateRoute";
+import { ROLES, getRoleTokens } from "@/utils/roles";
 
 interface AppointmentData {
   dateTime: string;
@@ -14,131 +16,138 @@ interface AppointmentData {
   loginMedcine?: string;
 }
 
-export default function RendezVous() {
+interface MedecinData {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  // Add other doctor properties as needed
+}
+
+const RendezVous = () => {
   const router = useRouter();
   const [dateTime, setDateTime] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [doctorInfo, setDoctorInfo] = useState<any>(null);
+  const [doctorInfo, setDoctorInfo] = useState<MedecinData | null>(null);
   const { id, login } = router.query;
 
-  // Fetch doctor info when query params are available
+  // Get role-specific tokens
+  const { tokenKey, idKey } = getRoleTokens(ROLES.PATIENT);
+
   useEffect(() => {
-    if (id) {
-      axios
-        .get(`https://tatbib-api.onrender.com/medcine/getMedcineById/${id}`)
-        .then((response) => {
-          console.log("Medcine data:", response.data);
-          setDoctorInfo(response.data);
-        })
-        .catch((err) => {
-          console.error("Error fetching medcine:", err);
-          toast.error("Failed to load doctor information");
-        });
-    }
+    console.log("Authentication Status Check:", {
+      token: localStorage.getItem(tokenKey),
+      role: localStorage.getItem("role"),
+      patientId: localStorage.getItem(idKey)
+    });
+
+    if (id) fetchDoctorInfo();
   }, [id]);
+
+  const fetchDoctorInfo = async () => {
+    try {
+      const token = localStorage.getItem(tokenKey);
+      if (!token) throw new Error("No authentication token found");
+
+      const response = await axios.get<MedecinData>(
+        `https://tatbib-api.onrender.com/medcine/getMedcineById/${id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      setDoctorInfo(response.data);
+    } catch (err: unknown) {
+      console.error("Error fetching medcine:", err);
+      let errorMessage = "Failed to load doctor information";
+      
+      if (axios.isAxiosError(err)) {
+        if (err.response?.status === 401) {
+          handleLogout();
+          return;
+        }
+        errorMessage = err.response?.data?.message || errorMessage;
+      }
+      toast.error(errorMessage);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Check if client side
-    if (typeof window === 'undefined') {
-      setIsSubmitting(false);
-      return;
-    }
-
-    const token = localStorage.getItem("tokenPatient");
-    const idPatient = localStorage.getItem("id_patient");
-
-    // Validate patient login
-    if (!token || !idPatient) {
-      router.push("/login_patient");
-      toast.warn("Please login first", {
-        position: "top-center",
-        autoClose: 5000,
-        theme: "colored"
-      });
-      setIsSubmitting(false);
-      return;
-    }
-
-    // Validate appointment data
-    if (!dateTime) {
-      toast.error("Please select a date and time");
-      setIsSubmitting(false);
-      return;
-    }
-
-    if (!id) {
-      toast.error("Doctor information is missing");
-      setIsSubmitting(false);
-      return;
-    }
-
     try {
-      // Prepare appointment data
+      // Client-side check
+      if (typeof window === 'undefined') return;
+
+      const token = localStorage.getItem(tokenKey);
+      const patientId = localStorage.getItem(idKey);
+
+      // Validate credentials
+      if (!token || !patientId) {
+        toast.warn("Please login first", { position: "top-center" });
+        router.push("/login_patient");
+        return;
+      }
+
+      if (!dateTime || !id) {
+        toast.error("Missing required information");
+        return;
+      }
+
       const appointmentData: AppointmentData = {
         dateTime: new Date(dateTime).toISOString(),
         medcine: id as string,
-        patient: idPatient,
+        patient: patientId,
         loginMedcine: login as string
       };
 
-      console.log("Submitting appointment:", appointmentData);
-
-      // Make API request with proper headers
       const response = await axios.post(
         "https://tatbib-api.onrender.com/appointment/addAppointment",
         appointmentData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
-          }
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // Handle response
-      if (response.data?.error) {
-        toast.info("This time slot is already booked", {
-          position: "top-center",
-          autoClose: 5000,
-          theme: "colored"
-        });
-      } else if (response.data?._id) {
-        localStorage.setItem("id_appointment", response.data._id);
-        toast.success("Appointment booked successfully", {
-          position: "top-right",
-          autoClose: 5000,
-          theme: "colored"
-        });
-        router.push("/patient_dashboard");
-      } else {
-        throw new Error("Invalid response from server");
-      }
-    } catch (error) {
-      console.error("Appointment error:", error);
-      let errorMessage = "Failed to book appointment";
-      
-      if (axios.isAxiosError(error)) {
-        const responseMsg = error.response?.data?.message;
-        errorMessage = responseMsg || "Network error. Please try again later.";
-      }
-      
-      toast.error(errorMessage, {
-        position: "top-center",
-        autoClose: 5000,
-        theme: "colored"
-      });
+      handleApiResponse(response.data);
+    } catch (err: unknown) {
+      handleSubmissionError(err);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Calculate minimum date-time (current time plus 30 minutes)
+  const handleApiResponse = (data: any) => {
+    if (data.error) {
+      toast.info("This time slot is already booked", { position: "top-center" });
+    } else if (data._id) {
+      localStorage.setItem("id_appointment", data._id);
+      toast.success("Appointment booked successfully");
+      router.push("/patient_dashboard");
+    } else {
+      throw new Error("Invalid response from server");
+    }
+  };
+
+  const handleSubmissionError = (err: unknown) => {
+    console.error("Appointment error:", err);
+    let errorMessage = "Failed to book appointment";
+
+    if (axios.isAxiosError(err)) {
+      errorMessage = err.response?.data?.message || "Network error";
+      if (err.response?.status === 401) handleLogout();
+    } else if (err instanceof Error) {
+      errorMessage = err.message;
+    }
+
+    toast.error(errorMessage, { position: "top-center" });
+  };
+
+  const handleLogout = () => {
+    const patientItems = [tokenKey, idKey, "role"];
+    patientItems.forEach(item => localStorage.removeItem(item));
+    router.push("/login_patient");
+  };
+
   const minDateTime = () => {
     const now = new Date();
-    now.setMinutes(now.getMinutes() + 30); // Add 30 minutes buffer
+    now.setMinutes(now.getMinutes() + 30);
     return now.toISOString().slice(0, 16);
   };
 
@@ -214,4 +223,6 @@ export default function RendezVous() {
       <ToastContainer />
     </div>
   );
-}
+};
+
+export default withAuth(RendezVous, { role: ROLES.PATIENT });

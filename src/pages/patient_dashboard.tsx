@@ -15,6 +15,7 @@ import { RiLogoutCircleFill } from "react-icons/ri";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import styles from "../styles/AppointmentButton.module.css";
 import { normalizeRole, ROLES, getRoleTokens } from "@/utils/roles";
+
 interface Medcine {
   fullName: string;
   speciality: string;
@@ -26,19 +27,18 @@ interface AppointmentWithMedcine extends Appointment {
 
 const PatientDashboard = () => {
   const router = useRouter();
-  const [listAppointment, setListAppointment] = useState<
-    AppointmentWithMedcine[] | null
-  >(null);
+  const [listAppointment, setListAppointment] = useState<AppointmentWithMedcine[] | null>(null);
   const [loading, setLoading] = useState(true);
-  const [login] = useLocalStorage<string | null>("LoginPatient", null); // Removed setLogin since we're not using it
-  const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.MEDICINE);
+  const [login] = useLocalStorage<string | null>("LoginPatient", null);
+  
+  // Corrected to use PATIENT role tokens
+  const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.PATIENT);
 
   useEffect(() => {
     console.log("Authentication Status Check:", {
       token: localStorage.getItem(tokenKey),
-      role: localStorage.getItem("role"),
-      normalizedRole: normalizeRole(localStorage.getItem("role") || ""),
-      login: localStorage.getItem(loginKey),
+      role: normalizeRole(localStorage.getItem("role") || ""),
+      patientId: localStorage.getItem(idKey)
     });
 
     fetchAppointments();
@@ -46,10 +46,10 @@ const PatientDashboard = () => {
 
   const fetchAppointments = async () => {
     try {
-      const id = localStorage.getItem(idKey);
-      console.log("Fetching appointments for patient ID:", id);
+      const patientId = localStorage.getItem(idKey);
+      console.log("Fetching appointments for patient ID:", patientId);
 
-      if (!id) {
+      if (!patientId) {
         throw new Error("No patient ID found in localStorage");
       }
 
@@ -58,9 +58,9 @@ const PatientDashboard = () => {
         throw new Error("No authentication token found");
       }
 
-      // Note: You might need to update your API endpoint to use "medicine" instead of "medcine"
+      // Corrected API endpoint URL
       const response = await axios.get(
-        `https://tatbib-api.onrender.com/appointment/getAppointmenPatient/${id}`,
+        `https://tatbib-api.onrender.com/appointment/getAppointmentPatient/${patientId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -68,19 +68,19 @@ const PatientDashboard = () => {
         }
       );
 
-      console.log("Appointments data:", response.data);
       setListAppointment(response.data);
     } catch (err: unknown) {
       console.error("Error fetching appointments:", err);
-
-      // Type guard to check if it's an Axios error
+      
       if (axios.isAxiosError(err)) {
         if (err.response?.status === 401) {
           toast.error("Session expired. Please login again.");
           handleLogout();
         } else {
-          toast.error("Failed to load appointments");
+          toast.error(err.response?.data?.message || "Failed to load appointments");
         }
+      } else if (err instanceof Error) {
+        toast.error(err.message);
       } else {
         toast.error("An unexpected error occurred");
       }
@@ -90,14 +90,19 @@ const PatientDashboard = () => {
   };
 
   const handleLogout = () => {
-    // Clear all medicine-related localStorage items using the correct keys
-    const medicineStorageItems = [tokenKey, loginKey, idKey, "rolePatient"];
+    const patientStorageItems = [
+      tokenKey,
+      loginKey,
+      idKey,
+      "role" // Changed to match standard role storage
+    ];
 
-    medicineStorageItems.forEach((item) => localStorage.removeItem(item));
+    patientStorageItems.forEach((item) => localStorage.removeItem(item));
 
     router.push("/login_patient");
     toast.success("Logged out successfully");
   };
+
   if (loading) {
     return (
       <div className="loading-container">
@@ -125,12 +130,8 @@ const PatientDashboard = () => {
             margin: 0 auto 16px;
           }
           @keyframes spin {
-            0% {
-              transform: rotate(0deg);
-            }
-            100% {
-              transform: rotate(360deg);
-            }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
           }
         `}</style>
       </div>
