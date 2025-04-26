@@ -7,7 +7,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import logo from "../../public/images/logo.png";
 import Imglogin from "../../public/images/login.svg";
-import { normalizeRole } from "@/utils/roles";
+import { normalizeRole, ROLES, getRoleTokens } from "@/utils/roles";
 
 export default function LoginPatient() {
   const router = useRouter();
@@ -43,15 +43,21 @@ export default function LoginPatient() {
         return;
       }
 
-      // Normalize and store auth data
+      // Normalize role and get the correct storage keys
       const normalizedRole = normalizeRole(role);
-      localStorage.setItem("tokenPatient", token);
-      localStorage.setItem("LoginPatient", login);
+      const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.PATIENT);
+
+      // Store auth data using the dynamic keys
+      localStorage.setItem(tokenKey, token);
+      localStorage.setItem(loginKey, login);
       localStorage.setItem("role", normalizedRole); // Using consistent 'role' key
-      localStorage.setItem("id_patient", id);
+      localStorage.setItem(idKey, id);
 
       console.log("Patient login successful", {
         role: normalizedRole,
+        token: localStorage.getItem(tokenKey),
+        login: localStorage.getItem(loginKey),
+        id: localStorage.getItem(idKey),
         storedRole: localStorage.getItem("role"),
       });
 

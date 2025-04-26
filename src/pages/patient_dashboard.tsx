@@ -14,7 +14,7 @@ import { FaNotesMedical, FaUserEdit } from "react-icons/fa";
 import { RiLogoutCircleFill } from "react-icons/ri";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import styles from "../styles/AppointmentButton.module.css";
-import { ROLES } from "@/utils/roles";
+import { normalizeRole, ROLES, getRoleTokens } from "@/utils/roles";
 interface Medcine {
   fullName: string;
   speciality: string;
@@ -24,73 +24,117 @@ interface AppointmentWithMedcine extends Appointment {
   medcine: Medcine;
 }
 
-
 const PatientDashboard = () => {
-
   const router = useRouter();
   const [listAppointment, setListAppointment] = useState<
     AppointmentWithMedcine[] | null
   >(null);
   const [loading, setLoading] = useState(true);
   const [login] = useLocalStorage<string | null>("LoginPatient", null); // Removed setLogin since we're not using it
+  const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.MEDICINE);
 
   useEffect(() => {
-    const fetchAppointments = async () => {
-      if (typeof window !== "undefined") {
-        const id = localStorage.getItem("id_patient");
-
-        if (!id) {
-          router.push("/login_patient");
-          return;
-        }
-
-        try {
-          const response = await axios.get(
-            `https://tatbib-api.onrender.com/appointment/getAppointmenPatient/${id}`
-          );
-          setListAppointment(response.data);
-        } catch (err) {
-          console.error("Error fetching appointments:", err);
-          toast.error("Failed to load appointments");
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
+    console.log("Authentication Status Check:", {
+      token: localStorage.getItem(tokenKey),
+      role: localStorage.getItem("role"),
+      normalizedRole: normalizeRole(localStorage.getItem("role") || ""),
+      login: localStorage.getItem(loginKey),
+    });
 
     fetchAppointments();
-  }, [router]);
+  }, []);
 
-  const logOut = () => {
-    if (typeof window !== "undefined") {
-      // Remove only patient-related items from localStorage
-      const patientItems = [
-        "tokenPatient",
-        "LoginPatient",
-        "id_patient",
-        "id_appointment",
-        "rolePatient"
-        // Add any other patient-specific items here
-      ];
+  const fetchAppointments = async () => {
+    try {
+      const id = localStorage.getItem(idKey);
+      console.log("Fetching appointments for patient ID:", id);
 
-      patientItems.forEach((item) => localStorage.removeItem(item));
+      if (!id) {
+        throw new Error("No patient ID found in localStorage");
+      }
+
+      const token = localStorage.getItem(tokenKey);
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      // Note: You might need to update your API endpoint to use "medicine" instead of "medcine"
+      const response = await axios.get(
+        `https://tatbib-api.onrender.com/appointment/getAppointmenPatient/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("Appointments data:", response.data);
+      setListAppointment(response.data);
+    } catch (err: unknown) {
+      console.error("Error fetching appointments:", err);
+
+      // Type guard to check if it's an Axios error
+      if (axios.isAxiosError(err)) {
+        if (err.response?.status === 401) {
+          toast.error("Session expired. Please login again.");
+          handleLogout();
+        } else {
+          toast.error("Failed to load appointments");
+        }
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+    } finally {
+      setLoading(false);
     }
-
-    router.push("/login_patient");
-    toast.success("Logged out successfully", {
-      position: "top-left",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
   };
 
+  const handleLogout = () => {
+    // Clear all medicine-related localStorage items using the correct keys
+    const medicineStorageItems = [tokenKey, loginKey, idKey, "rolePatient"];
+
+    medicineStorageItems.forEach((item) => localStorage.removeItem(item));
+
+    router.push("/login_patient");
+    toast.success("Logged out successfully");
+  };
   if (loading) {
-    return <div className="loading">Loading appointments...</div>;
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner">
+          <div className="spinner"></div>
+          <p>Loading patient data...</p>
+        </div>
+        <style jsx>{`
+          .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+          }
+          .loading-spinner {
+            text-align: center;
+          }
+          .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #09f;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+          }
+          @keyframes spin {
+            0% {
+              transform: rotate(0deg);
+            }
+            100% {
+              transform: rotate(360deg);
+            }
+          }
+        `}</style>
+      </div>
+    );
   }
 
   return (
@@ -131,7 +175,7 @@ const PatientDashboard = () => {
           </li>
           <li tabIndex={0} className="icon-settings">
             <RiLogoutCircleFill />
-            <span onClick={logOut} style={{ cursor: "pointer" }}>
+            <span onClick={handleLogout} style={{ cursor: "pointer" }}>
               Log out
             </span>
           </li>
