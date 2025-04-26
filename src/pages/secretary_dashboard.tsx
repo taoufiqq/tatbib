@@ -12,38 +12,56 @@ import moment from "moment";
 import { MdDashboard, MdFolderShared } from "react-icons/md";
 import { Appointment } from "@/types";
 import { RiLogoutCircleFill } from "react-icons/ri";
-import { ROLES } from "@/utils/roles";
-const SecretaryDashboard : NextPage = () => {
+import { ROLES, getRoleTokens } from "@/utils/roles";
+
+const SecretaryDashboard: NextPage = () => {
   const router = useRouter();
-  const [listAppointment, setListAppointment] = useState<Appointment[] | null>(
-    null
-  );
+  const [listAppointment, setListAppointment] = useState<Appointment[] | null>(null);
   const [login, setLogin] = useState<string>("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setLogin(localStorage.getItem("LoginSecretary") || "");
-      const id = localStorage.getItem("login_medcine");
+      // Use the utility function to get consistent key names
+      const { loginKey } = getRoleTokens(ROLES.SECRETARY);
+      setLogin(localStorage.getItem(loginKey) || "");
+      
+      const doctorLogin = localStorage.getItem("login_medcine");
+      
+      if (!doctorLogin) {
+        toast.error("Doctor information missing. Please log in again.");
+        handleLogout();
+        return;
+      }
 
-      axios
-        .get(
-          `https://tatbib-api.onrender.com/appointment/getAppointmentSecretary/${id}`
-        )
-        .then((response) => {
-          setListAppointment(response.data);
-          setLoading(false);
-        })
-        .catch((err) => {
-          console.error(err);
-          toast.error("Failed to load appointments");
-          setLoading(false);
-        });
+      fetchAppointments(doctorLogin);
     }
   }, []);
 
+  const fetchAppointments = (doctorLogin: string) => {
+    setLoading(true);
+    axios
+      .get(
+        `https://tatbib-api.onrender.com/appointment/getAppointmentSecretary/${doctorLogin}`
+      )
+      .then((response) => {
+        setListAppointment(response.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching appointments:", err);
+        toast.error("Failed to load appointments", {
+          position: "top-right",
+          autoClose: 5000,
+          theme: "colored",
+        });
+        setLoading(false);
+      });
+  };
+
   const deleteAppointment = (id: string) => {
     if (window.confirm("Are you sure you want to delete this appointment?")) {
+      setLoading(true);
       axios
         .delete(
           `https://tatbib-api.onrender.com/secretary/deleteAppointment/${id}`
@@ -52,11 +70,21 @@ const SecretaryDashboard : NextPage = () => {
           setListAppointment(
             (prev) => prev?.filter((app) => app._id !== id) || null
           );
-          toast.success("Appointment deleted successfully");
+          toast.success("Appointment deleted successfully", {
+            position: "top-right",
+            autoClose: 3000,
+            theme: "colored",
+          });
+          setLoading(false);
         })
         .catch((err) => {
-          console.error(err);
-          toast.error("Failed to delete appointment");
+          console.error("Error deleting appointment:", err);
+          toast.error("Failed to delete appointment", {
+            position: "top-right",
+            autoClose: 5000,
+            theme: "colored",
+          });
+          setLoading(false);
         });
     }
   };
@@ -67,11 +95,17 @@ const SecretaryDashboard : NextPage = () => {
   };
 
   const handleLogout = () => {
-    ["tokenSecretary", "LoginSecretary", "role", "id_secretary"].forEach(
+    // Use the utility function to get consistent key names
+    const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.SECRETARY);
+    
+    // Clear all related localStorage items
+    [tokenKey, loginKey, "role", idKey, "login_medcine"].forEach(
       item => localStorage.removeItem(item)
     );
+    
     router.push("/login_secretary");
   };
+
   return (
     <div className="Container">
       <nav className="menu" tabIndex={0}>
@@ -128,76 +162,87 @@ const SecretaryDashboard : NextPage = () => {
                 </div>
               </div>
 
-              <table className="table table-striped table-hover">
-                <thead>
-                  <tr>
-                    <th>LastName</th>
-                    <th>FirstName</th>
-                    <th>Email</th>
-                    <th>Telephone</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {listAppointment?.map((item) => (
-                    <tr key={item._id}>
-                      <td>{item.patient.lastName}</td>
-                      <td>{item.patient.firstName}</td>
-                      <td>{item.patient.email}</td>
-                      <td>{item.patient.telephone}</td>
-                      <td>{moment(item.dateTime).format("MMMM DD YYYY")}</td>
-                      <td>{moment(item.dateTime).format("HH:mm")}</td>
-                      <td
-                        style={{
-                          color:
-                            item.status === "Unconfirmed" ? "red" : "green",
-                        }}
-                      >
-                        {item.status}
-                      </td>
-                      <td>
-                        <button
-                          onClick={() =>
-                            handleAction(item._id, "/alert_appointment")
-                          }
-                          className="btn-action"
-                          title="Alert"
-                          aria-label="Alert"
-                        >
-                          <i className="fas fa-bell" />
-                        </button>
-                        <button
-                          onClick={() =>
-                            handleAction(item._id, "/confirm_appointment")
-                          }
-                          className="btn-action"
-                          title="Confirm"
-                          aria-label="Confirm"
-                        >
-                          <i className="fas fa-check-circle" />
-                        </button>
-                        <button
-                          onClick={() => deleteAppointment(item._id)}
-                          className="btn-action delete"
-                          title="Delete"
-                          aria-label="Delete"
-                        >
-                          <i className="fas fa-trash-alt" />
-                        </button>
-                      </td>
+              {listAppointment && listAppointment.length > 0 ? (
+                <table className="table table-striped table-hover">
+                  <thead>
+                    <tr>
+                      <th>LastName</th>
+                      <th>FirstName</th>
+                      <th>Email</th>
+                      <th>Telephone</th>
+                      <th>Date</th>
+                      <th>Time</th>
+                      <th>Status</th>
+                      <th>Action</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {listAppointment.map((item) => (
+                      <tr key={item._id}>
+                        <td>{item.patient.lastName}</td>
+                        <td>{item.patient.firstName}</td>
+                        <td>{item.patient.email}</td>
+                        <td>{item.patient.telephone}</td>
+                        <td>{moment(item.dateTime).format("MMMM DD YYYY")}</td>
+                        <td>{moment(item.dateTime).format("HH:mm")}</td>
+                        <td
+                          style={{
+                            color:
+                              item.status === "Unconfirmed" ? "red" : "green",
+                          }}
+                        >
+                          {item.status}
+                        </td>
+                        <td>
+                          <button
+                            onClick={() =>
+                              handleAction(item._id, "/alert_appointment")
+                            }
+                            className="btn-action"
+                            title="Alert"
+                            aria-label="Alert"
+                          >
+                            <i className="fas fa-bell" />
+                          </button>
+                          <button
+                            onClick={() =>
+                              handleAction(item._id, "/confirm_appointment")
+                            }
+                            className="btn-action"
+                            title="Confirm"
+                            aria-label="Confirm"
+                          >
+                            <i className="fas fa-check-circle" />
+                          </button>
+                          <button
+                            onClick={() => deleteAppointment(item._id)}
+                            className="btn-action delete"
+                            title="Delete"
+                            aria-label="Delete"
+                          >
+                            <i className="fas fa-trash-alt" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="no-data">No appointments found</div>
+              )}
             </div>
           </div>
         )}
       </main>
 
-      <ToastContainer />
+      <ToastContainer 
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+      />
     </div>
   );
 };

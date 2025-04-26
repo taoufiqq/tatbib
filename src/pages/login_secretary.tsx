@@ -7,7 +7,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import logo from "../../public/images/logo.png";
 import Imglogin from "../../public/images/Login2.svg";
-import { normalizeRole } from "@/utils/roles";
+import { normalizeRole, ROLES, getRoleTokens } from "@/utils/roles";
 
 export default function LoginSecretary() {
   const router = useRouter();
@@ -20,27 +20,36 @@ export default function LoginSecretary() {
     setIsLoading(true);
 
     try {
+      console.log("Attempting secretary login...");
       const response = await axios.post(
         `https://tatbib-api.onrender.com/secretary/login`,
         { login, password }
       );
 
+      console.log("API Response:", response.data);
+
       if (response.data.message) {
         throw new Error(response.data.message);
       }
 
-      const { status, tokenSecretary, roleSecretary, loginMedcine } = response.data;
+      const { status, tokenSecretary, roleSecretary, id, loginMedcine } = response.data;
+      const normalizedRole = normalizeRole(roleSecretary);
+
+      console.log("Normalized Role:", normalizedRole);
+      console.log("Expected Role:", ROLES.SECRETARY);
+
+      if (normalizedRole !== ROLES.SECRETARY) {
+        throw new Error(`Invalid role ${normalizedRole} for secretary login`);
+      }
 
       // Handle account status
       if (status === "InActive") {
-        toast.info(
-          "Your account is not active yet. Please wait for activation.",
-          {
-            position: "top-right",
-            autoClose: 5000,
-            theme: "colored",
-          }
-        );
+        toast.warn("Your account is not active yet. Please wait for activation.", {
+          position: "top-right",
+          autoClose: 5000,
+          theme: "colored",
+        });
+        setIsLoading(false);
         return;
       }
 
@@ -50,35 +59,48 @@ export default function LoginSecretary() {
           autoClose: 5000,
           theme: "colored",
         });
+        setIsLoading(false);
         return;
       }
 
-      // Normalize and store auth data
-      const normalizedRole = normalizeRole(roleSecretary);
-      localStorage.setItem("tokenSecretary", tokenSecretary);
-      localStorage.setItem("LoginSecretary", login);
-      localStorage.setItem("role", normalizedRole); // Using consistent 'role' key
-      localStorage.setItem("login_medcine", loginMedcine);
-      localStorage.setItem("accountStatus", status);
+      // Get the correct storage keys from our utility function
+      const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.SECRETARY);
 
-      console.log("Login successful", {
-        role: normalizedRole,
-        storedRole: localStorage.getItem("role")
+      // Store all auth data using the keys from our utility function
+      localStorage.setItem(tokenKey, tokenSecretary);
+      localStorage.setItem(loginKey, login);
+      localStorage.setItem("role", normalizedRole); // Store normalized role
+      localStorage.setItem(idKey, id || ""); // Make sure id is stored even if undefined
+      localStorage.setItem("login_medcine", loginMedcine || ""); // Store associated doctor
+
+      // Verify storage immediately for debugging
+      console.log("Stored Auth Data:", {
+        token: localStorage.getItem(tokenKey),
+        role: localStorage.getItem("role"),
+        login: localStorage.getItem(loginKey),
+        id: localStorage.getItem(idKey),
+        loginMedcine: localStorage.getItem("login_medcine")
       });
 
-      router.push("/secretary_dashboard");
       toast.success("Authenticated successfully", {
         position: "top-right",
         autoClose: 3000,
         theme: "colored",
       });
 
-    } catch (error: any) {
-      console.error("Login error:", error);
-      const errorMessage = error.response?.data?.message || 
-                         error.message || 
-                         "Login failed. Please try again.";
+      // Force redirect to secretary dashboard
+      router.push("/secretary_dashboard");
+
+    } catch (error: unknown) {
+      console.error("Login Error:", error);
+      let errorMessage = "Login failed. Please try again.";
       
+      if (axios.isAxiosError(error)) {
+        errorMessage = error.response?.data?.message || error.message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
       toast.error(errorMessage, {
         position: "top-right",
         autoClose: 5000,
@@ -95,7 +117,7 @@ export default function LoginSecretary() {
         <div className="row justify-content-between py-3 align-items-center">
           <div className="col-12 col-sm-3 col-lg-4 d-flex justify-content-center justify-content-lg-start py-2 py-lg-0">
             <Link href="/">
-              <Image alt="" src={logo} width="100" />
+              <Image alt="Logo" src={logo} width="100" priority />
             </Link>
           </div>
           <div className="col-12 col-sm-9 col-lg-6 col-xl-4">
@@ -118,7 +140,7 @@ export default function LoginSecretary() {
         </div>
         <div className="card EspacePatient">
           <div className="row">
-            <div className="col-12 col-md-12 col-lg-6" style={{ marginTop: "5%" }}>
+            <div className="col-12 col-md-12 col-lg-6" style={{ marginTop: "4%" }}>
               <form className="row" onSubmit={handleSubmit}>
                 <label className="form-label">Login as a Secretary</label>
                 <div className="fromlogin">
@@ -148,7 +170,10 @@ export default function LoginSecretary() {
                     disabled={isLoading}
                   >
                     {isLoading ? (
-                      <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        Logging in...
+                      </>
                     ) : (
                       "Log in"
                     )}
@@ -158,7 +183,7 @@ export default function LoginSecretary() {
             </div>
             <div className="col-12 col-md-12 col-lg-6">
               <Image
-                alt="Login illustration"
+                alt="Login Illustration"
                 src={Imglogin}
                 style={{ width: "70%", marginLeft: "60px" }}
                 className="imgLogin"
@@ -168,7 +193,14 @@ export default function LoginSecretary() {
           </div>
         </div>
       </div>
-      <ToastContainer />
+      <ToastContainer 
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+      />
     </section>
   );
 }
