@@ -12,33 +12,42 @@ import { Appointment } from "@/types";
 import { MdDashboard } from "react-icons/md";
 import { FaNotesMedical, FaUserEdit, FaUserPlus } from "react-icons/fa";
 import { RiLogoutCircleFill } from "react-icons/ri";
-import { normalizeRole, ROLES } from "@/utils/roles";
+import { normalizeRole, ROLES, getRoleTokens } from "@/utils/roles";
+
 const ListAppointments = () => {
   const router = useRouter();
   const [listAppointment, setListAppointment] = useState<Appointment[] | null>(null);
   const [loading, setLoading] = useState(true);
+  
+  // Get the correct storage keys
+  const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.MEDICINE);
+  
   useEffect(() => {
     console.log("Authentication Status Check:", {
-      token: localStorage.getItem("tokenMedicine"),
+      token: localStorage.getItem(tokenKey),
       role: localStorage.getItem("role"),
       normalizedRole: normalizeRole(localStorage.getItem("role") || ""),
-      login: localStorage.getItem("LoginMedicine")
+      login: localStorage.getItem(loginKey)
     });
+    
+    fetchAppointments();
   }, []);
+  
   const fetchAppointments = async () => {
     try {
-      const id = localStorage.getItem("id_medcine");
+      const id = localStorage.getItem(idKey);
       console.log("Fetching appointments for medicine ID:", id);
       
       if (!id) {
         throw new Error("No medicine ID found in localStorage");
       }
   
-      const token = localStorage.getItem("tokenMedicine");
+      const token = localStorage.getItem(tokenKey);
       if (!token) {
         throw new Error("No authentication token found");
       }
   
+      // Note: You might need to update your API endpoint to use "medicine" instead of "medcine"
       const response = await axios.get(
         `https://tatbib-api.onrender.com/appointment/getAppointmentMedcine/${id}`,
         {
@@ -64,7 +73,7 @@ const ListAppointments = () => {
       } else {
         toast.error("An unexpected error occurred");
       }
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -76,11 +85,11 @@ const ListAppointments = () => {
   };
 
   const handleLogout = () => {
-    // Clear all medicine-related localStorage items
+    // Clear all medicine-related localStorage items using the correct keys
     const medicineStorageItems = [
-      "tokenMedicine",
-      "LoginMedicine",
-      "id_medcine",
+      tokenKey,
+      loginKey,
+      idKey,
       "role",
       "medcine"
     ];
@@ -126,7 +135,7 @@ const ListAppointments = () => {
     );
   }
 
-  const currentUser = localStorage.getItem("LoginMedicine");
+  const currentUser = localStorage.getItem(loginKey);
 
   return (
     <div className="doctor-dashboard">
@@ -352,4 +361,4 @@ const ListAppointments = () => {
 };
 
 // At the bottom of list_appointments_medicine.tsx
-export default withAuth(ListAppointments, { role: ROLES.MEDICINE }); // Now using the value
+export default withAuth(ListAppointments, { role: ROLES.MEDICINE });
