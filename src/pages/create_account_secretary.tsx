@@ -124,7 +124,7 @@ export default function CreateAccountSecretary() {
                     </div>
                     <div className="col-md-6">
                       <input
-                      
+                         className="form-control"
                         type="email"
                         placeholder="Email"
                         id="email"
