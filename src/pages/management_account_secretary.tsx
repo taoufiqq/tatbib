@@ -33,7 +33,7 @@ export default function ManagementCompteSecretary() {
 
     axios
       .put(
-        `https://tatbib-api.onrender.com/medcine/activateCompteSecretary/${id_Secretary}`,
+        `https://tatbib-api.onrender.com/medcine/manageSecretaryAccount/${id_Secretary}`,
         data
       )
       .then((res) => {
