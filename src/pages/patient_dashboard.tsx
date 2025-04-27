@@ -21,13 +21,14 @@ interface Medcine {
   speciality: string;
 }
 
-interface AppointmentWithMedcine extends Appointment {
-  medcine: Medcine;
+interface AppointmentWithMedicine extends Appointment {
+  medicine: Medcine;
 }
+
 
 const PatientDashboard = () => {
   const router = useRouter();
-  const [listAppointment, setListAppointment] = useState<AppointmentWithMedcine[] | null>(null);
+  const [listAppointment, setListAppointment] = useState<AppointmentWithMedicine[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [login] = useLocalStorage<string | null>("LoginPatient", null);
   
@@ -202,8 +203,8 @@ const PatientDashboard = () => {
                 <tbody>
                   {listAppointment.map((item, index) => (
                     <tr key={index}>
-                      <td>{item.medcine?.fullName || "N/A"}</td>
-                      <td>{item.medcine?.speciality || "N/A"}</td>
+                      <td>{item.medicine?.fullName || "N/A"}</td>
+                      <td>{item.medicine?.speciality || "N/A"}</td>
                       <td>{moment(item.dateTime).format("MMMM DD YYYY")}</td>
                       <td>{moment(item.dateTime).format("HH:mm")}</td>
                       <td
