@@ -83,25 +83,25 @@ export default function LoginSecretary() {
       console.log("Expected Role:", ROLES.SECRETARY);
 
       // Handle account status
-      // if (status === "InActive") {
-      //   toast.warn("Your account is not active yet. Please wait for activation.", {
-      //     position: "top-right",
-      //     autoClose: 5000,
-      //     theme: "colored",
-      //   });
-      //   setIsLoading(false);
-      //   return;
-      // }
+      if (status === "InActive") {
+        toast.warn("Your account is not active yet. Please wait for activation.", {
+          position: "top-right",
+          autoClose: 5000,
+          theme: "colored",
+        });
+        setIsLoading(false);
+        return;
+      }
 
-      // if (status === "Block") {
-      //   toast.error("This account is blocked.", {
-      //     position: "top-right",
-      //     autoClose: 5000,
-      //     theme: "colored",
-      //   });
-      //   setIsLoading(false);
-      //   return;
-      // }
+      if (status === "Block") {
+        toast.error("This account is blocked.", {
+          position: "top-right",
+          autoClose: 5000,
+          theme: "colored",
+        });
+        setIsLoading(false);
+        return;
+      }
 
       // Get the correct storage keys from our utility function
       const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.SECRETARY);
