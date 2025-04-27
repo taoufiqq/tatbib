@@ -80,16 +80,11 @@ export default function LoginSecretary() {
       // Handle account status
       if (status === "InActive") {
         toast.warning(
-          response.data.message ||
-            "Your account is not active yet. Please wait for activation.",
+          "Your account is not active yet. Please wait for activation.",
           {
             position: "top-right",
             autoClose: 5000,
             theme: "colored", // This ensures the colored toast theme
-            style: {
-              backgroundColor: "#FFA500", // Orange background color for "InActive" status
-              color: "#ffffff", // White text color for better visibility
-            },
           }
         );
         setIsLoading(false);
