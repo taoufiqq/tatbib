@@ -277,7 +277,6 @@ const SecretaryDashboard: NextPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-  
     // Check authentication on component mount
     const checkAndLoadData = () => {
       if (typeof window !== "undefined") {
@@ -473,7 +472,23 @@ const SecretaryDashboard: NextPage = () => {
           />
           <h6>Welcome</h6>
           <h5 style={{ color: "white" }}>{login}</h5>
- 
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "white",
+              fontSize: "17px",
+            }}
+          >
+            <FaCircle
+              style={{
+                color: status === "Active" ? "green" : "gray",
+                marginRight: "5px",
+              }}
+            />
+            {status === "Active" ? "Online" : "Offline"}
+          </div>
         </header>
         <ul>
           <li tabIndex={0} className="icon-customers">
@@ -495,23 +510,6 @@ const SecretaryDashboard: NextPage = () => {
             </span>
           </li>
         </ul>
-        <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent:"center",
-              color: "white",
-              fontSize: "14px",
-            }}
-          >
-            <FaCircle
-              style={{
-                color: status === "Active" ? "green" : "gray",
-                marginRight: "5px",
-              }}
-            />
-            {status === "Active" ? "Online" : "Offline"}
-          </div>
       </nav>
 
       <main>
