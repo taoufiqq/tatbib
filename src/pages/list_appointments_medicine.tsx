@@ -48,7 +48,9 @@ const ListAppointments = () => {
       if (!token) {
         throw new Error("No authentication token found");
       }
-
+      console.log("ID:", id);
+      console.log("Token:", token);
+      console.log("Full URL:", `https://tatbib-api.onrender.com/appointment/getAppointmentMedcine/${id}`);
       const response = await axios.get(
         `https://tatbib-api.onrender.com/appointment/getAppointmentMedcine/${id}`,
         {
