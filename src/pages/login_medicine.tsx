@@ -99,7 +99,7 @@ export default function LoginMedicine() {
       // Get the correct storage keys from our utility function
       const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.MEDICINE);
 
-      // Store all auth data using the keys from our utility function with safeLocalStorage
+      // Store all auth data using the keys from our utility function with safeLocalStora
       const storageSuccess = [
         safeLocalStorage.setItem(tokenKey, token),
         safeLocalStorage.setItem(loginKey, login),
