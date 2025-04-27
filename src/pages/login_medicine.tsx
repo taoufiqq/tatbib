@@ -103,9 +103,9 @@ export default function LoginMedicine() {
       const storageSuccess = [
         safeLocalStorage.setItem(tokenKey, token),
         safeLocalStorage.setItem(loginKey, login),
-        safeLocalStorage.setItem("role", ROLES.MEDICINE), // Always use the constant
+        safeLocalStorage.setItem("role", ROLES.MEDICINE),
         safeLocalStorage.setItem(idKey, id || ""),
-        safeLocalStorage.setItem("login_medcine", login), // Add this line to store the doctor's login
+        medcine?.login ? safeLocalStorage.setItem("login_medcine", medcine.login) : true, // 🔥 use medcine.login
         medcine ? safeLocalStorage.setItem("medcine", JSON.stringify(medcine)) : true
       ].every(Boolean);
 
