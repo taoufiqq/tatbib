@@ -232,7 +232,7 @@ export default function SecretaryCompte() {
                             href=""
                             onClick={() => getIdSecretary(item._id)}
                             className="edit"
-                            title="Active Account Secretary"
+                            title="Manage Account Secretary"
                             data-toggle="tooltip"
                           >
                             <i className="material-icons">&#xE254;</i>

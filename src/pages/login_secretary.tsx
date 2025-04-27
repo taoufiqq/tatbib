@@ -95,7 +95,7 @@ export default function LoginSecretary() {
         setIsLoading(false);
         return;
       }
-      if (status === "Block") {
+      if (status === "Blocked") {
         toast.error("This account is blocked. Redirecting to login...", {
           position: "top-right",
           autoClose: 5000,
