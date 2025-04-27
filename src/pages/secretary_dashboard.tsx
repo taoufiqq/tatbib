@@ -473,22 +473,7 @@ const SecretaryDashboard: NextPage = () => {
           />
           <h6>Welcome</h6>
           <h5 style={{ color: "white" }}>{login}</h5>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              color: "white",
-              fontSize: "14px",
-            }}
-          >
-            <FaCircle
-              style={{
-                color: status === "Active" ? "green" : "gray",
-                marginRight: "5px",
-              }}
-            />
-            {status === "Active" ? "Online" : "Offline"}
-          </div>
+ 
         </header>
         <ul>
           <li tabIndex={0} className="icon-customers">
@@ -510,7 +495,23 @@ const SecretaryDashboard: NextPage = () => {
             </span>
           </li>
         </ul>
-        Active 
+        <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent:"center",
+              color: "white",
+              fontSize: "14px",
+            }}
+          >
+            <FaCircle
+              style={{
+                color: status === "Active" ? "green" : "gray",
+                marginRight: "5px",
+              }}
+            />
+            {status === "Active" ? "Online" : "Offline"}
+          </div>
       </nav>
 
       <main>
