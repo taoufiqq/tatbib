@@ -1,9 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/router";
-import type React from "react";
-import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation"; // Changed to next/navigation
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
@@ -11,54 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { normalizeRole, ROLES, getRoleTokens } from "@/utils/roles";
 import logo from "../../public/images/logo.png";
 import Imglogin from "../../public/images/Login2.svg";
-
-// Safely access localStorage with error handling
-const safeLocalStorage = {
-  getItem: (key: string): string | null => {
-    try {
-      return typeof window !== "undefined" ? localStorage.getItem(key) : null;
-    } catch (error) {
-      console.error(`Error getting ${key} from localStorage:`, error);
-      return null;
-    }
-  },
-  setItem: (key: string, value: string): boolean => {
-    try {
-      if (typeof window !== "undefined") {
-        localStorage.setItem(key, value);
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error(`Error setting ${key} in localStorage:`, error);
-      return false;
-    }
-  },
-  removeItem: (key: string): boolean => {
-    try {
-      if (typeof window !== "undefined") {
-        localStorage.removeItem(key);
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error(`Error removing ${key} from localStorage:`, error);
-      return false;
-    }
-  },
-  clear: (): boolean => {
-    try {
-      if (typeof window !== "undefined") {
-        localStorage.clear();
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error(`Error clearing localStorage:`, error);
-      return false;
-    }
-  },
-};
+import { safeLocalStorage } from "@/components/withPrivateRoute"; // Import the shared utility
 
 export default function LoginSecretary() {
   const router = useRouter();
@@ -80,10 +32,7 @@ export default function LoginSecretary() {
           const token = safeLocalStorage.getItem(tokenKey);
 
           if (token) {
-            console.log(
-              "Already logged in as secretary, redirecting to dashboard"
-            );
-            // Use setTimeout to ensure this runs after component is fully mounted
+            console.log("Already logged in as secretary, redirecting to dashboard");
             setTimeout(() => {
               window.location.href = "/secretary_dashboard";
             }, 100);
@@ -91,27 +40,11 @@ export default function LoginSecretary() {
         }
       } catch (error) {
         console.error("Error checking existing auth:", error);
-        // Only clear secretary auth data if corrupted
-        clearSecretaryAuthData();
       }
     };
 
     checkExistingAuth();
   }, []);
-
-  // Function to clear only secretary-related auth data
-  const clearSecretaryAuthData = () => {
-    try {
-      const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.SECRETARY);
-      safeLocalStorage.removeItem(tokenKey);
-      safeLocalStorage.removeItem(loginKey);
-      safeLocalStorage.removeItem(idKey);
-      // Don't remove "role" here as it might be used by other components
-      safeLocalStorage.removeItem("login_medcine");
-    } catch (error) {
-      console.error("Error clearing secretary auth data:", error);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -124,9 +57,6 @@ export default function LoginSecretary() {
     setIsLoading(true);
 
     try {
-      // Only clear secretary-specific auth data, not all localStorage
-      clearSecretaryAuthData();
-
       console.log("Attempting secretary login...");
       const response = await axios.post(
         `https://tatbib-api.onrender.com/secretary/login`,
@@ -139,37 +69,26 @@ export default function LoginSecretary() {
 
       console.log("API Response:", response.data);
 
-      if (!response.data || response.data.message) {
-        throw new Error(
-          response.data?.message || "Invalid response from server"
-        );
+      if (response.data.message) {
+        throw new Error(response.data.message);
       }
 
-      const { status, tokenSecretary, roleSecretary, id, loginMedcine } =
-        response.data;
-
-      // Validate required fields
-      if (!tokenSecretary) {
-        throw new Error("Authentication token missing from response");
-      }
-
-      console.log("Raw response role:", roleSecretary);
-
+      const { status, tokenSecretary, roleSecretary, id, loginMedcine } = response.data;
+      
       // Make sure we have a role string to normalize (add fallback)
       const roleToNormalize = roleSecretary || "secretary"; // Default to secretary if missing
       const normalizedRole = normalizeRole(roleToNormalize);
-      console.log("After normalization:", normalizedRole);
+      
+      console.log("Normalized Role:", normalizedRole);
+      console.log("Expected Role:", ROLES.SECRETARY);
 
       // Handle account status
       if (status === "InActive") {
-        toast.warn(
-          "Your account is not active yet. Please wait for activation.",
-          {
-            position: "top-right",
-            autoClose: 5000,
-            theme: "colored",
-          }
-        );
+        toast.warn("Your account is not active yet. Please wait for activation.", {
+          position: "top-right",
+          autoClose: 5000,
+          theme: "colored",
+        });
         setIsLoading(false);
         return;
       }
@@ -191,24 +110,22 @@ export default function LoginSecretary() {
       const storageSuccess = [
         safeLocalStorage.setItem(tokenKey, tokenSecretary),
         safeLocalStorage.setItem(loginKey, login),
-        safeLocalStorage.setItem("role", ROLES.SECRETARY), // Always use the constant, not the normalized value
-        safeLocalStorage.setItem(idKey, id || ""), // Make sure id is stored even if undefined
-        loginMedcine
-          ? safeLocalStorage.setItem("login_medcine", loginMedcine)
-          : true,
+        safeLocalStorage.setItem("role", ROLES.SECRETARY), // Always use the constant
+        safeLocalStorage.setItem(idKey, id || ""),
+        loginMedcine ? safeLocalStorage.setItem("login_medcine", loginMedcine) : true
       ].every(Boolean);
 
       if (!storageSuccess) {
         throw new Error("Failed to store authentication data");
       }
 
-      // Verify storage immediately for debugging
+      // Verify storage immediately
       console.log("Stored Auth Data:", {
         token: safeLocalStorage.getItem(tokenKey),
         role: safeLocalStorage.getItem("role"),
         login: safeLocalStorage.getItem(loginKey),
         id: safeLocalStorage.getItem(idKey),
-        loginMedcine: safeLocalStorage.getItem("login_medcine"),
+        loginMedcine: safeLocalStorage.getItem("login_medcine")
       });
 
       toast.success("Authenticated successfully", {
@@ -219,32 +136,18 @@ export default function LoginSecretary() {
 
       // Add a small delay to ensure localStorage is updated and toast is shown
       setTimeout(() => {
-        try {
-          // Force redirect to secretary dashboard
-          window.location.href = "/secretary_dashboard";
-        } catch (error) {
-          console.error("Navigation error:", error);
-          // If navigation fails, provide a link
-          toast.info("Click here to continue to dashboard", {
-            position: "top-right",
-            autoClose: false,
-            onClick: () => (window.location.href = "/secretary_dashboard"),
-            theme: "colored",
-          });
-        }
+        window.location.href = "/secretary_dashboard";
       }, 2000);
+
     } catch (error: unknown) {
       console.error("Login Error:", error);
       let errorMessage = "Login failed. Please try again.";
-
+      
       if (axios.isAxiosError(error)) {
         if (error.code === "ECONNABORTED") {
-          errorMessage =
-            "Connection timeout. Please check your internet connection.";
+          errorMessage = "Connection timeout. Please check your internet connection.";
         } else if (error.response) {
-          errorMessage =
-            error.response.data?.message ||
-            `Server error: ${error.response.status}`;
+          errorMessage = error.response.data?.message || `Server error: ${error.response.status}`;
         } else if (error.request) {
           errorMessage = "No response from server. Please try again later.";
         }
@@ -269,15 +172,8 @@ export default function LoginSecretary() {
           <div className="col-12 col-sm-3 col-lg-4 d-flex justify-content-center justify-content-lg-start py-2 py-lg-0">
             <Link href="/">
               <div style={{ width: "100px", height: "auto" }}>
-                {/* Use a placeholder if logo is undefined */}
                 {isClient && (
-                  <Image
-                    alt="Logo"
-                    src={logo}
-                    width={100}
-                    height={100}
-                    priority
-                  />
+                  <Image alt="Logo" src={logo} width={100} height={100} priority />
                 )}
               </div>
             </Link>
@@ -302,10 +198,7 @@ export default function LoginSecretary() {
         </div>
         <div className="card EspacePatient">
           <div className="row">
-            <div
-              className="col-12 col-md-12 col-lg-6"
-              style={{ marginTop: "4%" }}
-            >
+            <div className="col-12 col-md-12 col-lg-6" style={{ marginTop: "4%" }}>
               <form className="row" onSubmit={handleSubmit}>
                 <label className="form-label">Login as a Secretary</label>
                 <div className="fromlogin">
@@ -336,11 +229,7 @@ export default function LoginSecretary() {
                   >
                     {isLoading ? (
                       <>
-                        <span
-                          className="spinner-border spinner-border-sm me-2"
-                          role="status"
-                          aria-hidden="true"
-                        ></span>
+                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                         Logging in...
                       </>
                     ) : (
@@ -352,23 +241,21 @@ export default function LoginSecretary() {
             </div>
             <div className="col-12 col-md-12 col-lg-6">
               {isClient && (
-                <div style={{ width: "70%", marginLeft: "60px" }}>
-                  <Image
-                    alt="Login Illustration"
-                    src={Imglogin || "/images/login-fallback.png"}
-                    width={500}
-                    height={300}
-                    style={{ width: "70%", marginLeft: "60px" }}
-                    className="imgLogin"
-                    priority
-                  />
-                </div>
+                <Image
+                  alt="Login Illustration"
+                  src={Imglogin}
+                  width={500}
+                  height={300}
+                  style={{ width: "70%", marginLeft: "60px" }}
+                  className="imgLogin"
+                  priority
+                />
               )}
             </div>
           </div>
         </div>
       </div>
-      <ToastContainer
+      <ToastContainer 
         position="top-right"
         autoClose={5000}
         hideProgressBar={false}

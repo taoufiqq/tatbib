@@ -1,6 +1,8 @@
+"use client";
+
 import Image from "next/image";
-import { useRouter } from "next/router";
-import React, { useState } from "react";
+import { useRouter } from "next/navigation"; // Changed to next/navigation
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
@@ -8,24 +10,61 @@ import "react-toastify/dist/ReactToastify.css";
 import logo from "../../public/images/logo.png";
 import Imglogin from "../../public/images/login3.svg";
 import { normalizeRole, ROLES, getRoleTokens } from "@/utils/roles";
+import { safeLocalStorage } from "@/components/withPrivateRoute"; // Import the shared utility
 
-// Renamed component to have correct spelling
 export default function LoginMedicine() {
   const router = useRouter();
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  // Only run client-side code after component mounts
+  useEffect(() => {
+    setIsClient(true);
+
+    // Check if already logged in as medicine
+    const checkExistingAuth = () => {
+      try {
+        const storedRole = safeLocalStorage.getItem("role");
+        if (storedRole === ROLES.MEDICINE) {
+          const { tokenKey } = getRoleTokens(ROLES.MEDICINE);
+          const token = safeLocalStorage.getItem(tokenKey);
+
+          if (token) {
+            console.log("Already logged in as medicine, redirecting to dashboard");
+            setTimeout(() => {
+              window.location.href = "/list_appointments_medicine";
+            }, 100);
+          }
+        }
+      } catch (error) {
+        console.error("Error checking existing auth:", error);
+      }
+    };
+
+    checkExistingAuth();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isClient) {
+      toast.error("Application is still initializing. Please try again.");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
       console.log("Attempting login...");
-      // Note: The API endpoint might still use "medcine" - you may need to update that on the backend
       const response = await axios.post(
         `https://tatbib-api.onrender.com/medcine/login`,
-        { login, password }
+        { login, password },
+        {
+          // Add timeout to prevent hanging requests
+          timeout: 15000,
+        }
       );
 
       console.log("API Response:", response.data);
@@ -35,8 +74,11 @@ export default function LoginMedicine() {
       }
 
       const { verified, token, role, id, medcine } = response.data;
-      const normalizedRole = normalizeRole(role);
-
+      
+      // Make sure we have a role string to normalize (add fallback)
+      const roleToNormalize = role || "medicine"; // Default to medicine if missing
+      const normalizedRole = normalizeRole(roleToNormalize);
+      
       console.log("Normalized Role:", normalizedRole);
       console.log("Expected Role:", ROLES.MEDICINE);
 
@@ -45,42 +87,71 @@ export default function LoginMedicine() {
       }
 
       if (verified === false) {
-        toast.warn("Please verify your account first via email");
+        toast.warn("Please verify your account first via email", {
+          position: "top-right",
+          autoClose: 5000,
+          theme: "colored",
+        });
+        setIsLoading(false);
         return;
       }
 
       // Get the correct storage keys from our utility function
       const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.MEDICINE);
 
-      // Store all auth data using the keys from our utility function
-      localStorage.setItem(tokenKey, token);
-      localStorage.setItem(loginKey, login);
-      localStorage.setItem("role", normalizedRole); // Store normalized role
-      localStorage.setItem(idKey, id);
-      localStorage.setItem("medcine", JSON.stringify(medcine));
+      // Store all auth data using the keys from our utility function with safeLocalStorage
+      const storageSuccess = [
+        safeLocalStorage.setItem(tokenKey, token),
+        safeLocalStorage.setItem(loginKey, login),
+        safeLocalStorage.setItem("role", ROLES.MEDICINE), // Always use the constant
+        safeLocalStorage.setItem(idKey, id || ""),
+        medcine ? safeLocalStorage.setItem("medcine", JSON.stringify(medcine)) : true
+      ].every(Boolean);
+
+      if (!storageSuccess) {
+        throw new Error("Failed to store authentication data");
+      }
 
       // Verify storage immediately
       console.log("Stored Auth Data:", {
-        token: localStorage.getItem(tokenKey),
-        role: localStorage.getItem("role"),
-        login: localStorage.getItem(loginKey),
-        id: localStorage.getItem(idKey)
+        token: safeLocalStorage.getItem(tokenKey),
+        role: safeLocalStorage.getItem("role"),
+        login: safeLocalStorage.getItem(loginKey),
+        id: safeLocalStorage.getItem(idKey)
       });
 
-      // Force reload to ensure auth state is picked up
-      window.location.href = "/list_appointments_medicine";
+      toast.success("Authenticated successfully", {
+        position: "top-right",
+        autoClose: 2000,
+        theme: "colored",
+      });
+
+      // Add a small delay to ensure localStorage is updated and toast is shown
+      setTimeout(() => {
+        window.location.href = "/list_appointments_medicine";
+      }, 2000);
 
     } catch (error: unknown) {
       console.error("Login Error:", error);
       let errorMessage = "Login failed. Please try again.";
       
       if (axios.isAxiosError(error)) {
-        errorMessage = error.response?.data?.message || error.message;
+        if (error.code === "ECONNABORTED") {
+          errorMessage = "Connection timeout. Please check your internet connection.";
+        } else if (error.response) {
+          errorMessage = error.response.data?.message || `Server error: ${error.response.status}`;
+        } else if (error.request) {
+          errorMessage = "No response from server. Please try again later.";
+        }
       } else if (error instanceof Error) {
         errorMessage = error.message;
       }
 
-      toast.error(errorMessage);
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        theme: "colored",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -92,7 +163,11 @@ export default function LoginMedicine() {
         <div className="row justify-content-between py-3 align-items-center">
           <div className="col-12 col-sm-3 col-lg-4 d-flex justify-content-center justify-content-lg-start py-2 py-lg-0">
             <Link href="/">
-              <Image alt="Logo" src={logo} width="100" priority />
+              <div style={{ width: "100px", height: "auto" }}>
+                {isClient && (
+                  <Image alt="Logo" src={logo} width={100} height={100} priority />
+                )}
+              </div>
             </Link>
           </div>
           <div className="col-12 col-sm-9 col-lg-6 col-xl-4">
@@ -167,13 +242,17 @@ export default function LoginMedicine() {
               </form>
             </div>
             <div className="col-12 col-md-12 col-lg-6">
-              <Image
-                alt="Login Illustration"
-                src={Imglogin}
-                style={{ width: "70%", marginLeft: "60px" }}
-                className="imgLogin"
-                priority
-              />
+              {isClient && (
+                <Image
+                  alt="Login Illustration"
+                  src={Imglogin}
+                  width={500}
+                  height={300}
+                  style={{ width: "70%", marginLeft: "60px" }}
+                  className="imgLogin"
+                  priority
+                />
+              )}
             </div>
           </div>
         </div>

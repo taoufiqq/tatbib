@@ -71,18 +71,12 @@
 // export default withAuth;
 "use client";
 
-import { useRouter } from "next/router";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState, ComponentType } from "react";
 import { normalizeRole, type AuthRole, getRoleTokens, ROLES } from "@/utils/roles";
 
-interface SafeLocalStorage {
-  getItem: (key: string) => string | null;
-  setItem: (key: string, value: string) => boolean;
-  removeItem: (key: string) => boolean;
-  clear: () => boolean;
-}
-
-const safeLocalStorage: SafeLocalStorage = {
+// Safely access localStorage with error handling - moved to a shared utility
+export const safeLocalStorage = {
   getItem: (key: string): string | null => {
     try {
       return typeof window !== "undefined" ? localStorage.getItem(key) : null;
@@ -135,6 +129,7 @@ const withAuth = <P extends object>(
 ) => {
   const AuthComponent = (props: P) => {
     const router = useRouter();
+    const pathname = usePathname();
     const [authState, setAuthState] = useState<{
       checked: boolean;
       isValid: boolean;
@@ -195,20 +190,25 @@ const withAuth = <P extends object>(
       setAuthState({ checked: true, isValid: authStatus });
 
       if (!authStatus && mounted) {
-        console.log("Not authenticated, redirecting...");
+        // Determine redirect path based on role
         const redirectPath = options?.role === ROLES.MEDICINE
           ? "/login_medicine"
           : options?.role === ROLES.SECRETARY
           ? "/login_secretary"
           : "/login_patient";
-
-        router.push(redirectPath).catch((error) => {
-          console.error("Redirect failed:", error);
-          window.location.href = redirectPath;
-        });
+        
+        // Prevent redirect loops
+        if (pathname !== redirectPath) {
+          console.log(`Not authenticated, redirecting to ${redirectPath}...`);
+          router.push(redirectPath);
+        }
       }
-    }, [mounted, router, options?.role]);
+    }, [mounted, router, pathname, options?.role]);
 
+    // Don't render anything during SSR
+    if (typeof window === "undefined") return null;
+    
+    // Don't render anything until mount
     if (!mounted) return null;
 
     if (!authState.checked) {
