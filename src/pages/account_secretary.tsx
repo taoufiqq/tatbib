@@ -11,6 +11,7 @@ import { MdDashboard } from "react-icons/md";
 import { FaNotesMedical, FaUserEdit, FaUserPlus } from "react-icons/fa";
 import { RiLogoutCircleFill } from "react-icons/ri";
 import { getRoleTokens, ROLES } from "@/utils/roles";
+import { safeLocalStorage } from "@/components/withPrivateRoute";
 
 export default function SecretaryCompte() {
   const router = useRouter();
@@ -23,7 +24,8 @@ export default function SecretaryCompte() {
     const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.MEDICINE);
   
   if (typeof window !== "undefined") {
-    const loginMedcine = localStorage.getItem("LoginMedcine") || " ";
+   const loginMedcine = safeLocalStorage.getItem("login_medcine") || 
+                             safeLocalStorage.getItem("LoginMedcine");
 
     axios
       .get(
