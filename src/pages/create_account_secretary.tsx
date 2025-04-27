@@ -36,7 +36,7 @@ export default function CreateAccountSecretary() {
       }
 
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/medicine/createAccountSecretary`,
+        `${process.env.NEXT_PUBLIC_API_URL}/medcine/createAccountSecretary`,
         { ...formData, loginMedcine },
         {
           headers: {
@@ -91,6 +91,7 @@ export default function CreateAccountSecretary() {
                   <div className="row ">
                     <div className="col-md-6">
                       <input
+                       className="form-control"
                         type="text"
                         placeholder="Full Name"
                         id="fullName"
@@ -101,6 +102,7 @@ export default function CreateAccountSecretary() {
                     </div>
                     <div className="col-md-6">
                     <input
+                     className="form-control"
                         type="email"
                         placeholder="Email"
                         id="email"
@@ -122,6 +124,7 @@ export default function CreateAccountSecretary() {
                   <div className="row ">
                     <div className="col-md-6">
                     <input
+                     className="form-control"
                         type="text"
                         placeholder="login"
                         id="login"
@@ -133,6 +136,7 @@ export default function CreateAccountSecretary() {
                     </div>
                     <div className="col-md-6">
                     <input
+                     className="form-control"
                          type="password"
                         placeholder="Password"
                         id="password"
