@@ -268,14 +268,33 @@ import { ROLES, getRoleTokens } from "@/utils/roles";
 import { FaCircle } from "react-icons/fa";
 
 const SecretaryDashboard: NextPage = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
   const [listAppointment, setListAppointment] = useState<Appointment[] | null>(
     null
   );
   const [status, setStatus] = useState<string>("Inactive");
   const [login, setLogin] = useState<string>("");
-  const [loading, setLoading] = useState(true);
 
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (
+        menuOpen && 
+        window.innerWidth <= 768 && 
+        !target.closest('.sidebar-menu') && 
+        !target.closest('.mobile-menu-toggle')
+      ) {
+        setMenuOpen(false);
+      }
+    };
+  
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [menuOpen]);
   useEffect(() => {
     // Check authentication on component mount
     const checkAndLoadData = () => {
@@ -454,166 +473,152 @@ const SecretaryDashboard: NextPage = () => {
   };
 
   return (
-    <div className="Container">
-      <nav className="menu" tabIndex={0}>
-        <div className="smartphone-menu-trigger" />
-        <header className="avatar">
-          <Image
-            alt="Secretary"
-            src={logo}
-            width={150}
-            height={150}
-            style={{ borderRadius: "50%", width: "150px" }}
-            onError={(e) => {
-              (e.target as HTMLImageElement).src =
-                "/images/avatar-fallback.png";
-            }}
-            priority
-          />
+    <div className="dashboard-container">
+    {/* Hamburger menu for mobile */}
+    <div className="mobile-menu-toggle" onClick={() => setMenuOpen(prev => !prev)}>
+      <i className="fas fa-bars"></i>
+    </div>
+  
+    {/* Sidebar navigation */}
+    <nav className={`sidebar-menu ${menuOpen ? 'active' : ''}`}>
+      <div className="sidebar-header">
+        <Image
+          alt="Secretary"
+          src={logo}
+          width={80}
+          height={80}
+          style={{ borderRadius: "50%", width: "80px", height: "80px" }}
+          onError={(e) => {
+            (e.target as HTMLImageElement).src =
+              "/images/avatar-fallback.png";
+          }}
+          priority
+        />
+        <div className="user-info">
           <h6>Welcome</h6>
-          <h5 style={{ color: "white" }}>{login}</h5>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "white",
-              fontSize: "17px",
-            }}
-          >
+          <h5>{login}</h5>
+          <div className="status-indicator">
             <FaCircle
               style={{
                 color: status === "Active" ? "green" : "gray",
                 marginRight: "5px",
+                fontSize: "12px"
               }}
             />
-            {status === "Active" ? "Online" : "Offline"}
+            <span>{status === "Active" ? "Online" : "Offline"}</span>
           </div>
-        </header>
-        <ul>
-          <li tabIndex={0} className="icon-customers">
-            <MdDashboard />
-            <Link href="" style={{ textDecoration: "none", color: "white" }}>
-              <span>Appointment</span>
-            </Link>
-          </li>
-          <li tabIndex={0} className="icon-folder">
-            <MdFolderShared />
-            <Link href="" style={{ textDecoration: "none", color: "white" }}>
-              <span>Patient Record</span>
-            </Link>
-          </li>
-          <li tabIndex={0} className="icon-settings">
-            <RiLogoutCircleFill />
-            <span onClick={handleLogout} style={{ cursor: "pointer" }}>
-              Log out
-            </span>
-          </li>
-        </ul>
-      </nav>
-
-      <main>
-        <div className="helper">
-          Appointment<span> Management | Appointment</span>
         </div>
-
-        {loading ? (
-          <div className="loading-spinner">Loading appointments...</div>
-        ) : (
-          <div className="table-responsive">
-            <div className="table-wrapper">
-              <div className="table-title">
-                <div className="row">
-                  <div className="col-sm-5">
-                    <h2>
-                      Appointment <b>list</b>
-                    </h2>
-                  </div>
-                </div>
-              </div>
-
-              {listAppointment && listAppointment.length > 0 ? (
-                <table className="table table-striped table-hover">
-                  <thead>
-                    <tr>
-                      <th>LastName</th>
-                      <th>FirstName</th>
-                      <th>Email</th>
-                      <th>Telephone</th>
-                      <th>Date</th>
-                      <th>Time</th>
-                      <th>Status</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {listAppointment.map((item) => (
-                      <tr key={item._id}>
-                        <td>{item.patient.lastName}</td>
-                        <td>{item.patient.firstName}</td>
-                        <td>{item.patient.email}</td>
-                        <td>{item.patient.telephone}</td>
-                        <td>{moment(item.dateTime).format("MMMM DD YYYY")}</td>
-                        <td>{moment(item.dateTime).format("HH:mm")}</td>
-                        {/* <td
-                          style={{
-                            color:
-                              item.status === "Unconfirmed" ? "red" : "green",
-                          }}
-                        >
-                          {item.status}
-                        </td> */}
-                        <td>
-                          <button
-                            onClick={() =>
-                              handleAction(item._id, "/alert_appointment")
-                            }
-                            className="btn-action"
-                            title="Alert"
-                            aria-label="Alert"
-                          >
-                            <i className="fas fa-bell" />
-                          </button>
-                          <button
-                            onClick={() =>
-                              handleAction(item._id, "/confirm_appointment")
-                            }
-                            className="btn-action"
-                            title="Confirm"
-                            aria-label="Confirm"
-                          >
-                            <i className="fas fa-check-circle" />
-                          </button>
-                          <button
-                            onClick={() => deleteAppointment(item._id)}
-                            className="btn-action delete"
-                            title="Delete"
-                            aria-label="Delete"
-                          >
-                            <i className="fas fa-trash-alt" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <div className="no-data">No appointments found</div>
-              )}
-            </div>
+      </div>
+      
+      <ul className="sidebar-menu-items">
+        <li className="menu-item">
+          <Link href="" className="menu-link">
+            <MdDashboard className="menu-icon" />
+            <span className="menu-text">Appointment</span>
+          </Link>
+        </li>
+        <li className="menu-item">
+          <Link href="" className="menu-link">
+            <MdFolderShared className="menu-icon" />
+            <span className="menu-text">Patient Record</span>
+          </Link>
+        </li>
+        <li className="menu-item">
+          <button onClick={handleLogout} className="menu-link logout-button">
+            <RiLogoutCircleFill className="menu-icon" />
+            <span className="menu-text">Log out</span>
+          </button>
+        </li>
+      </ul>
+    </nav>
+  
+    {/* Main content area */}
+    <main className="main-content">
+      <div className="page-header">
+        <h1>Appointment<span> Management | Appointment</span></h1>
+      </div>
+  
+      {loading ? (
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <p>Loading appointments...</p>
+        </div>
+      ) : (
+        <div className="content-card">
+          <div className="card-header">
+            <h2>Appointment <b>list</b></h2>
           </div>
-        )}
-      </main>
-
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        closeOnClick
-        pauseOnHover
-        draggable
-      />
-    </div>
+  
+          {listAppointment && listAppointment.length > 0 ? (
+            <div className="table-responsive">
+              <table className="appointment-table">
+                <thead>
+                  <tr>
+                    <th>LastName</th>
+                    <th>FirstName</th>
+                    <th className="hide-sm">Email</th>
+                    <th>Telephone</th>
+                    <th>Date</th>
+                    <th className="hide-sm">Time</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {listAppointment.map((item) => (
+                    <tr key={item._id}>
+                      <td data-label="LastName">{item.patient.lastName}</td>
+                      <td data-label="FirstName">{item.patient.firstName}</td>
+                      <td data-label="Email" className="hide-sm">{item.patient.email}</td>
+                      <td data-label="Telephone">{item.patient.telephone}</td>
+                      <td data-label="Date">{moment(item.dateTime).format("MMM DD")}</td>
+                      <td data-label="Time" className="hide-sm">{moment(item.dateTime).format("HH:mm")}</td>
+                      <td data-label="Action" className="action-buttons">
+                        <button
+                          onClick={() => handleAction(item._id, "/alert_appointment")}
+                          className="btn-action alert"
+                          title="Alert"
+                        >
+                          <i className="fas fa-bell" />
+                        </button>
+                        <button
+                          onClick={() => handleAction(item._id, "/confirm_appointment")}
+                          className="btn-action confirm"
+                          title="Confirm"
+                        >
+                          <i className="fas fa-check-circle" />
+                        </button>
+                        <button
+                          onClick={() => deleteAppointment(item._id)}
+                          className="btn-action delete"
+                          title="Delete"
+                        >
+                          <i className="fas fa-trash-alt" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="no-data">
+              <i className="fas fa-calendar-times"></i>
+              <p>No appointments found</p>
+            </div>
+          )}
+        </div>
+      )}
+    </main>
+  
+    <ToastContainer
+      position="top-right"
+      autoClose={5000}
+      hideProgressBar={false}
+      closeOnClick
+      pauseOnHover
+      draggable
+    />
+  </div>
   );
 };
 
