@@ -12,41 +12,56 @@ export default function CreateAccountSecretary() {
   // var Medecin = JSON.parse(localStorage.getItem('medcine'));
   const router = useRouter();
 
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [login, setLogin] = useState("");
-  const [password, setPassword] = useState("");
-  // const id=localStorage.getItem('id_medcine');
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    login: "",
+    password: "",
+  });
+  const [loading, setLoading] = useState(false);
 
-  //---------add admin-------------
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+  };
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
 
-    if (typeof window !== "undefined") {
-      // Perform localStorage action
-      const LoginMedcine = localStorage.getItem("LoginMedcine") || "";
+    try {
+      const loginMedcine = localStorage.getItem("LoginMedcine");
+      if (!loginMedcine) {
+        throw new Error("Doctor information not found");
+      }
 
-      const Secretary = {
-        fullName,
-        email,
-        password,
-        login,
-        loginMedcine: LoginMedcine,
-      };
-      axios
-        .post(
-          `https://tatbib-api.onrender.com/medcine/createAccountSecretary`,
-          Secretary
-        )
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/medicine/createAccountSecretary`,
+        { ...formData, loginMedcine },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-        .then((res) => {
-          if (!res.data.message) {
-            router.push("/account_secretary");
-          } else {
-            console.log(res.data);
-          }
-        });
+      if (response.data.success) {
+        toast.success(response.data.message);
+        router.push("/account_secretary");
+      } else {
+        throw new Error(response.data.message || "Account creation failed");
+      }
+    } catch (error) {
+      console.error("Account creation error:", error);
+      if (axios.isAxiosError(error)) {
+        toast.error(
+          error.response?.data?.message || "Failed to create account"
+        );
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -77,16 +92,23 @@ export default function CreateAccountSecretary() {
                     <div className="col-md-6">
                       <input
                         type="text"
-                        placeholder="FullName"
-                        className="form-control"
+                        placeholder="Full Name"
                         id="fullName"
                         required
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
+                        value={formData.fullName}
+                        onChange={handleChange}
                       />
                     </div>
                     <div className="col-md-6">
-                      <input
+                    <input
+                        type="email"
+                        placeholder="Email"
+                        id="email"
+                        required
+                        value={formData.email}
+                        onChange={handleChange}
+                      />
+                      {/* <input
                         type="text"
                         placeholder="Email"
                         className="form-control"
@@ -94,42 +116,40 @@ export default function CreateAccountSecretary() {
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                      />
+                      /> */}
                     </div>
                   </div>
                   <div className="row ">
                     <div className="col-md-6">
-                      <input
+                    <input
                         type="text"
-                        className="form-control"
-                        id="login"
                         placeholder="login"
-                        value={login}
-                        onChange={(e) => setLogin(e.target.value)}
+                        id="login"
+                        required
+                        value={formData.login}
+                        onChange={handleChange}
                       />
+                     
                     </div>
                     <div className="col-md-6">
-                      <input
-                        type="password"
+                    <input
+                         type="password"
                         placeholder="Password"
-                        className="form-control "
                         id="password"
                         required
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        value={formData.password}
+                        onChange={handleChange}
                       />
+
+                    
                     </div>
                   </div>
                 </div>
-                <div>
-                  <input
-                    type="submit"
-                    className="form-control mt-5 btnConnect"
-                    id="signup"
-                    value="Confirm"
-                  />
-                </div>
+                <button type="submit" disabled={loading}>
+                  {loading ? "Creating..." : "Confirm"}
+                </button>
               </form>
+              <ToastContainer />
             </div>
           </div>
         </div>
