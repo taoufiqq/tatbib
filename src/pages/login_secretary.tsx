@@ -83,25 +83,25 @@ export default function LoginSecretary() {
       console.log("Expected Role:", ROLES.SECRETARY);
 
       // Handle account status
-      if (status === "InActive") {
-        toast.warn("Your account is not active yet. Please wait for activation.", {
-          position: "top-right",
-          autoClose: 5000,
-          theme: "colored",
-        });
-        setIsLoading(false);
-        return;
-      }
+      // if (status === "InActive") {
+      //   toast.warn("Your account is not active yet. Please wait for activation.", {
+      //     position: "top-right",
+      //     autoClose: 5000,
+      //     theme: "colored",
+      //   });
+      //   setIsLoading(false);
+      //   return;
+      // }
 
-      if (status === "Block") {
-        toast.error("This account is blocked.", {
-          position: "top-right",
-          autoClose: 5000,
-          theme: "colored",
-        });
-        setIsLoading(false);
-        return;
-      }
+      // if (status === "Block") {
+      //   toast.error("This account is blocked.", {
+      //     position: "top-right",
+      //     autoClose: 5000,
+      //     theme: "colored",
+      //   });
+      //   setIsLoading(false);
+      //   return;
+      // }
 
       // Get the correct storage keys from our utility function
       const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.SECRETARY);
@@ -141,26 +141,28 @@ export default function LoginSecretary() {
 
     } catch (error: unknown) {
       console.error("Login Error:", error);
-      let errorMessage = "Login failed. Please try again.";
-      
+    
       if (axios.isAxiosError(error)) {
         if (error.code === "ECONNABORTED") {
-          errorMessage = "Connection timeout. Please check your internet connection.";
+          toast.error("Connection timeout. Please check your internet connection.", { position: "top-right", autoClose: 5000, theme: "colored" });
         } else if (error.response) {
-          errorMessage = error.response.data?.message || `Server error: ${error.response.status}`;
+          const status = error.response.data?.status;
+    
+          if (status === "InActive") {
+            toast.warn("Your account is not active yet. Please wait for activation.", { position: "top-right", autoClose: 5000, theme: "colored" });
+          } else if (status === "Block") {
+            toast.error("This account is blocked.", { position: "top-right", autoClose: 5000, theme: "colored" });
+          } else {
+            const message = error.response.data?.message || `Server error: ${error.response.status}`;
+            toast.error(message, { position: "top-right", autoClose: 5000, theme: "colored" });
+          }
         } else if (error.request) {
-          errorMessage = "No response from server. Please try again later.";
+          toast.error("No response from server. Please try again later.", { position: "top-right", autoClose: 5000, theme: "colored" });
         }
       } else if (error instanceof Error) {
-        errorMessage = error.message;
+        toast.error(error.message, { position: "top-right", autoClose: 5000, theme: "colored" });
       }
-
-      toast.error(errorMessage, {
-        position: "top-right",
-        autoClose: 5000,
-        theme: "colored",
-      });
-    } finally {
+    
       setIsLoading(false);
     }
   };
