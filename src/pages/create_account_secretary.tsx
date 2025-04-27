@@ -190,6 +190,7 @@
 //   );
 // }
 
+// create-account-secretary.tsx
 "use client"
 
 import Image from "next/image"
@@ -203,10 +204,28 @@ import "react-toastify/dist/ReactToastify.css"
 import logo from "../../public/images/logo.png"
 import { safeLocalStorage } from "@/components/withPrivateRoute" // Import the shared utility
 
+// Define a type for the form data
+type SecretaryFormData = {
+  fullName: string;
+  email: string;
+  login: string;
+  password: string;
+}
+
+// Type-safe way to check if all fields are filled
+const checkRequiredFields = (data: SecretaryFormData): string[] => {
+  const missing: string[] = [];
+  if (!data.fullName) missing.push("fullName");
+  if (!data.email) missing.push("email");
+  if (!data.login) missing.push("login");
+  if (!data.password) missing.push("password");
+  return missing;
+};
+
 export default function CreateAccountSecretary() {
   const router = useRouter()
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<SecretaryFormData>({
     fullName: "",
     email: "",
     login: "",
@@ -239,23 +258,37 @@ export default function CreateAccountSecretary() {
         throw new Error("Doctor information not found")
       }
 
-      console.log("Submitting secretary creation via proxy")
-      console.log("With data:", { ...formData, loginMedcine })
+      // Validate required fields using our type-safe function
+      const missingFields = checkRequiredFields(formData);
+      
+      if (missingFields.length > 0) {
+        toast.error(`Please fill in all required fields: ${missingFields.join(", ")}`)
+        throw new Error("Missing required fields")
+      }
 
-      // Use our proxy API route instead of calling the external API directly
-      // This avoids CORS issues because the request to the external API is made from the server
-      const response = await axios.post(
-        "/api/proxy", // Our Next.js API route
-        {
-          endpoint: "/medcine/createAccountSecretary", // The actual API endpoint
-          data: { ...formData, loginMedcine }, // The data to send
+      // Prepare the data to send - exactly matching what the backend expects
+      const requestData = {
+        endpoint: "/medcine/createAccountSecretary",
+        data: {
+          loginMedcine,
+          fullName: formData.fullName,
+          email: formData.email,
+          login: formData.login,
+          password: formData.password,
         },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
+      }
+
+      console.log("Submitting secretary creation via proxy")
+      console.log("With data:", requestData.data)
+
+      // Make the request through our proxy
+      const response = await axios.post("/api/proxy", requestData, {
+        headers: {
+          "Content-Type": "application/json",
         },
-      )
+        // Increase timeout for slow responses
+        timeout: 30000,
+      })
 
       console.log("Response:", response.data)
 
@@ -269,8 +302,12 @@ export default function CreateAccountSecretary() {
       }
     } catch (error) {
       console.error("Account creation error:", error)
+
       if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data?.message || "Failed to create account")
+        const errorMessage =
+          error.response?.data?.message || error.response?.data?.error || error.message || "Failed to create account"
+
+        toast.error(errorMessage)
       } else if (error instanceof Error) {
         toast.error(error.message || "An unexpected error occurred")
       } else {
@@ -350,7 +387,7 @@ export default function CreateAccountSecretary() {
                     </div>
                   </div>
                 </div>
-                <button type="submit" className="form-control mt-5 btnConnect" disabled={loading}>
+                <button type="submit" className="form-control mt-3 btnConnect" disabled={loading}>
                   {loading ? (
                     <>
                       <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>

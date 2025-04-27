@@ -1,5 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from "next/types"
-import axios from "axios"
+// pages/api/proxy.ts
+import type { NextApiRequest, NextApiResponse } from 'next/types'
+import axios from 'axios'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Only allow POST requests
@@ -18,36 +19,69 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ message: "Endpoint is required" })
     }
 
-    console.log(`Proxying request to: ${apiUrl}${endpoint}`)
-    console.log("With data:", data)
+    // Log the request details for debugging
+    console.log(`[Proxy] Request to: ${apiUrl}${endpoint}`)
+    console.log(`[Proxy] Request data:`, JSON.stringify(data))
 
-    // Make the request to the actual API
-    const response = await axios.post(`${apiUrl}${endpoint}`, data, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      // Add a timeout to prevent hanging requests
-      timeout: 15000,
-    })
+    // Validate required fields for secretary creation
+    if (endpoint === "/medcine/createAccountSecretary") {
+      const requiredFields = ["loginMedcine", "fullName", "email", "login", "password"]
+      const missingFields = requiredFields.filter((field) => !data[field])
 
-    // Return the API response to the client
-    return res.status(response.status).json(response.data)
-  } catch (error) {
-    console.error("Proxy error:", error)
-
-    // Handle different types of errors
-    if (axios.isAxiosError(error)) {
-      const status = error.response?.status || 500
-      const message = error.response?.data?.message || error.message
-
-      return res.status(status).json({
-        message: `API Error: ${message}`,
-        details: error.response?.data,
-      })
+      if (missingFields.length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: `Missing required fields: ${missingFields.join(", ")}`,
+        })
+      }
     }
 
+    // Make the request to the actual API
+    try {
+      const response = await axios({
+        method: "post",
+        url: `${apiUrl}${endpoint}`,
+        data: data,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        // Increase timeout for slow APIs
+        timeout: 30000,
+      })
+
+      // Log the response for debugging
+      console.log(`[Proxy] Response status: ${response.status}`)
+      console.log(`[Proxy] Response data:`, JSON.stringify(response.data))
+
+      // Return the API response to the client
+      return res.status(response.status).json(response.data)
+    } catch (axiosError) {
+      // This will catch network errors, timeouts, etc.
+      console.error("[Proxy] Axios error:", axiosError)
+
+      if (axios.isAxiosError(axiosError)) {
+        // If we got a response from the server, return it
+        if (axiosError.response) {
+          return res.status(axiosError.response.status).json(axiosError.response.data)
+        }
+
+        // Otherwise return a generic error
+        return res.status(500).json({
+          success: false,
+          message: "Error connecting to API server",
+          error: axiosError.message,
+          code: axiosError.code,
+        })
+      }
+
+      throw axiosError // Re-throw for the outer catch
+    }
+  } catch (error) {
+    console.error("[Proxy] Unhandled error:", error)
+
     return res.status(500).json({
-      message: "An unexpected error occurred",
+      success: false,
+      message: "An unexpected error occurred in the proxy",
       error: (error as Error).message,
     })
   }
