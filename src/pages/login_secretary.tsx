@@ -32,7 +32,9 @@ export default function LoginSecretary() {
           const token = safeLocalStorage.getItem(tokenKey);
 
           if (token) {
-            console.log("Already logged in as secretary, redirecting to dashboard");
+            console.log(
+              "Already logged in as secretary, redirecting to dashboard"
+            );
             setTimeout(() => {
               window.location.href = "/secretary_dashboard";
             }, 100);
@@ -48,14 +50,14 @@ export default function LoginSecretary() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     if (!isClient) {
       toast.error("Application is still initializing. Please try again.");
       return;
     }
-  
+
     setIsLoading(true);
-  
+
     try {
       console.log("Attempting secretary login...");
       const response = await axios.post(
@@ -65,26 +67,31 @@ export default function LoginSecretary() {
           timeout: 15000,
         }
       );
-  
+
       console.log("API Response:", response.data);
-  
+
       if (response.data.message) {
         throw new Error(response.data.message);
       }
-  
-      const { status, tokenSecretary, roleSecretary, id, loginMedcine } = response.data;
-  
+
+      const { status, tokenSecretary, roleSecretary, id, loginMedcine } =
+        response.data;
+
       // Handle account status
       if (status === "InActive") {
-        toast.warn(response.data.message || "Your account is not active yet. Please wait for activation.", {
-          position: "top-right",
-          autoClose: 5000,
-          theme: "colored",
-        });
+        toast.warning(
+          response.data.message ||
+            "Your account is not active yet. Please wait for activation.",
+          {
+            position: "top-right",
+            autoClose: 5000,
+            theme: "colored",
+          }
+        );
         setIsLoading(false);
         return;
       }
-  
+
       if (status === "Block") {
         toast.error(response.data.message || "This account is blocked.", {
           position: "top-right",
@@ -94,48 +101,52 @@ export default function LoginSecretary() {
         setIsLoading(false);
         return;
       }
-  
+
       // Proceed with login if status is active
       const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.SECRETARY);
-  
+
       const storageSuccess = [
         safeLocalStorage.setItem(tokenKey, tokenSecretary),
         safeLocalStorage.setItem(loginKey, login),
         safeLocalStorage.setItem("role", ROLES.SECRETARY),
         safeLocalStorage.setItem(idKey, id || ""),
-        loginMedcine ? safeLocalStorage.setItem("login_medcine", loginMedcine) : true,
+        loginMedcine
+          ? safeLocalStorage.setItem("login_medcine", loginMedcine)
+          : true,
       ].every(Boolean);
-  
+
       if (!storageSuccess) {
         throw new Error("Failed to store authentication data");
       }
-  
+
       toast.success("Authenticated successfully", {
         position: "top-right",
         autoClose: 2000,
         theme: "colored",
       });
-  
+
       setTimeout(() => {
         window.location.href = "/secretary_dashboard";
       }, 2000);
-  
     } catch (error: unknown) {
       console.error("Login Error:", error);
       let errorMessage = "Login failed. Please try again.";
-  
+
       if (axios.isAxiosError(error)) {
         if (error.code === "ECONNABORTED") {
-          errorMessage = "Connection timeout. Please check your internet connection.";
+          errorMessage =
+            "Connection timeout. Please check your internet connection.";
         } else if (error.response) {
-          errorMessage = error.response.data?.message || `Server error: ${error.response.status}`;
+          errorMessage =
+            error.response.data?.message ||
+            `Server error: ${error.response.status}`;
         } else if (error.request) {
           errorMessage = "No response from server. Please try again later.";
         }
       } else if (error instanceof Error) {
         errorMessage = error.message;
       }
-  
+
       toast.error(errorMessage, {
         position: "top-right",
         autoClose: 5000,
@@ -153,7 +164,13 @@ export default function LoginSecretary() {
             <Link href="/">
               <div style={{ width: "100px", height: "auto" }}>
                 {isClient && (
-                  <Image alt="Logo" src={logo} width={100} height={100} priority />
+                  <Image
+                    alt="Logo"
+                    src={logo}
+                    width={100}
+                    height={100}
+                    priority
+                  />
                 )}
               </div>
             </Link>
@@ -178,7 +195,10 @@ export default function LoginSecretary() {
         </div>
         <div className="card EspacePatient">
           <div className="row">
-            <div className="col-12 col-md-12 col-lg-6" style={{ marginTop: "4%" }}>
+            <div
+              className="col-12 col-md-12 col-lg-6"
+              style={{ marginTop: "4%" }}
+            >
               <form className="row" onSubmit={handleSubmit}>
                 <label className="form-label">Login as a Secretary</label>
                 <div className="fromlogin">
@@ -209,7 +229,11 @@ export default function LoginSecretary() {
                   >
                     {isLoading ? (
                       <>
-                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        <span
+                          className="spinner-border spinner-border-sm me-2"
+                          role="status"
+                          aria-hidden="true"
+                        ></span>
                         Logging in...
                       </>
                     ) : (
@@ -235,7 +259,7 @@ export default function LoginSecretary() {
           </div>
         </div>
       </div>
-      <ToastContainer 
+      <ToastContainer
         position="top-right"
         autoClose={5000}
         hideProgressBar={false}
