@@ -95,14 +95,18 @@ export default function LoginSecretary() {
         setIsLoading(false);
         return;
       }
-      
-
       if (status === "Block") {
-        toast.error(response.data.message || "This account is blocked.", {
+        toast.error("This account is blocked. Redirecting to login...", {
           position: "top-right",
           autoClose: 5000,
           theme: "colored",
         });
+
+        // Redirect to login page after a short delay to show the toast
+        setTimeout(() => {
+          window.location.href = "/login"; // Replace "/login" with your login page URL if necessary
+        }, 3000); // Delay the redirection by 3 seconds
+
         setIsLoading(false);
         return;
       }
