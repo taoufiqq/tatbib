@@ -85,12 +85,17 @@ export default function LoginSecretary() {
           {
             position: "top-right",
             autoClose: 5000,
-            theme: "colored",
+            theme: "colored", // This ensures the colored toast theme
+            style: {
+              backgroundColor: "#FFA500", // Orange background color for "InActive" status
+              color: "#ffffff", // White text color for better visibility
+            },
           }
         );
         setIsLoading(false);
         return;
       }
+      
 
       if (status === "Block") {
         toast.error(response.data.message || "This account is blocked.", {
