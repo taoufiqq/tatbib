@@ -108,7 +108,7 @@ const PatientDashboard = () => {
       <div className="loading-container">
         <div className="loading-spinner">
           <div className="spinner"></div>
-          <p>Loading patient data...</p>
+          <p>... جاري تحميل المواعيد </p>
         </div>
         <style jsx>{`
           .loading-container {
