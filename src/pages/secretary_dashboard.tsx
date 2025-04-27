@@ -266,7 +266,6 @@ import type { Appointment } from "@/types";
 import { RiLogoutCircleFill } from "react-icons/ri";
 import { ROLES, getRoleTokens } from "@/utils/roles";
 import { FaCircle } from "react-icons/fa";
-import "@/styles/"
 const SecretaryDashboard: NextPage = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
