@@ -460,12 +460,13 @@ const SecretaryDashboard: NextPage = () => {
         <header className="avatar">
           <Image
             alt="Secretary"
-            src="/path/to/logo.jpg"
+            src={logo}
             width={150}
             height={150}
             style={{ borderRadius: "50%", width: "150px" }}
             onError={(e) => {
-              (e.target as HTMLImageElement).src = "/images/avatar-fallback.png";
+              (e.target as HTMLImageElement).src =
+                "/images/avatar-fallback.png";
             }}
             priority
           />
@@ -504,7 +505,7 @@ const SecretaryDashboard: NextPage = () => {
           </li>
           <li tabIndex={0} className="icon-settings">
             <RiLogoutCircleFill />
-            <span onClick={() => {}} style={{ cursor: "pointer" }}>
+            <span onClick={handleLogout} style={{ cursor: "pointer" }}>
               Log out
             </span>
           </li>
@@ -554,9 +555,19 @@ const SecretaryDashboard: NextPage = () => {
                         <td>{item.patient.telephone}</td>
                         <td>{moment(item.dateTime).format("MMMM DD YYYY")}</td>
                         <td>{moment(item.dateTime).format("HH:mm")}</td>
+                        {/* <td
+                          style={{
+                            color:
+                              item.status === "Unconfirmed" ? "red" : "green",
+                          }}
+                        >
+                          {item.status}
+                        </td> */}
                         <td>
                           <button
-                            onClick={() => {}}
+                            onClick={() =>
+                              handleAction(item._id, "/alert_appointment")
+                            }
                             className="btn-action"
                             title="Alert"
                             aria-label="Alert"
@@ -564,7 +575,9 @@ const SecretaryDashboard: NextPage = () => {
                             <i className="fas fa-bell" />
                           </button>
                           <button
-                            onClick={() => {}}
+                            onClick={() =>
+                              handleAction(item._id, "/confirm_appointment")
+                            }
                             className="btn-action"
                             title="Confirm"
                             aria-label="Confirm"
@@ -572,7 +585,7 @@ const SecretaryDashboard: NextPage = () => {
                             <i className="fas fa-check-circle" />
                           </button>
                           <button
-                            onClick={() => {}}
+                            onClick={() => deleteAppointment(item._id)}
                             className="btn-action delete"
                             title="Delete"
                             aria-label="Delete"
