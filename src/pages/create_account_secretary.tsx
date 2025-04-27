@@ -47,7 +47,7 @@ export default function CreateAccountSecretary() {
       }
 
       // Get API URL from env or use default
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://tatbib-api.onrender.com";
+      const apiUrl = "https://tatbib-api.onrender.com";
 
       console.log("Submitting secretary creation to:", `${apiUrl}/medcine/createAccountSecretary`);
       console.log("With data:", { ...formData, loginMedcine });
