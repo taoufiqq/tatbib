@@ -490,6 +490,7 @@ const SecretaryDashboard: NextPage = () => {
             </span>
           </li>
         </ul>
+        Active 
       </nav>
 
       <main>
