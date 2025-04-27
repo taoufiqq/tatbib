@@ -21,11 +21,12 @@ export default function SecretaryCompte() {
 
   const [listSecretary, setListSecretary] = useState<Secretary[] | null>(null);
   const [loading, setLoading] = useState(true);
-    const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.MEDICINE);
-  
+  const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.MEDICINE);
+
   if (typeof window !== "undefined") {
-   const loginMedcine = safeLocalStorage.getItem("login_medcine") || 
-                             safeLocalStorage.getItem("LoginMedcine");
+    const loginMedcine =
+      safeLocalStorage.getItem("login_medcine") ||
+      safeLocalStorage.getItem("LoginMedcine");
 
     axios
       .get(
@@ -65,21 +66,21 @@ export default function SecretaryCompte() {
     };
 
     //-----------------------log out-----------------
-  const handleLogout = () => {
-    const medicineItems = [tokenKey, loginKey, idKey, "role"];
-    medicineItems.forEach(item => localStorage.removeItem(item));
-    
-    router.push("/login_medicine");
-    toast.success("Logged out successfully", {
-      position: "top-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      theme: "colored"
-    });
-  };
+    const handleLogout = () => {
+      const medicineItems = [tokenKey, loginKey, idKey, "role"];
+      medicineItems.forEach((item) => localStorage.removeItem(item));
+
+      router.push("/login_medicine");
+      toast.success("Logged out successfully", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "colored",
+      });
+    };
     if (loading) {
       return (
         <div
@@ -117,61 +118,61 @@ export default function SecretaryCompte() {
     }
     return (
       <div className="Container">
-          <nav className="menu" tabIndex={0}>
-        <div className="smartphone-menu-trigger" />
-        <header className="avatar">
-          <Image
-            alt="Doctor profile"
-            src={logo}
-            width={150}
-            height={150}
-            style={{ borderRadius: "50%" }}
-          />
-          <h6>Welcome</h6>
-          <h5 style={{ color: "white" }}>{loginMedcine}</h5>
-        </header>
+        <nav className="menu" tabIndex={0}>
+          <div className="smartphone-menu-trigger" />
+          <header className="avatar">
+            <Image
+              alt="Doctor profile"
+              src={logo}
+              width={150}
+              height={150}
+              style={{ borderRadius: "50%" }}
+            />
+            <h6>Welcome</h6>
+            <h5 style={{ color: "white" }}>{loginMedcine}</h5>
+          </header>
 
-        <ul>
-          <li tabIndex={0} className="icon-customers">
-            <MdDashboard />
-            <Link href="/list_appointments_medicine" passHref>
-              <span style={{ textDecoration: "none", color: "white" }}>
-                List Appointments
+          <ul>
+            <li tabIndex={0} className="icon-customers">
+              <MdDashboard />
+              <Link href="/list_appointments_medicine" passHref>
+                <span style={{ textDecoration: "none", color: "white" }}>
+                  List Appointments
+                </span>
+              </Link>
+            </li>
+            <li tabIndex={0} className="icon-profil">
+              <FaUserEdit />
+              <Link href="/medicine_dashboard" passHref>
+                <span style={{ textDecoration: "none", color: "white" }}>
+                  My Account
+                </span>
+              </Link>
+            </li>
+            <li tabIndex={0} className="icon-users">
+              <FaNotesMedical />
+              <Link href="/ordonnances_by_medicine" passHref>
+                <span style={{ textDecoration: "none", color: "white" }}>
+                  Ordonnances
+                </span>
+              </Link>
+            </li>
+            <li tabIndex={0} className="icon-Secrétaire">
+              <FaUserPlus />
+              <Link href="/account_secretary" passHref>
+                <span style={{ textDecoration: "none", color: "white" }}>
+                  Secretary
+                </span>
+              </Link>
+            </li>
+            <li tabIndex={0} className="icon-settings">
+              <RiLogoutCircleFill />
+              <span onClick={handleLogout} style={{ cursor: "pointer" }}>
+                Log out
               </span>
-            </Link>
-          </li>
-          <li tabIndex={0} className="icon-profil">
-            <FaUserEdit />
-            <Link href="/medicine_dashboard" passHref>
-              <span style={{ textDecoration: "none", color: "white" }}>
-                My Account
-              </span>
-            </Link>
-          </li>
-          <li tabIndex={0} className="icon-users">
-            <FaNotesMedical />
-            <Link href="/ordonnances_by_medicine" passHref>
-              <span style={{ textDecoration: "none", color: "white" }}>
-                Ordonnances
-              </span>
-            </Link>
-          </li>
-          <li tabIndex={0} className="icon-Secrétaire">
-            <FaUserPlus />
-            <Link href="/account_secretary" passHref>
-              <span style={{ textDecoration: "none", color: "white" }}>
-                Secretary
-              </span>
-            </Link>
-          </li>
-          <li tabIndex={0} className="icon-settings">
-            <RiLogoutCircleFill />
-            <span onClick={handleLogout} style={{ cursor: "pointer" }}>
-              Log out
-            </span>
-          </li>
-        </ul>
-      </nav>
+            </li>
+          </ul>
+        </nav>
         <main>
           <div className="helper">
             Secretary Account<span> Secretary | Management</span>
@@ -215,12 +216,17 @@ export default function SecretaryCompte() {
                         <td>{item.login}</td>
                         <td
                           style={{
-                            color: item.status !== "InActive" ? "color" : "red",
+                            color:
+                              item.status === "Active"
+                                ? "green"
+                                : item.status === "InActive"
+                                ? "orange"
+                                : "red",
                           }}
                         >
-                          <span className="status text-danger"></span>
-                          {item.status}
+                          <span className="status">{item.status}</span>
                         </td>
+
                         <td>
                           <Link
                             href=""
