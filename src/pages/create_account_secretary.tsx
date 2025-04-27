@@ -191,6 +191,10 @@
 // }
 
 // create-account-secretary.tsx
+
+
+
+// create-account-secretary.tsx
 "use client"
 
 import Image from "next/image"
@@ -233,6 +237,7 @@ export default function CreateAccountSecretary() {
   })
   const [loading, setLoading] = useState(false)
   const [isClient, setIsClient] = useState(false)
+  const [apiError, setApiError] = useState<string | null>(null)
 
   useEffect(() => {
     setIsClient(true)
@@ -246,6 +251,7 @@ export default function CreateAccountSecretary() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    setApiError(null)
 
     try {
       // Check both possible localStorage keys for doctor login
@@ -281,40 +287,101 @@ export default function CreateAccountSecretary() {
       console.log("Submitting secretary creation via proxy")
       console.log("With data:", requestData.data)
 
-      // Make the request through our proxy
-      const response = await axios.post("/api/proxy", requestData, {
+      // Configure request with retry and better error handling
+      const axiosConfig = {
         headers: {
           "Content-Type": "application/json",
         },
-        // Increase timeout for slow responses
-        timeout: 30000,
-      })
+        timeout: 60000, // Longer timeout
+      };
 
-      console.log("Response:", response.data)
+      // Make the request through our proxy with improved error handling
+      toast.info("Creating account...", { autoClose: false, toastId: "creating" });
+      
+      const response = await axios.post("/api/proxy", requestData, axiosConfig);
+      
+      console.log("Response:", response.data);
+      toast.dismiss("creating");
 
       if (response.data.success) {
-        toast.success(response.data.message || "Secretary account created successfully")
+        toast.success(response.data.message || "Secretary account created successfully");
         setTimeout(() => {
-          router.push("/account_secretary")
-        }, 2000)
+          router.push("/account_secretary");
+        }, 2000);
       } else {
-        throw new Error(response.data.message || "Account creation failed")
+        // Handle "success: false" case from the API
+        throw new Error(response.data.message || "Account creation failed");
       }
     } catch (error) {
-      console.error("Account creation error:", error)
+      toast.dismiss("creating");
+      console.error("Account creation error:", error);
 
+      // Attempt direct API call if proxy fails
+      try {
+        if (axios.isAxiosError(error) && (error.code === "ECONNABORTED" || error.response?.status === 502)) {
+          const loginMedcine = safeLocalStorage.getItem("login_medcine") || safeLocalStorage.getItem("LoginMedcine");
+          
+          console.log("Proxy request failed. Attempting direct API call as fallback...");
+          toast.info("Retrying with direct connection...", { autoClose: 3000 });
+          
+          // Get API URL from env or use default
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://tatbib-api.onrender.com";
+          
+          // Make direct request to API
+          const directResponse = await axios.post(
+            `${apiUrl}/medcine/createAccountSecretary`,
+            {
+              loginMedcine,
+              fullName: formData.fullName,
+              email: formData.email,
+              login: formData.login,
+              password: formData.password,
+            },
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+              timeout: 60000,
+            }
+          );
+          
+          console.log("Direct API response:", directResponse.data);
+          
+          if (directResponse.data.success) {
+            toast.success(directResponse.data.message || "Secretary account created successfully");
+            setTimeout(() => {
+              router.push("/account_secretary");
+            }, 2000);
+            return; // Exit the function if successful
+          }
+        }
+      } catch (directError) {
+        console.error("Direct API call also failed:", directError);
+        // Continue to the normal error handling below
+      }
+
+      // Standard error handling
       if (axios.isAxiosError(error)) {
+        console.log("Status:", error.response?.status);
+        console.log("Response data:", error.response?.data);
+        
         const errorMessage =
-          error.response?.data?.message || error.response?.data?.error || error.message || "Failed to create account"
-
-        toast.error(errorMessage)
+          error.response?.data?.message || 
+          error.response?.data?.error || 
+          error.message || 
+          "Failed to create account";
+        
+        setApiError(errorMessage);
+        toast.error(errorMessage);
       } else if (error instanceof Error) {
-        toast.error(error.message || "An unexpected error occurred")
+        setApiError(error.message);
+        toast.error(error.message || "An unexpected error occurred");
       } else {
-        toast.error("An unexpected error occurred")
+        setApiError("Unknown error");
+        toast.error("An unexpected error occurred");
       }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
@@ -337,6 +404,15 @@ export default function CreateAccountSecretary() {
                 <label className="form-label" style={{ marginTop: "4%" }}>
                   Create Secretary Account
                 </label>
+                
+                {apiError && (
+                  <div className="alert alert-danger mt-3" role="alert">
+                    Error: {apiError}
+                    <br />
+                    <small>Please try again or contact support if this persists.</small>
+                  </div>
+                )}
+                
                 <div className="fromloginSignUp" style={{ marginTop: "10%" }}>
                   <div className="row">
                     <div className="col-md-6">
@@ -397,6 +473,12 @@ export default function CreateAccountSecretary() {
                     "Confirm"
                   )}
                 </button>
+                
+                {loading && (
+                  <p className="text-center text-muted mt-2">
+                    <small>Please wait, this may take a moment...</small>
+                  </p>
+                )}
               </form>
             </div>
           </div>
