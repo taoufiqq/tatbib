@@ -265,16 +265,19 @@ import { MdDashboard, MdFolderShared } from "react-icons/md";
 import type { Appointment } from "@/types";
 import { RiLogoutCircleFill } from "react-icons/ri";
 import { ROLES, getRoleTokens } from "@/utils/roles";
+import { FaCircle } from "react-icons/fa";
 
 const SecretaryDashboard: NextPage = () => {
   const router = useRouter();
   const [listAppointment, setListAppointment] = useState<Appointment[] | null>(
     null
   );
+  const [status, setStatus] = useState<string>("Inactive");
   const [login, setLogin] = useState<string>("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+  
     // Check authentication on component mount
     const checkAndLoadData = () => {
       if (typeof window !== "undefined") {
@@ -291,7 +294,8 @@ const SecretaryDashboard: NextPage = () => {
             handleLogout();
             return;
           }
-
+          const fetchedStatus = "Active"; // Replace with actual status check
+          setStatus(fetchedStatus);
           setLogin(secretaryLogin);
 
           const doctorLogin = localStorage.getItem("login_medcine");
@@ -469,6 +473,22 @@ const SecretaryDashboard: NextPage = () => {
           />
           <h6>Welcome</h6>
           <h5 style={{ color: "white" }}>{login}</h5>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              color: "white",
+              fontSize: "14px",
+            }}
+          >
+            <FaCircle
+              style={{
+                color: status === "Active" ? "green" : "gray",
+                marginRight: "5px",
+              }}
+            />
+            {status === "Active" ? "Online" : "Offline"}
+          </div>
         </header>
         <ul>
           <li tabIndex={0} className="icon-customers">
