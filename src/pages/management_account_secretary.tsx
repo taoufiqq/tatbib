@@ -76,7 +76,7 @@ export default function ManagementCompteSecretary() {
                   <option selected>Choose a status</option>
                   <option value="InActive">InActive</option>
                   <option value="Active">Active</option>
-                  <option value="Block">Block</option>
+                  <option value="Blocked">Block</option>
                 </select>
               </div>
             </div>
