@@ -1,7 +1,6 @@
 import "@/styles/globals.css";
 import "@/styles/style_patient.css";
 import "@/styles/style_medicine.css";
-
 import type { AppProps } from "next/app";
 import Script from "next/script";
 import Head from "next/head";
