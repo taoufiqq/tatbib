@@ -105,6 +105,7 @@ export default function LoginMedicine() {
         safeLocalStorage.setItem(loginKey, login),
         safeLocalStorage.setItem("role", ROLES.MEDICINE), // Always use the constant
         safeLocalStorage.setItem(idKey, id || ""),
+        safeLocalStorage.setItem("login_medcine", login), // Add this line to store the doctor's login
         medcine ? safeLocalStorage.setItem("medcine", JSON.stringify(medcine)) : true
       ].every(Boolean);
 

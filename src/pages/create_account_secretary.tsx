@@ -7,9 +7,9 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import logo from "../../public/images/logo.png";
 import { Secretary } from "@/types";
+import { safeLocalStorage } from "@/components/withPrivateRoute"; // Import the shared utility
 
 export default function CreateAccountSecretary() {
-  // var Medecin = JSON.parse(localStorage.getItem('medcine'));
   const router = useRouter();
 
   const [formData, setFormData] = useState({
@@ -19,6 +19,11 @@ export default function CreateAccountSecretary() {
     password: "",
   });
   const [loading, setLoading] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -30,13 +35,25 @@ export default function CreateAccountSecretary() {
     setLoading(true);
 
     try {
-      const loginMedcine = localStorage.getItem("LoginMedcine");
+      // Check both possible localStorage keys for doctor login
+      const loginMedcine = safeLocalStorage.getItem("login_medcine") || 
+                          safeLocalStorage.getItem("LoginMedcine");
+      
+      console.log("Found doctor login:", loginMedcine);
+      
       if (!loginMedcine) {
+        toast.error("Doctor information not found. Please log in first.");
         throw new Error("Doctor information not found");
       }
 
+      // Get API URL from env or use default
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://tatbib-api.onrender.com";
+      
+      console.log("Submitting secretary creation to:", `${apiUrl}/medcine/createAccountSecretary`);
+      console.log("With data:", { ...formData, loginMedcine });
+
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/medcine/createAccountSecretary`,
+        `${apiUrl}/medcine/createAccountSecretary`,
         { ...formData, loginMedcine },
         {
           headers: {
@@ -45,9 +62,13 @@ export default function CreateAccountSecretary() {
         }
       );
 
+      console.log("Response:", response.data);
+
       if (response.data.success) {
-        toast.success(response.data.message);
-        router.push("/account_secretary");
+        toast.success(response.data.message || "Secretary account created successfully");
+        setTimeout(() => {
+          router.push("/account_secretary");
+        }, 2000);
       } else {
         throw new Error(response.data.message || "Account creation failed");
       }
@@ -57,6 +78,8 @@ export default function CreateAccountSecretary() {
         toast.error(
           error.response?.data?.message || "Failed to create account"
         );
+      } else if (error instanceof Error) {
+        toast.error(error.message || "An unexpected error occurred");
       } else {
         toast.error("An unexpected error occurred");
       }
@@ -71,27 +94,26 @@ export default function CreateAccountSecretary() {
         <div className="row justify-content-between py-3 align-items-center">
           <div className="col-12 col-sm-3 col-lg-4 d-flex justify-content-center justify-content-lg-start py-2 py-lg-0">
             <Link href="/">
-              <Image alt="" src={logo} width="100" />
+              <div style={{ width: "100px", height: "auto" }}>
+                {isClient && (
+                  <Image alt="Logo" src={logo} width={100} height={100} priority />
+                )}
+              </div>
             </Link>
           </div>
         </div>
         <div className="card EspacePatient">
-          <div className="row ">
+          <div className="row">
             <div>
-              <form
-                className="row"
-                method="#"
-                action="#"
-                onSubmit={handleSubmit}
-              >
+              <form className="row" onSubmit={handleSubmit}>
                 <label className="form-label" style={{ marginTop: "4%" }}>
-                  Create Compte Secretary
+                  Create Secretary Account
                 </label>
                 <div className="fromloginSignUp" style={{ marginTop: "10%" }}>
-                  <div className="row ">
+                  <div className="row">
                     <div className="col-md-6">
                       <input
-                       className="form-control"
+                        className="form-control"
                         type="text"
                         placeholder="Full Name"
                         id="fullName"
@@ -101,8 +123,8 @@ export default function CreateAccountSecretary() {
                       />
                     </div>
                     <div className="col-md-6">
-                    <input
-                     className="form-control"
+                      <input
+                        className="form-control"
                         type="email"
                         placeholder="Email"
                         id="email"
@@ -110,54 +132,60 @@ export default function CreateAccountSecretary() {
                         value={formData.email}
                         onChange={handleChange}
                       />
-                      {/* <input
-                        type="text"
-                        placeholder="Email"
-                        className="form-control"
-                        id="email"
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                      /> */}
                     </div>
                   </div>
-                  <div className="row ">
+                  <div className="row">
                     <div className="col-md-6">
-                    <input
-                     className="form-control"
+                      <input
+                        className="form-control"
                         type="text"
-                        placeholder="login"
+                        placeholder="Login"
                         id="login"
                         required
                         value={formData.login}
                         onChange={handleChange}
                       />
-                     
                     </div>
                     <div className="col-md-6">
-                    <input
-                     className="form-control"
-                         type="password"
+                      <input
+                        className="form-control"
+                        type="password"
                         placeholder="Password"
                         id="password"
                         required
                         value={formData.password}
                         onChange={handleChange}
                       />
-
-                    
                     </div>
                   </div>
                 </div>
-                <button type="submit" disabled={loading}>
-                  {loading ? "Creating..." : "Confirm"}
+                <button 
+                  type="submit" 
+                  className="form-control mt-5 btnConnect"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      Creating...
+                    </>
+                  ) : (
+                    "Confirm"
+                  )}
                 </button>
               </form>
-              <ToastContainer />
             </div>
           </div>
         </div>
       </div>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+      />
     </section>
   );
 }
