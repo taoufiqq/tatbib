@@ -6,7 +6,6 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import logo from "../../public/images/logo.png";
-import { Secretary } from "@/types";
 import { safeLocalStorage } from "@/components/withPrivateRoute"; // Import the shared utility
 
 export default function CreateAccountSecretary() {
@@ -36,11 +35,12 @@ export default function CreateAccountSecretary() {
 
     try {
       // Check both possible localStorage keys for doctor login
-      const loginMedcine = safeLocalStorage.getItem("login_medcine") || 
-                          safeLocalStorage.getItem("LoginMedcine");
-      
+      const loginMedcine =
+        safeLocalStorage.getItem("login_medcine") ||
+        safeLocalStorage.getItem("LoginMedcine");
+
       console.log("Found doctor login:", loginMedcine);
-      
+
       if (!loginMedcine) {
         toast.error("Doctor information not found. Please log in first.");
         throw new Error("Doctor information not found");
@@ -48,7 +48,7 @@ export default function CreateAccountSecretary() {
 
       // Get API URL from env or use default
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://tatbib-api.onrender.com";
-      
+
       console.log("Submitting secretary creation to:", `${apiUrl}/medcine/createAccountSecretary`);
       console.log("With data:", { ...formData, loginMedcine });
 
@@ -159,8 +159,8 @@ export default function CreateAccountSecretary() {
                     </div>
                   </div>
                 </div>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className="form-control mt-5 btnConnect"
                   disabled={loading}
                 >
