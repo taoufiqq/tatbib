@@ -27,20 +27,6 @@ export interface Secretary {
   roleSecretary: string;
 }
 
-// export interface Appointment {
-//   _id: string;
-//   dateTime: string;
-//   patient: {
-//     // Change from string to object
-//     _id: string;
-//     firstName: string;
-//     lastName: string;
-//     email: string;
-//     telephone: string;
-//   };
-//   status: string;
-//   // ... other fields
-// }
 export type Appointment = {
   _id: string;
   patient: {
