@@ -48,43 +48,35 @@ export default function LoginSecretary() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     if (!isClient) {
       toast.error("Application is still initializing. Please try again.");
       return;
     }
-
+  
     setIsLoading(true);
-
+  
     try {
       console.log("Attempting secretary login...");
       const response = await axios.post(
         `https://tatbib-api.onrender.com/secretary/login`,
         { login, password },
         {
-          // Add timeout to prevent hanging requests
           timeout: 15000,
         }
       );
-
+  
       console.log("API Response:", response.data);
-
+  
       if (response.data.message) {
         throw new Error(response.data.message);
       }
-
+  
       const { status, tokenSecretary, roleSecretary, id, loginMedcine } = response.data;
-      
-      // Make sure we have a role string to normalize (add fallback)
-      const roleToNormalize = roleSecretary || "secretary"; // Default to secretary if missing
-      const normalizedRole = normalizeRole(roleToNormalize);
-      
-      console.log("Normalized Role:", normalizedRole);
-      console.log("Expected Role:", ROLES.SECRETARY);
-
+  
       // Handle account status
       if (status === "InActive") {
-        toast.warn("Your account is not active yet. Please wait for activation.", {
+        toast.warn(response.data.message || "Your account is not active yet. Please wait for activation.", {
           position: "top-right",
           autoClose: 5000,
           theme: "colored",
@@ -92,9 +84,9 @@ export default function LoginSecretary() {
         setIsLoading(false);
         return;
       }
-
+  
       if (status === "Block") {
-        toast.error("This account is blocked.", {
+        toast.error(response.data.message || "This account is blocked.", {
           position: "top-right",
           autoClose: 5000,
           theme: "colored",
@@ -102,71 +94,57 @@ export default function LoginSecretary() {
         setIsLoading(false);
         return;
       }
-
-      // Get the correct storage keys from our utility function
+  
+      // Proceed with login if status is active
       const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.SECRETARY);
-
-      // Store secretary auth data using the keys from our utility function
+  
       const storageSuccess = [
         safeLocalStorage.setItem(tokenKey, tokenSecretary),
         safeLocalStorage.setItem(loginKey, login),
-        safeLocalStorage.setItem("role", ROLES.SECRETARY), // Always use the constant
+        safeLocalStorage.setItem("role", ROLES.SECRETARY),
         safeLocalStorage.setItem(idKey, id || ""),
-        loginMedcine ? safeLocalStorage.setItem("login_medcine", loginMedcine) : true
+        loginMedcine ? safeLocalStorage.setItem("login_medcine", loginMedcine) : true,
       ].every(Boolean);
-
+  
       if (!storageSuccess) {
         throw new Error("Failed to store authentication data");
       }
-
-      // Verify storage immediately
-      console.log("Stored Auth Data:", {
-        token: safeLocalStorage.getItem(tokenKey),
-        role: safeLocalStorage.getItem("role"),
-        login: safeLocalStorage.getItem(loginKey),
-        id: safeLocalStorage.getItem(idKey),
-        loginMedcine: safeLocalStorage.getItem("login_medcine")
-      });
-
+  
       toast.success("Authenticated successfully", {
         position: "top-right",
         autoClose: 2000,
         theme: "colored",
       });
-
-      // Add a small delay to ensure localStorage is updated and toast is shown
+  
       setTimeout(() => {
         window.location.href = "/secretary_dashboard";
       }, 2000);
-
+  
     } catch (error: unknown) {
       console.error("Login Error:", error);
-    
+      let errorMessage = "Login failed. Please try again.";
+  
       if (axios.isAxiosError(error)) {
         if (error.code === "ECONNABORTED") {
-          toast.error("Connection timeout. Please check your internet connection.", { position: "top-right", autoClose: 5000, theme: "colored" });
+          errorMessage = "Connection timeout. Please check your internet connection.";
         } else if (error.response) {
-          const status = error.response.data?.status;
-    
-          if (status === "InActive") {
-            toast.warn("Your account is not active yet. Please wait for activation.", { position: "top-right", autoClose: 5000, theme: "colored" });
-          } else if (status === "Block") {
-            toast.error("This account is blocked.", { position: "top-right", autoClose: 5000, theme: "colored" });
-          } else {
-            const message = error.response.data?.message || `Server error: ${error.response.status}`;
-            toast.error(message, { position: "top-right", autoClose: 5000, theme: "colored" });
-          }
+          errorMessage = error.response.data?.message || `Server error: ${error.response.status}`;
         } else if (error.request) {
-          toast.error("No response from server. Please try again later.", { position: "top-right", autoClose: 5000, theme: "colored" });
+          errorMessage = "No response from server. Please try again later.";
         }
       } else if (error instanceof Error) {
-        toast.error(error.message, { position: "top-right", autoClose: 5000, theme: "colored" });
+        errorMessage = error.message;
       }
-    
+  
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        theme: "colored",
+      });
+    } finally {
       setIsLoading(false);
     }
   };
-
   return (
     <section className="header-page">
       <div className="container">
