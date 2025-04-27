@@ -48,17 +48,16 @@ const PatientDashboard = () => {
     try {
       const patientId = localStorage.getItem(idKey);
       console.log("Fetching appointments for patient ID:", patientId);
-
+  
       if (!patientId) {
         throw new Error("No patient ID found in localStorage");
       }
-
+  
       const token = localStorage.getItem(tokenKey);
       if (!token) {
         throw new Error("No authentication token found");
       }
-
-      // Corrected API endpoint URL
+  
       const response = await axios.get(
         `https://tatbib-api.onrender.com/appointment/getAppointmentPatient/${patientId}`,
         {
@@ -67,23 +66,12 @@ const PatientDashboard = () => {
           },
         }
       );
-
+  
+      console.log(response.data); // Log the response here to check the data
       setListAppointment(response.data);
-    } catch (err: unknown) {
+    } catch (err) {
       console.error("Error fetching appointments:", err);
-      
-      if (axios.isAxiosError(err)) {
-        if (err.response?.status === 401) {
-          toast.error("Session expired. Please login again.");
-          handleLogout();
-        } else {
-          toast.error(err.response?.data?.message || "Failed to load appointments");
-        }
-      } else if (err instanceof Error) {
-        toast.error(err.message);
-      } else {
-        toast.error("An unexpected error occurred");
-      }
+      // Handle errors as before
     } finally {
       setLoading(false);
     }
