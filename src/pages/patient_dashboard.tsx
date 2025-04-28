@@ -211,19 +211,55 @@ const PatientDashboard = () => {
                       <td>{item.medicine?.speciality || "N/A"}</td>
                       <td>{moment(item.dateTime).format("MMMM DD YYYY")}</td>
                       <td>{moment(item.dateTime).format("HH:mm")}</td>
-                      <td style={{ textAlign: "center" }}>
+                      <td
+                        style={{
+                          textAlign: "center",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
                         {item.status === "Pending" ? (
-                          <div className="loading-spinner">
-                            <div className="spinner"></div>
-                          </div>
+                          <>
+                            <div className="loading-spinner">
+                              <div className="spinner"></div>
+                            </div>
+                            <span
+                              style={{ marginLeft: "10px", fontSize: "14px" }}
+                            >
+                              Pending
+                            </span>
+                          </>
                         ) : item.status === "Confirmed" ? (
-                          <span style={{ color: "green", fontSize: "18px" }}>
-                            ✔️
-                          </span>
+                          <>
+                            <span
+                              style={{
+                                color: "green",
+                                fontSize: "18px",
+                                marginRight: "8px",
+                              }}
+                            >
+                              ✔️
+                            </span>
+                            <span style={{ color: "green", fontSize: "14px" }}>
+                              Confirmed
+                            </span>
+                          </>
                         ) : item.status === "Unconfirmed" ? (
-                          <span style={{ color: "red", fontSize: "18px" }}>
-                            ❌
-                          </span>
+                          <>
+                            <span
+                              style={{
+                                color: "red",
+                                fontSize: "18px",
+                                marginRight: "8px",
+                              }}
+                            >
+                              ❌
+                            </span>
+                            <span style={{ color: "red", fontSize: "14px" }}>
+                              Unconfirmed
+                            </span>
+                          </>
                         ) : (
                           item.status
                         )}
@@ -259,15 +295,21 @@ const PatientDashboard = () => {
         )}
 
         <ToastContainer />
+        {/* Add some style for the spinner */}
         <style jsx>{`
           .loading-spinner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .spinner {
             width: 24px;
             height: 24px;
             border: 4px solid rgba(0, 0, 0, 0.1);
             border-left-color: #09f;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto;
           }
 
           @keyframes spin {
