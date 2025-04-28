@@ -320,6 +320,7 @@ const SecretaryDashboard: NextPage = () => {
                       <th>Telephone</th>
                       <th>Date</th>
                       <th className="hide-sm">Time</th>
+                      <th>Status</th>
                       <th>Action</th>
                     </tr>
                   </thead>
@@ -338,6 +339,63 @@ const SecretaryDashboard: NextPage = () => {
                         <td data-label="Time" className="hide-sm">
                           {moment(item.dateTime).format("HH:mm")}
                         </td>
+                        <td
+                        style={{
+                          textAlign: "center",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        {item.status === "Pending" ? (
+                          <>
+                            <div className="loading-spinner">
+                              <div className="spinner"></div>
+                            </div>
+                            <span
+                              style={{
+                                marginLeft: "10px",
+                                fontSize: "14px",
+                                color: "orange",
+                              }}
+                            >
+                              Pending
+                            </span>
+                          </>
+                        ) : item.status === "Confirmed" ? (
+                          <>
+                            <span
+                              style={{
+                                fontSize: "18px",
+                                marginRight: "8px",
+                                color: "green",
+                              }}
+                            >
+                              ✔️
+                            </span>
+                            <span style={{ fontSize: "14px", color: "green" }}>
+                              Confirmed
+                            </span>
+                          </>
+                        ) : item.status === "Unconfirmed" ? (
+                          <>
+                            <span
+                              style={{
+                                fontSize: "18px",
+                                marginRight: "8px",
+                                color: "red",
+                              }}
+                            >
+                              ❌
+                            </span>
+                            <span style={{ fontSize: "14px", color: "red" }}>
+                              Unconfirmed
+                            </span>
+                          </>
+                        ) : (
+                          item.status
+                        )}
+                      </td>
                         <td data-label="Action" className="action-buttons">
                           <button
                             onClick={() =>
