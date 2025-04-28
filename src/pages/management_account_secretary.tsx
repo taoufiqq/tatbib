@@ -89,7 +89,7 @@ export default function ManagementCompteSecretary() {
             <div className="d-grid">
               <button
                 type="submit"
-                className="blog-slider__button mt-5"
+                className="mt-5"
                 style={{ outline: "none" }}
                 disabled={isSubmitting || !idKey}
               >
