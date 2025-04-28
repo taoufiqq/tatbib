@@ -128,7 +128,7 @@ const ManagementAvailablityMedcine = () => {
       </main>
 
       <ToastContainer />
-      {/* <style jsx>{`
+      <style jsx>{`
         .container {
           min-height: 100vh;
           padding: 2rem;
@@ -186,7 +186,7 @@ const ManagementAvailablityMedcine = () => {
         .submit-button:active {
           transform: translateY(0);
         }
-      `}</style> */}
+      `}</style>
     </div>
   );
 };
