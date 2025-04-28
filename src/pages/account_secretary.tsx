@@ -102,7 +102,7 @@ export default function SecretaryCompte() {
               animation: "spin 1s linear infinite",
             }}
           ></div>
-          <p>Loading Account Secretary...</p>
+          <p>جاري التحميل ...</p>
           <style jsx>{`
             @keyframes spin {
               0% {
