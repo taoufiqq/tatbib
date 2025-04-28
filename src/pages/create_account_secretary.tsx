@@ -8,6 +8,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import logo from "../../public/images/logo.png";
 import { safeLocalStorage } from "@/components/withPrivateRoute"; // Import the shared utility
+import { getRoleTokens, ROLES } from "@/utils/roles";
 
 export default function CreateAccountSecretary() {
   const router = useRouter();
@@ -20,7 +21,7 @@ export default function CreateAccountSecretary() {
   });
   const [loading, setLoading] = useState(false);
   const [isClient, setIsClient] = useState(false);
-
+ const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.MEDICINE);
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -36,13 +37,11 @@ export default function CreateAccountSecretary() {
 
     try {
       // Check both possible localStorage keys for doctor login
-      const loginMedcine =
-        safeLocalStorage.getItem("login_medcine") ||
-        safeLocalStorage.getItem("LoginMedcine");
+      const login = localStorage.getItem(loginKey);
 
-      console.log("Found doctor login:", loginMedcine);
+      // console.log("Found doctor login:", loginMedcine);
 
-      if (!loginMedcine) {
+      if (!login) {
         toast.error("Doctor information not found. Please log in first.");
         throw new Error("Doctor information not found");
       }
@@ -51,11 +50,11 @@ export default function CreateAccountSecretary() {
       const apiUrl = "https://tatbib-api.onrender.com";
 
       console.log("Submitting secretary creation to:", `${apiUrl}/medcine/createAccountSecretary`);
-      console.log("With data:", { ...formData, loginMedcine });
+      console.log("With data:", { ...formData, login });
 
       const response = await axios.post(
         `${apiUrl}/medcine/createAccountSecretary`,
-        { ...formData, loginMedcine },
+        { ...formData, login },
         {
           headers: {
             "Content-Type": "application/json",
