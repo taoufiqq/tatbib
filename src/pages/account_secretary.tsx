@@ -21,10 +21,7 @@ export default function SecretaryCompte() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const loginMedcine =
-        safeLocalStorage.getItem(loginKey) ||
-        localStorage.getItem(loginKey) ||
-        "";
+      const loginMedcine = localStorage.getItem(loginKey);
 
       if (!loginMedcine) {
         toast.error("Login not found");
