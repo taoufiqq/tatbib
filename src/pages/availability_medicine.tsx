@@ -7,8 +7,8 @@ import withAuth from "@/components/withPrivateRoute";
 
 const ManagementAvailablityMedcine = () => {
   const router = useRouter();
-  const [availablity, setAvailablity] = useState("");
-  const [updatedAvailablity, setUpdatedAvailablity] = useState("");
+  const [availability, setAvailability] = useState("");
+  const [updatedAvailability, setUpdatedAvailability] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,8 +24,8 @@ const ManagementAvailablityMedcine = () => {
         );
         
         if (response.data?.availablity) {
-          setAvailablity(response.data.availablity);
-          setUpdatedAvailablity(response.data.availablity);
+          setAvailability(response.data.availability);
+          setUpdatedAvailability(response.data.availability);
         }
       } catch (err) {
         console.error("Error fetching doctor data:", err);
@@ -47,14 +47,14 @@ const ManagementAvailablityMedcine = () => {
         throw new Error("Doctor ID not found");
       }
 
-      if (!updatedAvailablity) {
+      if (!updatedAvailability) {
         toast.warning("Please select an availability option");
         return;
       }
 
       const response = await axios.put(
-        `https://tatbib-api.onrender.com/medcine/updateAvailablityMedcine/${id}`,
-        { availablity: updatedAvailablity }
+        `https://tatbib-api.onrender.com/medcine/updateAvailabilityMedicine/${id}`,
+        { availability: updatedAvailability }
       );
 
       if (response.data) {
@@ -108,8 +108,8 @@ const ManagementAvailablityMedcine = () => {
               <div className="input-group mb-4">
                 <select
                   className="form-select p-3"
-                  value={updatedAvailablity}
-                  onChange={(e) => setUpdatedAvailablity(e.target.value)}
+                  value={updatedAvailability}
+                  onChange={(e) => setUpdatedAvailability(e.target.value)}
                   required
                 >
                   <option value="">Select your availability</option>
@@ -128,7 +128,7 @@ const ManagementAvailablityMedcine = () => {
       </main>
 
       <ToastContainer />
-      <style jsx>{`
+      {/* <style jsx>{`
         .container {
           min-height: 100vh;
           padding: 2rem;
@@ -186,7 +186,7 @@ const ManagementAvailablityMedcine = () => {
         .submit-button:active {
           transform: translateY(0);
         }
-      `}</style>
+      `}</style> */}
     </div>
   );
 };
