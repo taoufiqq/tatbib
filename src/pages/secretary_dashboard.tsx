@@ -27,8 +27,29 @@ const SecretaryDashboard: NextPage = () => {
   );
   const [status, setStatus] = useState<string>("Inactive");
   const [login, setLogin] = useState<string>("");
-
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const appointmentsPerPage = 1; // Adjust number of rows per page
+  // Pagination calculations
+  const totalPages = listAppointment
+    ? Math.ceil(listAppointment.length / appointmentsPerPage)
+    : 1;
+
+  const handlePrevious = () => {
+    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
+  };
+
+  const handleNext = () => {
+    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
+  };
+
+  const paginatedAppointments = listAppointment
+    ? listAppointment.slice(
+        (currentPage - 1) * appointmentsPerPage,
+        currentPage * appointmentsPerPage
+      )
+    : [];
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
@@ -310,137 +331,155 @@ const SecretaryDashboard: NextPage = () => {
             </div>
 
             {listAppointment && listAppointment.length > 0 ? (
-              <div className="table-responsive">
-                <table className="appointment-table">
-                  <thead>
-                    <tr>
-                      <th>LastName</th>
-                      <th>FirstName</th>
-                      <th className="hide-sm">Email</th>
-                      <th>Telephone</th>
-                      <th>Date</th>
-                      <th className="hide-sm">Time</th>
-                      <th>Status</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {listAppointment.map((item) => (
-                      <tr key={item._id}>
-                        <td data-label="LastName">{item.patient.lastName}</td>
-                        <td data-label="FirstName">{item.patient.firstName}</td>
-                        <td data-label="Email" className="hide-sm">
-                          {item.patient.email}
-                        </td>
-                        <td data-label="Telephone">{item.patient.telephone}</td>
-                        <td data-label="Date">
-                          {moment(item.dateTime).format("MMM DD")}
-                        </td>
-                        <td data-label="Time" className="hide-sm">
-                          {moment(item.dateTime).format("HH:mm")}
-                        </td>
-                        <td
-                          style={{
-                            textAlign: "center",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          {item.status === "Pending" ? (
-                            <>
-                              <div className="loading-spinner">
-                                <div className="spinner"></div>
-                              </div>
-                              <span
-                                style={{
-                                  marginLeft: "10px",
-                                  fontSize: "14px",
-                                  color: "orange",
-                                }}
-                              >
-                                Pending
-                              </span>
-                            </>
-                          ) : item.status === "Confirmed" ? (
-                            <>
-                              <span
-                                style={{
-                                  fontSize: "18px",
-                                  marginRight: "8px",
-                                  color: "green",
-                                }}
-                              >
-                                ✔️
-                              </span>
-                              <span
-                                style={{ fontSize: "14px", color: "green" }}
-                              >
-                                Confirmed
-                              </span>
-                            </>
-                          ) : item.status === "Unconfirmed" ? (
-                            <>
-                              <span
-                                style={{
-                                  fontSize: "18px",
-                                  marginRight: "8px",
-                                  color: "red",
-                                }}
-                              >
-                                ❌
-                              </span>
-                              <span style={{ fontSize: "14px", color: "red" }}>
-                                Unconfirmed
-                              </span>
-                            </>
-                          ) : (
-                            item.status
-                          )}
-                        </td>
-                        <td data-label="Action" className="action-buttons">
-                          {/* <button
-                            onClick={() =>
-                              handleAction(item._id, "/alert_appointment")
-                            }
-                            className="btn-action alert"
-                            title="Alert"
+              <>
+                <div className="table-responsive">
+                  <table className="appointment-table">
+                    <thead>
+                      <tr>
+                        <th>LastName</th>
+                        <th>FirstName</th>
+                        <th className="hide-sm">Email</th>
+                        <th>Telephone</th>
+                        <th>Date</th>
+                        <th className="hide-sm">Time</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {paginatedAppointments.map((item) => (
+                        <tr key={item._id}>
+                          <td data-label="LastName">{item.patient.lastName}</td>
+                          <td data-label="FirstName">
+                            {item.patient.firstName}
+                          </td>
+                          <td data-label="Email" className="hide-sm">
+                            {item.patient.email}
+                          </td>
+                          <td data-label="Telephone">
+                            {item.patient.telephone}
+                          </td>
+                          <td data-label="Date">
+                            {moment(item.dateTime).format("MMM DD")}
+                          </td>
+                          <td data-label="Time" className="hide-sm">
+                            {moment(item.dateTime).format("HH:mm")}
+                          </td>
+                          <td
+                            style={{
+                              textAlign: "center",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
                           >
-                            <FaBell />
-                          </button> */}
-                          {item.status !== "Unconfirmed" && (
+                            {item.status === "Pending" ? (
+                              <>
+                                <div className="loading-spinner">
+                                  <div className="spinner"></div>
+                                </div>
+                                <span
+                                  style={{
+                                    marginLeft: "10px",
+                                    fontSize: "14px",
+                                    color: "orange",
+                                  }}
+                                >
+                                  Pending
+                                </span>
+                              </>
+                            ) : item.status === "Confirmed" ? (
+                              <>
+                                <span
+                                  style={{
+                                    fontSize: "18px",
+                                    marginRight: "8px",
+                                    color: "green",
+                                  }}
+                                >
+                                  ✔️
+                                </span>
+                                <span
+                                  style={{ fontSize: "14px", color: "green" }}
+                                >
+                                  Confirmed
+                                </span>
+                              </>
+                            ) : item.status === "Unconfirmed" ? (
+                              <>
+                                <span
+                                  style={{
+                                    fontSize: "18px",
+                                    marginRight: "8px",
+                                    color: "red",
+                                  }}
+                                >
+                                  ❌
+                                </span>
+                                <span
+                                  style={{ fontSize: "14px", color: "red" }}
+                                >
+                                  Unconfirmed
+                                </span>
+                              </>
+                            ) : (
+                              item.status
+                            )}
+                          </td>
+                          <td data-label="Action" className="action-buttons">
+                            {item.status !== "Unconfirmed" && (
+                              <button
+                                onClick={() =>
+                                  handleAction(item._id, "/alert_appointment")
+                                }
+                                className="btn-action alert"
+                                title="Alert"
+                              >
+                                <FaBell />
+                              </button>
+                            )}
                             <button
                               onClick={() =>
-                                handleAction(item._id, "/alert_appointment")
+                                handleAction(item._id, "/confirm_appointment")
                               }
-                              className="btn-action alert"
-                              title="Alert"
+                              className="btn-action confirm"
+                              title="Confirm"
                             >
-                              <FaBell />
+                              <FaCheckCircle />
                             </button>
-                          )}
-                          <button
-                            onClick={() =>
-                              handleAction(item._id, "/confirm_appointment")
-                            }
-                            className="btn-action confirm"
-                            title="Confirm"
-                          >
-                            <FaCheckCircle />
-                          </button>
-                          <button
-                            onClick={() => deleteAppointment(item._id)}
-                            className="btn-action delete"
-                            title="Delete"
-                          >
-                            <FaTrashAlt />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                            <button
+                              onClick={() => deleteAppointment(item._id)}
+                              className="btn-action delete"
+                              title="Delete"
+                            >
+                              <FaTrashAlt />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="pagination-controls">
+                  <button
+                    onClick={handlePrevious}
+                    disabled={currentPage === 1}
+                    className="pagination-btn"
+                  >
+                    Previous
+                  </button>
+                  <span className="page-info">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <button
+                    onClick={handleNext}
+                    disabled={currentPage === totalPages}
+                    className="pagination-btn"
+                  >
+                    Next
+                  </button>
+                </div>
+              </>
             ) : (
               <div className="no-data">
                 <i className="fas fa-calendar-times"></i>
@@ -464,7 +503,31 @@ const SecretaryDashboard: NextPage = () => {
             border-radius: 50%;
             animation: spin 1s linear infinite;
           }
-
+ .pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+  }
+  .pagination-btn {
+    background-color: #0070f3;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    margin: 0 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s ease;
+  }
+  .pagination-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+  .page-info {
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0 12px;
           @keyframes spin {
             0% {
               transform: rotate(0deg);
