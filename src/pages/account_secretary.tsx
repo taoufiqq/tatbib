@@ -15,110 +15,110 @@ import { safeLocalStorage } from "@/components/withPrivateRoute";
 
 export default function SecretaryCompte() {
   const router = useRouter();
-
-  // const [secretary, setSecretary] = useState();
-  // const login = localStorage.getItem('LoginMedcine') || " "
-
   const [listSecretary, setListSecretary] = useState<Secretary[] | null>(null);
   const [loading, setLoading] = useState(true);
   const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.MEDICINE);
 
-  if (typeof window !== "undefined") {
-    // const loginMedcine =
-    //   safeLocalStorage.getItem("login_medcine") ||
-    //   safeLocalStorage.getItem("LoginMedcine");
-    const loginMedcine = localStorage.getItem(loginKey) || "";
-    console.log("loginmedcine",loginMedcine);
-    
-    axios
-      .get(
-        `https://tatbib-api.onrender.com/medcine/getSecretaryByMedcineName/${loginMedcine}`
-      )
-      .then(function (response) {
-        setListSecretary(response.data);
-        setLoading(false);
-      })
-      .catch(function (err) {
-        console.log(err);
-        setLoading(false);
-        toast.error("Failed to load account secretary");
-      });
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const loginMedcine =
+        safeLocalStorage.getItem(loginKey) ||
+        localStorage.getItem(loginKey) ||
+        "";
 
-    const getIdSecretary = (id: any) => {
-      localStorage.setItem("idSecretary", id);
-      router.push("/management_account_secretary");
-    };
-
-    // delete My Account
-    const deleteAccountSecretary = (id: any) => {
-      var msgConfirmation = window.confirm(
-        "Are You Sure Yo want to delete this Account ?"
-      );
-      if (msgConfirmation) {
-        axios
-          .delete(
-            `https://tatbib-api.onrender.com/medcine/deleteSecretary/${id}`
-          )
-          .then(function (response) {
-            window.location.reload();
-            console.log("item was deleted Succesfully ... ");
-            //   toastr.success(' Account was deleted SuccessFully')
-          });
+      if (!loginMedcine) {
+        toast.error("Login not found");
+        setLoading(false);
+        return;
       }
-    };
 
-    //-----------------------log out-----------------
-    const handleLogout = () => {
-      const medicineItems = [tokenKey, loginKey, idKey, "role"];
-      medicineItems.forEach((item) => localStorage.removeItem(item));
+      axios
+        .get(
+          `https://tatbib-api.onrender.com/medcine/getSecretaryByMedcineName/${loginMedcine}`
+        )
+        .then((response) => {
+          setListSecretary(response.data);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          setLoading(false);
+          toast.error("Failed to load secretary accounts");
+        });
+    }
+  }, []); // run only once
 
-      router.push("/login_medicine");
-      toast.success("Logged out successfully", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "colored",
-      });
-    };
-    if (loading) {
-      return (
+  const getIdSecretary = (id: any) => {
+    localStorage.setItem("idSecretary", id);
+    router.push("/management_account_secretary");
+  };
+
+  const deleteAccountSecretary = (id: any) => {
+    const msgConfirmation = window.confirm(
+      "Are you sure you want to delete this account?"
+    );
+    if (msgConfirmation) {
+      axios
+        .delete(`https://tatbib-api.onrender.com/medcine/deleteSecretary/${id}`)
+        .then(() => {
+          window.location.reload();
+        })
+        .catch((err) => {
+          console.error(err);
+          toast.error("Failed to delete secretary");
+        });
+    }
+  };
+
+  const handleLogout = () => {
+    const medicineItems = [tokenKey, loginKey, idKey, "role"];
+    medicineItems.forEach((item) => localStorage.removeItem(item));
+
+    router.push("/login_medicine");
+    toast.success("Logged out successfully", {
+      position: "top-right",
+      autoClose: 5000,
+    });
+  };
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+        }}
+      >
         <div
           style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            height: "100vh",
+            border: "4px solid rgba(0, 0, 0, 0.1)",
+            width: "36px",
+            height: "36px",
+            borderRadius: "50%",
+            borderLeftColor: "#09f",
+            animation: "spin 1s linear infinite",
           }}
-        >
-          <div
-            style={{
-              border: "4px solid rgba(0, 0, 0, 0.1)",
-              width: "36px",
-              height: "36px",
-              borderRadius: "50%",
-              borderLeftColor: "#09f",
-              animation: "spin 1s linear infinite",
-            }}
-          ></div>
-          <p>جاري التحميل ...</p>
-          <style jsx>{`
-            @keyframes spin {
-              0% {
-                transform: rotate(0deg);
-              }
-              100% {
-                transform: rotate(360deg);
-              }
+        />
+        <p>جاري التحميل ...</p>
+        <style jsx>{`
+          @keyframes spin {
+            0% {
+              transform: rotate(0deg);
             }
-          `}</style>
-        </div>
-      );
-    }
-    const login = localStorage.getItem(loginKey) || "";
+            100% {
+              transform: rotate(360deg);
+            }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
+  const login = (typeof window !== "undefined" && localStorage.getItem(loginKey)) || "";
+
 
     return (
       <div className="Container">
@@ -261,4 +261,4 @@ export default function SecretaryCompte() {
       </div>
     );
   }
-}
+
