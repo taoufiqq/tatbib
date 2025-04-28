@@ -46,8 +46,9 @@ const ManagementAvailablityMedcine = () => {
     e.preventDefault();
 
     try {
-      const id = localStorage.getItem("id_medcine");
-      if (!id) {
+      // const id = localStorage.getItem("id_medcine");
+      const doctorId = localStorage.getItem(idKey);
+      if (!doctorId) {
         throw new Error("Doctor ID not found");
       }
 
@@ -57,7 +58,7 @@ const ManagementAvailablityMedcine = () => {
       }
 
       const response = await axios.put(
-        `https://tatbib-api.onrender.com/medcine/updateAvailabilityMedicine/${id}`,
+        `https://tatbib-api.onrender.com/medcine/updateAvailabilityMedicine/${doctorId}`,
         { availability: updatedAvailability }
       );
 
