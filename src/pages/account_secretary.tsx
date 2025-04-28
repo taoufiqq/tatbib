@@ -22,42 +22,49 @@ export default function SecretaryCompte() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const loginMedcine = localStorage.getItem(loginKey);
-      
+
       console.log("Login medicine value:", loginMedcine);
-  
+
       if (!loginMedcine) {
         toast.error("Login not found");
         setLoading(false);
         return;
       }
-  
+
       const url = `https://tatbib-api.onrender.com/medcine/getSecretaryByMedcineName/${loginMedcine}`;
       console.log("API URL:", url);
-      
+
       axios
         .get(url)
         .then((response) => {
           console.log("API response status:", response.status);
           console.log("API response data:", response.data);
-          console.log("Is response data an array?", Array.isArray(response.data));
+          console.log(
+            "Is response data an array?",
+            Array.isArray(response.data)
+          );
           if (Array.isArray(response.data)) {
             console.log("Array length:", response.data.length);
           }
-          
+
           setListSecretary(response.data);
           setLoading(false);
         })
         .catch((err) => {
-          console.error("API error:", err.response ? {
-            status: err.response.status,
-            data: err.response.data
-          } : err.message);
+          console.error(
+            "API error:",
+            err.response
+              ? {
+                  status: err.response.status,
+                  data: err.response.data,
+                }
+              : err.message
+          );
           setLoading(false);
           toast.error("Failed to load secretary accounts");
         });
     }
   }, []);
-
 
   const getIdSecretary = (id: any) => {
     localStorage.setItem("idSecretary", id);
@@ -128,90 +135,91 @@ export default function SecretaryCompte() {
     );
   }
 
-  const login = (typeof window !== "undefined" && localStorage.getItem(loginKey)) || "";
+  const login =
+    (typeof window !== "undefined" && localStorage.getItem(loginKey)) || "";
 
+  return (
+    <div className="Container">
+      <nav className="menu" tabIndex={0}>
+        <div className="smartphone-menu-trigger" />
+        <header className="avatar">
+          <Image
+            alt="Doctor profile"
+            src={logo}
+            width={150}
+            height={150}
+            style={{ borderRadius: "50%" }}
+          />
+          <h6>Welcome</h6>
+          <h5 style={{ color: "white" }}>{login}</h5>
+        </header>
 
-    return (
-      <div className="Container">
-        <nav className="menu" tabIndex={0}>
-          <div className="smartphone-menu-trigger" />
-          <header className="avatar">
-            <Image
-              alt="Doctor profile"
-              src={logo}
-              width={150}
-              height={150}
-              style={{ borderRadius: "50%" }}
-            />
-            <h6>Welcome</h6>
-            <h5 style={{ color: "white" }}>{login}</h5>
-          </header>
-
-          <ul>
-            <li tabIndex={0} className="icon-customers">
-              <MdDashboard />
-              <Link href="/list_appointments_medicine" passHref>
-                <span style={{ textDecoration: "none", color: "white" }}>
-                  List Appointments
-                </span>
-              </Link>
-            </li>
-            <li tabIndex={0} className="icon-profil">
-              <FaUserEdit />
-              <Link href="/medicine_dashboard" passHref>
-                <span style={{ textDecoration: "none", color: "white" }}>
-                  My Account
-                </span>
-              </Link>
-            </li>
-            <li tabIndex={0} className="icon-users">
-              <FaNotesMedical />
-              <Link href="/ordonnances_by_medicine" passHref>
-                <span style={{ textDecoration: "none", color: "white" }}>
-                  Ordonnances
-                </span>
-              </Link>
-            </li>
-            <li tabIndex={0} className="icon-Secrétaire">
-              <FaUserPlus />
-              <Link href="/account_secretary" passHref>
-                <span style={{ textDecoration: "none", color: "white" }}>
-                  Secretary
-                </span>
-              </Link>
-            </li>
-            <li tabIndex={0} className="icon-settings">
-              <RiLogoutCircleFill />
-              <span onClick={handleLogout} style={{ cursor: "pointer" }}>
-                Log out
+        <ul>
+          <li tabIndex={0} className="icon-customers">
+            <MdDashboard />
+            <Link href="/list_appointments_medicine" passHref>
+              <span style={{ textDecoration: "none", color: "white" }}>
+                List Appointments
               </span>
-            </li>
-          </ul>
-        </nav>
-        <main>
-          <div className="helper">
-            Secretary Account<span> Secretary | Management</span>
-          </div>
-          <div className="table-responsive">
-            <div className="table-wrapper">
-              <div className="table-title">
-                <div className="row">
-                  <div className="col-sm-5">
-                    <h2>
-                      Account <b>Management</b>
-                    </h2>
-                  </div>
-                  <div className="col-sm-7">
-                    <Link
-                      href="/create_account_secretary"
-                      className="btn btn-secondary"
-                    >
-                      <i className="material-icons"></i>{" "}
-                      <span>Add New Secretary</span>
-                    </Link>
-                  </div>
+            </Link>
+          </li>
+          <li tabIndex={0} className="icon-profil">
+            <FaUserEdit />
+            <Link href="/medicine_dashboard" passHref>
+              <span style={{ textDecoration: "none", color: "white" }}>
+                My Account
+              </span>
+            </Link>
+          </li>
+          <li tabIndex={0} className="icon-users">
+            <FaNotesMedical />
+            <Link href="/ordonnances_by_medicine" passHref>
+              <span style={{ textDecoration: "none", color: "white" }}>
+                Ordonnances
+              </span>
+            </Link>
+          </li>
+          <li tabIndex={0} className="icon-Secrétaire">
+            <FaUserPlus />
+            <Link href="/account_secretary" passHref>
+              <span style={{ textDecoration: "none", color: "white" }}>
+                Secretary
+              </span>
+            </Link>
+          </li>
+          <li tabIndex={0} className="icon-settings">
+            <RiLogoutCircleFill />
+            <span onClick={handleLogout} style={{ cursor: "pointer" }}>
+              Log out
+            </span>
+          </li>
+        </ul>
+      </nav>
+      <main>
+        <div className="helper">
+          Secretary Account<span> Secretary | Management</span>
+        </div>
+        <div className="table-responsive">
+          <div className="table-wrapper">
+            <div className="table-title">
+              <div className="row">
+                <div className="col-sm-5">
+                  <h2>
+                    Account <b>Management</b>
+                  </h2>
+                </div>
+                <div className="col-sm-7">
+                  <Link
+                    href="/create_account_secretary"
+                    className="btn btn-secondary"
+                  >
+                    <i className="material-icons"></i>{" "}
+                    <span>Add New Secretary</span>
+                  </Link>
                 </div>
               </div>
+            </div>
+            {listSecretary && listSecretary.length > 0 ? (
               <table className="table table-striped table-hover">
                 <thead>
                   <tr>
@@ -222,54 +230,59 @@ export default function SecretaryCompte() {
                     <th>Action</th>
                   </tr>
                 </thead>
-                {listSecretary &&
-                  listSecretary.map((item: any, index: number) => (
-                    <tbody key={index}>
-                      <tr>
-                        <td>{item.fullName}</td>
-                        <td>{item.email}</td>
-                        <td>{item.login}</td>
-                        <td
-                          style={{
-                            color:
-                              item.status === "Active"
-                                ? "green"
-                                : item.status === "InActive"
-                                ? "orange"
-                                : "red",
-                          }}
+                <tbody>
+                  {listSecretary.map((item: any, index: number) => (
+                    <tr key={index}>
+                      <td>{item.fullName}</td>
+                      <td>{item.email}</td>
+                      <td>{item.login}</td>
+                      <td
+                        style={{
+                          color:
+                            item.status === "Active"
+                              ? "green"
+                              : item.status === "InActive"
+                              ? "orange"
+                              : "red",
+                        }}
+                      >
+                        <span className="status">{item.status}</span>
+                      </td>
+                      <td>
+                        <Link
+                          href=""
+                          onClick={() => getIdSecretary(item._id)}
+                          className="edit"
+                          title="Manage Account Secretary"
+                          data-toggle="tooltip"
                         >
-                          <span className="status">{item.status}</span>
-                        </td>
-
-                        <td>
-                          <Link
-                            href=""
-                            onClick={() => getIdSecretary(item._id)}
-                            className="edit"
-                            title="Manage Account Secretary"
-                            data-toggle="tooltip"
-                          >
-                            <i className="material-icons">&#xE254;</i>
-                          </Link>
-                          <Link
-                            href=""
-                            onClick={() => deleteAccountSecretary(item._id)}
-                            className="delete"
-                            title="Delete Account Secretary"
-                            data-toggle="tooltip"
-                          >
-                            <i className="material-icons">&#xE872;</i>
-                          </Link>
-                        </td>
-                      </tr>
-                    </tbody>
+                          <i className="material-icons">&#xE254;</i>
+                        </Link>
+                        <Link
+                          href=""
+                          onClick={() => deleteAccountSecretary(item._id)}
+                          className="delete"
+                          title="Delete Account Secretary"
+                          data-toggle="tooltip"
+                        >
+                          <i className="material-icons">&#xE872;</i>
+                        </Link>
+                      </td>
+                    </tr>
                   ))}
+                </tbody>
               </table>
-            </div>
+            ) : (
+              <div className="no-data-message">
+                <p>
+                  No secretary accounts found. Please add a secretary using the
+                  button above.
+                </p>
+              </div>
+            )}
           </div>
-        </main>
-      </div>
-    );
-  }
-
+        </div>
+      </main>
+    </div>
+  );
+}
