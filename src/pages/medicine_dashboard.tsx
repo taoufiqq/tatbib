@@ -18,7 +18,7 @@ interface MedecinData {
   email: string;
   speciality: string;
   city: string;
-  availablity: string;
+  availability: string;
   login: string;
 }
 
@@ -222,11 +222,11 @@ const DashboardMedcine = () => {
                   <td>{medecinData?.speciality}</td>
                   <td>{medecinData?.city}</td>
                   <td style={{
-                    color: medecinData?.availablity !== "NotAvailable" 
+                    color: medecinData?.availability !== "NotAvailable" 
                       ? "green" 
                       : "red"
                   }}>
-                    {medecinData?.availablity}
+                    {medecinData?.availability}
                   </td>
                   <td>
                     <button

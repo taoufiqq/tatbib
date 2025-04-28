@@ -3,7 +3,7 @@ export interface Medicine {
   fullName: string;
   speciality: string;
   city: string;
-  availablity: string;
+  availability: string;
   login?: string; // Optional property
 }
 export type Appointment = {
