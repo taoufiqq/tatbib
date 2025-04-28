@@ -16,23 +16,22 @@ const ManagementAvailablityMedcine = () => {
       try {
         const id = localStorage.getItem("id_medcine");
         if (!id) {
+          console.log("idMedicine", id);
+
           throw new Error("Doctor ID not found");
         }
-        console.log("idMedicine",id);
+        console.log("idMedicine", id);
         const response = await axios.get(
           `https://tatbib-api.onrender.com/medcine/getMedcineById/${id}`
         );
-        
-        
+
         if (response.data?.availablity) {
           setAvailability(response.data.availability);
           setUpdatedAvailability(response.data.availability);
         }
-    
       } catch (err) {
         console.error("Error fetching doctor data:", err);
         toast.error("Failed to load doctor availability");
-        
       } finally {
         setLoading(false);
       }
