@@ -102,10 +102,11 @@ export default function LoginMedicine() {
       // Store all auth data using the keys from our utility function with safeLocalStora
       const storageSuccess = [
         safeLocalStorage.setItem(tokenKey, token),
-        safeLocalStorage.setItem(loginKey, login),
+        safeLocalStorage.setItem(loginKey, medcine?.login || login),
+
         safeLocalStorage.setItem("role", ROLES.MEDICINE),
         safeLocalStorage.setItem(idKey, id || ""),
-        medcine?.login ? safeLocalStorage.setItem("login_medcine", medcine.login) : true, // 🔥 use medcine.login
+        // medcine?.login ? safeLocalStorage.setItem("login_medcine", medcine.login) : true, // 🔥 use medcine.login
         medcine ? safeLocalStorage.setItem("medcine", JSON.stringify(medcine)) : true
       ].every(Boolean);
 

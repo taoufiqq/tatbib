@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
@@ -39,7 +39,11 @@ export default function CreateAccountSecretary() {
       // const loginMedcine =
       //   safeLocalStorage.getItem("login_medcine") ||
       //   safeLocalStorage.getItem("LoginMedcine");
-      const loginMedcine = localStorage.getItem(loginKey);
+
+      const loginMedcine =
+        safeLocalStorage.getItem(loginKey) ||
+        safeLocalStorage.getItem("login_medcine");
+
       console.log("Found doctor login:", loginMedcine);
 
       if (!loginMedcine) {
@@ -50,7 +54,10 @@ export default function CreateAccountSecretary() {
       // Get API URL from env or use default
       const apiUrl = "https://tatbib-api.onrender.com";
 
-      console.log("Submitting secretary creation to:", `${apiUrl}/medcine/createAccountSecretary`);
+      console.log(
+        "Submitting secretary creation to:",
+        `${apiUrl}/medcine/createAccountSecretary`
+      );
       console.log("With data:", { ...formData, loginMedcine });
 
       const response = await axios.post(
@@ -66,7 +73,9 @@ export default function CreateAccountSecretary() {
       console.log("Response:", response.data);
 
       if (response.data.success) {
-        toast.success(response.data.message || "Secretary account created successfully");
+        toast.success(
+          response.data.message || "Secretary account created successfully"
+        );
         setTimeout(() => {
           router.push("/account_secretary");
         }, 2000);
@@ -97,7 +106,13 @@ export default function CreateAccountSecretary() {
             <Link href="/">
               <div style={{ width: "100px", height: "auto" }}>
                 {isClient && (
-                  <Image alt="Logo" src={logo} width={100} height={100} priority />
+                  <Image
+                    alt="Logo"
+                    src={logo}
+                    width={100}
+                    height={100}
+                    priority
+                  />
                 )}
               </div>
             </Link>
@@ -125,7 +140,7 @@ export default function CreateAccountSecretary() {
                     </div>
                     <div className="col-md-6">
                       <input
-                         className="form-control"
+                        className="form-control"
                         type="email"
                         placeholder="Email"
                         id="email"
@@ -167,7 +182,11 @@ export default function CreateAccountSecretary() {
                 >
                   {loading ? (
                     <>
-                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      <span
+                        className="spinner-border spinner-border-sm me-2"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
                       Creating...
                     </>
                   ) : (
@@ -190,5 +209,3 @@ export default function CreateAccountSecretary() {
     </section>
   );
 }
-
-
