@@ -503,31 +503,32 @@ const SecretaryDashboard: NextPage = () => {
             border-radius: 50%;
             animation: spin 1s linear infinite;
           }
- .pagination-controls {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 20px;
-  }
-  .pagination-btn {
-    background-color: #0070f3;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    margin: 0 8px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background 0.3s ease;
-  }
-  .pagination-btn:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-  }
-  .page-info {
-    font-size: 16px;
-    font-weight: 500;
-    margin: 0 12px;
+          .pagination-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+          }
+          .pagination-btn {
+            background-color: #0070f3;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            margin: 0 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s ease;
+          }
+          .pagination-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+          }
+          .page-info {
+            font-size: 16px;
+            font-weight: 500;
+            margin: 0 12px;
+          }
           @keyframes spin {
             0% {
               transform: rotate(0deg);
