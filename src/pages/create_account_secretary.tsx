@@ -35,10 +35,7 @@ export default function CreateAccountSecretary() {
     setLoading(true);
 
     try {
-      // Check both possible localStorage keys for doctor login
-      // const loginMedcine =
-      //   safeLocalStorage.getItem("login_medcine") ||
-      //   safeLocalStorage.getItem("LoginMedcine");
+
 
       const loginMedcine =
         safeLocalStorage.getItem(loginKey) ||
