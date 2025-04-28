@@ -22,6 +22,7 @@ const ManagementAvailablityMedcine = () => {
         const response = await axios.get(
           `https://tatbib-api.onrender.com/medcine/getMedcineById/${id}`
         );
+        console.log("idMedicine",id);
         
         if (response.data?.availablity) {
           setAvailability(response.data.availability);
