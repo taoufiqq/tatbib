@@ -22,28 +22,32 @@ export default function SecretaryCompte() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const loginMedcine = localStorage.getItem(loginKey);
-
+      
+      console.log("Login medicine value:", loginMedcine); // Add this
+  
       if (!loginMedcine) {
         toast.error("Login not found");
         setLoading(false);
         return;
       }
-
+  
+      const url = `https://tatbib-api.onrender.com/medcine/getSecretaryByMedcineName/${loginMedcine}`;
+      console.log("API URL:", url); // Add this
+      
       axios
-        .get(
-          `https://tatbib-api.onrender.com/medcine/getSecretaryByMedcineName/${loginMedcine}`
-        )
+        .get(url)
         .then((response) => {
+          console.log("API response:", response.data); // Add this
           setListSecretary(response.data);
           setLoading(false);
         })
         .catch((err) => {
-          console.error(err);
+          console.error("API error:", err.response || err); // Improve error logging
           setLoading(false);
           toast.error("Failed to load secretary accounts");
         });
     }
-  }, []); // run only once
+  }, []);
 
   const getIdSecretary = (id: any) => {
     localStorage.setItem("idSecretary", id);
