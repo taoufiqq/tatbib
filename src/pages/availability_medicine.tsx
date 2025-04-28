@@ -11,8 +11,8 @@ const ManagementAvailablityMedcine = () => {
   const [availability, setAvailability] = useState("");
   const [updatedAvailability, setUpdatedAvailability] = useState("");
   const [loading, setLoading] = useState(true);
-  const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.MEDICINE);
-
+  const { idKey } = getRoleTokens(ROLES.MEDICINE);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   useEffect(() => {
     const fetchDoctorAvailability = async () => {
       try {
@@ -87,26 +87,34 @@ const ManagementAvailablityMedcine = () => {
 
   if (loading) {
     return (
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh'
-      }}>
-        <div style={{
-          border: '4px solid rgba(0, 0, 0, 0.1)',
-          width: '36px',
-          height: '36px',
-          borderRadius: '50%',
-          borderLeftColor: '#09f',
-          animation: 'spin 1s linear infinite'
-        }}></div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+        }}
+      >
+        <div
+          style={{
+            border: "4px solid rgba(0, 0, 0, 0.1)",
+            width: "36px",
+            height: "36px",
+            borderRadius: "50%",
+            borderLeftColor: "#09f",
+            animation: "spin 1s linear infinite",
+          }}
+        ></div>
         <p>Loading doctor data...</p>
         <style jsx>{`
           @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+              transform: rotate(0deg);
+            }
+            100% {
+              transform: rotate(360deg);
+            }
           }
         `}</style>
       </div>
@@ -148,9 +156,17 @@ const ManagementAvailablityMedcine = () => {
               </div>
             </div>
             <div className="d-grid">
-              <button type="submit" className="submit-button py-3">
-                Confirm
+              <button
+                type="submit"
+                className="blog-slider__button mt-5"
+                style={{ outline: "none" }}
+                disabled={isSubmitting || !idKey}
+              >
+                {isSubmitting ? "Processing..." : "Confirm"}
               </button>
+              {/* <button type="submit" className="submit-button py-3">
+                Confirm
+              </button> */}
             </div>
           </form>
         </div>
