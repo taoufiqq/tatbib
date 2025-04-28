@@ -29,7 +29,7 @@ const SecretaryDashboard: NextPage = () => {
   const [login, setLogin] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const appointmentsPerPage = 1; // Adjust number of rows per page
+  const appointmentsPerPage = 5; // Adjust number of rows per page
   // Pagination calculations
   const totalPages = listAppointment
     ? Math.ceil(listAppointment.length / appointmentsPerPage)
