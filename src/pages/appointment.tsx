@@ -11,7 +11,7 @@ import { ROLES, getRoleTokens } from "@/utils/roles";
 
 interface AppointmentData {
   dateTime: string;
-  medcine: string;
+  medicine: string;
   patient: string;
   loginMedcine?: string;
 }
@@ -94,11 +94,10 @@ const RendezVous = () => {
 
       const appointmentData: AppointmentData = {
         dateTime: new Date(dateTime).toISOString(),
-        medcine: id as string,
+        medicine: id as string,  // Changed from "medcine" to "medicine"
         patient: patientId,
         loginMedcine: login as string
       };
-
       const response = await axios.post(
         "https://tatbib-api.onrender.com/appointment/addAppointment",
         appointmentData,
