@@ -15,7 +15,9 @@ export default function SearchMedicine() {
   useEffect(() => {
     const fetchMedicines = async () => {
       try {
-        const response = await axios.get("https://tatbib-api.onrender.com/medcine/getAllMedcine"); // Using Axios to make the API request
+        const response = await axios.get(
+          "https://tatbib-api.onrender.com/medcine/getAllMedcine"
+        ); // Using Axios to make the API request
         if (response.status === 200) {
           const data = response.data; // Axios automatically parses the JSON response
           if (Array.isArray(data)) {
@@ -39,26 +41,34 @@ export default function SearchMedicine() {
 
   if (loading) {
     return (
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh'
-      }}>
-        <div style={{
-          border: '4px solid rgba(0, 0, 0, 0.1)',
-          width: '36px',
-          height: '36px',
-          borderRadius: '50%',
-          borderLeftColor: '#09f',
-          animation: 'spin 1s linear infinite'
-        }}></div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+        }}
+      >
+        <div
+          style={{
+            border: "4px solid rgba(0, 0, 0, 0.1)",
+            width: "36px",
+            height: "36px",
+            borderRadius: "50%",
+            borderLeftColor: "#09f",
+            animation: "spin 1s linear infinite",
+          }}
+        ></div>
         <p>Loading doctor data...</p>
         <style jsx>{`
           @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+              transform: rotate(0deg);
+            }
+            100% {
+              transform: rotate(360deg);
+            }
           }
         `}</style>
       </div>
@@ -78,19 +88,23 @@ export default function SearchMedicine() {
       <div className="blog-slider__wrp swiper-wrapper">
         <div className="blog-slider__item swiper-slide">
           <div className="blog-slider__img">
-            <Image 
-              src={logo} 
-              alt={`${item.fullName || 'Doctor'} profile`} 
-              width={100} 
-              height={100} 
+            <Image
+              src={logo}
+              alt={`${item.fullName || "Doctor"} profile`}
+              width={100}
+              height={100}
             />
           </div>
           <div className="blog-slider__content">
             <div className="blog-slider__title">
               <h4>{item.fullName || "Unknown Doctor"}</h4>
             </div>
-            <span className="blog-slider__code">{item.speciality || "General"}</span>
-            <div className="blog-slider__code">{item.city || "Unknown location"}</div>
+            <span className="blog-slider__code">
+              {item.speciality || "General"}
+            </span>
+            <div className="blog-slider__code">
+              {item.city || "Unknown location"}
+            </div>
             <div
               className="blog-slider__title"
               style={{
@@ -99,30 +113,29 @@ export default function SearchMedicine() {
             >
               {item.availability || "Availability unknown"}
             </div>
-            {item.availability !== "NotAvailable" && (
-              <>
-                <Link
-                  href={{
-                    pathname: "/appointment",
-                    query: {
-                      id: item._id,
-                      login: item.login,
-                    },
-                  }}
-                  className="blog-slider__button"
-                  passHref
-                >
-                  Take Appointment
-                </Link>
-                <Link 
-                  href="#" 
-                  className="blog-slider__button"
-                  passHref
-                  onClick={(e) => e.preventDefault()}
-                >
-                  TeleConsultation
-                </Link>
-              </>
+            {item.availability === "NotAvailable" ? (
+              <Link
+                href="#"
+                className="blog-slider__button"
+                passHref
+                onClick={(e) => e.preventDefault()}
+              >
+                TeleConsultation
+              </Link>
+            ) : (
+              <Link
+                href={{
+                  pathname: "/appointment",
+                  query: {
+                    id: item._id,
+                    login: item.login,
+                  },
+                }}
+                className="blog-slider__button"
+                passHref
+              >
+                Take Appointment
+              </Link>
             )}
           </div>
         </div>
@@ -137,12 +150,7 @@ export default function SearchMedicine() {
           <div className="row justify-content-between py-3 align-items-center">
             <div className="col-12 col-sm-3 col-lg-4 d-flex justify-content-center justify-content-lg-start py-2 py-lg-0">
               <Link href="/" passHref>
-                <Image 
-                  alt="Website logo" 
-                  src={logo} 
-                  width={100}
-                  height={50} 
-                />
+                <Image alt="Website logo" src={logo} width={100} height={50} />
               </Link>
             </div>
           </div>
@@ -150,7 +158,11 @@ export default function SearchMedicine() {
 
         <div className="container">
           <div className="row align-items-center">
-            {listMedicines.length > 0 ? listMedicines : <div>No medicines available</div>}
+            {listMedicines.length > 0 ? (
+              listMedicines
+            ) : (
+              <div>No medicines available</div>
+            )}
           </div>
         </div>
       </section>
