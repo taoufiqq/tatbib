@@ -111,7 +111,7 @@ export default function SearchMedicine() {
                 color: item.availability !== "NotAvailable" ? "green" : "red",
               }}
             >
-              {item.availability || "Availability unknown"}
+              {item.availability}
             </div>
             {item.availability === "NotAvailable" ? (
               <Link
