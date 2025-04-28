@@ -311,7 +311,7 @@ const PatientDashboard = () => {
             width: 24px;
             height: 24px;
             border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left-color: #09f;
+            border-left-color: #ffa500;
             border-radius: 50%;
             animation: spin 1s linear infinite;
           }
