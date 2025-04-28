@@ -399,7 +399,7 @@ const SecretaryDashboard: NextPage = () => {
                           )}
                         </td>
                         <td data-label="Action" className="action-buttons">
-                          <button
+                          {/* <button
                             onClick={() =>
                               handleAction(item._id, "/alert_appointment")
                             }
@@ -407,7 +407,18 @@ const SecretaryDashboard: NextPage = () => {
                             title="Alert"
                           >
                             <FaBell />
-                          </button>
+                          </button> */}
+                          {item.status !== "Unconfirmed" && (
+                            <button
+                              onClick={() =>
+                                handleAction(item._id, "/alert_appointment")
+                              }
+                              className="btn-action alert"
+                              title="Alert"
+                            >
+                              <FaBell />
+                            </button>
+                          )}
                           <button
                             onClick={() =>
                               handleAction(item._id, "/confirm_appointment")
