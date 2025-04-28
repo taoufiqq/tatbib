@@ -24,10 +24,10 @@ export default function SecretaryCompte() {
   const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.MEDICINE);
 
   if (typeof window !== "undefined") {
-    const loginMedcine =
-      safeLocalStorage.getItem("login_medcine") ||
-      safeLocalStorage.getItem("LoginMedcine");
-
+    // const loginMedcine =
+    //   safeLocalStorage.getItem("login_medcine") ||
+    //   safeLocalStorage.getItem("LoginMedcine");
+    const loginMedcine = localStorage.getItem(loginKey) || "";
     axios
       .get(
         `https://tatbib-api.onrender.com/medcine/getSecretaryByMedcineName/${loginMedcine}`
@@ -116,6 +116,7 @@ export default function SecretaryCompte() {
         </div>
       );
     }
+    const login = localStorage.getItem(loginKey) || "";
     return (
       <div className="Container">
         <nav className="menu" tabIndex={0}>
@@ -129,7 +130,7 @@ export default function SecretaryCompte() {
               style={{ borderRadius: "50%" }}
             />
             <h6>Welcome</h6>
-            <h5 style={{ color: "white" }}>{loginMedcine}</h5>
+            <h5 style={{ color: "white" }}>{login}</h5>
           </header>
 
           <ul>
