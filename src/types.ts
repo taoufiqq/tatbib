@@ -6,7 +6,22 @@ export interface Medicine {
   availablity: string;
   login?: string; // Optional property
 }
-
+export type Appointment = {
+  _id: string;
+  patient: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    telephone: string;
+  };
+  medicine: {
+    fullName: string;
+    speciality: string;
+  };
+  dateTime: string;
+  status: 'Pending' | 'Confirmed' | 'Cancelled' | 'Completed' | 'Unconfirmed';
+};
 export interface Patient {
   firstName: string;
   lastName: string;
@@ -27,22 +42,7 @@ export interface Secretary {
   roleSecretary: string;
 }
 
-export type Appointment = {
-  _id: string;
-  patient: {
-    _id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    telephone: string;
-  };
-  medicine: {
-    fullName: string;
-    speciality: string;
-  };
-  dateTime: string;
-  status: 'Pending' | 'Confirmed' | 'Cancelled' | 'Completed' | 'Unconfirmed';
-};
+
 // In your component file
 export interface Ordonnance {
   _id: string;
