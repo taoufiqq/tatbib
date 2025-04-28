@@ -219,19 +219,20 @@ export default function SecretaryCompte() {
                 </div>
               </div>
             </div>
-            {listSecretary && listSecretary.length > 0 ? (
-              <table className="table table-striped table-hover">
-                <thead>
-                  <tr>
-                    <th>FullName</th>
-                    <th>Email</th>
-                    <th>Login</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {listSecretary.map((item: any, index: number) => (
+            {/* {listSecretary && listSecretary.length > 0 ? ( */}
+            <table className="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>FullName</th>
+                  <th>Email</th>
+                  <th>Login</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {listSecretary && listSecretary.length > 0 ? (
+                  listSecretary.map((item: any, index: number) => (
                     <tr key={index}>
                       <td>{item.fullName}</td>
                       <td>{item.email}</td>
@@ -269,17 +270,17 @@ export default function SecretaryCompte() {
                         </Link>
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <div className="no-data-message">
-                <p>
-                  No secretary accounts found. Please add a secretary using the
-                  button above.
-                </p>
-              </div>
-            )}
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={8} style={{ textAlign: "center" }}>
+                      No secretary accounts found. Please add a secretary using
+                      the button above.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       </main>
