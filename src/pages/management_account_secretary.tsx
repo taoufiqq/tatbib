@@ -13,7 +13,7 @@ export default function ManagementCompteSecretary() {
   const [status, setStatus] = useState("");
   const [updatedStatus, setUpdatedStatus] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-    const { idKey } = getRoleTokens(ROLES.MEDICINE);
+  const { idKey } = getRoleTokens(ROLES.MEDICINE);
   useEffect(() => {
     const id_Secretary = localStorage.getItem("idSecretary") || "";
     axios
@@ -32,12 +32,16 @@ export default function ManagementCompteSecretary() {
     e.preventDefault();
     const id_Secretary = localStorage.getItem("idSecretary") || "";
     const data = { status: updatedStatus };
-
+    if (!updatedStatus) {
+      toast.warning("updated Status Needed !!!!!");
+      return;
+    }
     axios
       .put(
         `https://tatbib-api.onrender.com/medcine/manageSecretaryAccount/${id_Secretary}`,
         data
       )
+
       .then((res) => {
         if (!res.data.message) {
           router.push("/account_secretary");
@@ -83,7 +87,7 @@ export default function ManagementCompteSecretary() {
               </div>
             </div>
             <div className="d-grid">
-            <button
+              <button
                 type="submit"
                 className="blog-slider__button mt-5"
                 style={{ outline: "none" }}
