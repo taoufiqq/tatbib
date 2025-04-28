@@ -28,6 +28,8 @@ export default function SecretaryCompte() {
     //   safeLocalStorage.getItem("login_medcine") ||
     //   safeLocalStorage.getItem("LoginMedcine");
     const loginMedcine = localStorage.getItem(loginKey) || "";
+    console.log("loginmedcine",loginMedcine);
+    
     axios
       .get(
         `https://tatbib-api.onrender.com/medcine/getSecretaryByMedcineName/${loginMedcine}`
