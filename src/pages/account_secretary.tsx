@@ -24,10 +24,10 @@ export default function SecretaryCompte() {
   const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.MEDICINE);
 
   if (typeof window !== "undefined") {
-    // const loginMedcine =
-    //   safeLocalStorage.getItem("login_medcine") ||
-    //   safeLocalStorage.getItem("LoginMedcine");
-    const loginMedcine = localStorage.getItem(loginKey) || "";
+    const loginMedcine =
+      safeLocalStorage.getItem("login_medcine") ||
+      safeLocalStorage.getItem("LoginMedcine");
+
     axios
       .get(
         `https://tatbib-api.onrender.com/medcine/getSecretaryByMedcineName/${loginMedcine}`
