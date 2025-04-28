@@ -23,7 +23,7 @@ export default function SecretaryCompte() {
     if (typeof window !== "undefined") {
       const loginMedcine = localStorage.getItem(loginKey);
       
-      console.log("Login medicine value:", loginMedcine); // Add this
+      console.log("Login medicine value:", loginMedcine);
   
       if (!loginMedcine) {
         toast.error("Login not found");
@@ -32,22 +32,32 @@ export default function SecretaryCompte() {
       }
   
       const url = `https://tatbib-api.onrender.com/medcine/getSecretaryByMedcineName/${loginMedcine}`;
-      console.log("API URL:", url); // Add this
+      console.log("API URL:", url);
       
       axios
         .get(url)
         .then((response) => {
-          console.log("API response:", response.data); // Add this
+          console.log("API response status:", response.status);
+          console.log("API response data:", response.data);
+          console.log("Is response data an array?", Array.isArray(response.data));
+          if (Array.isArray(response.data)) {
+            console.log("Array length:", response.data.length);
+          }
+          
           setListSecretary(response.data);
           setLoading(false);
         })
         .catch((err) => {
-          console.error("API error:", err.response || err); // Improve error logging
+          console.error("API error:", err.response ? {
+            status: err.response.status,
+            data: err.response.data
+          } : err.message);
           setLoading(false);
           toast.error("Failed to load secretary accounts");
         });
     }
   }, []);
+
 
   const getIdSecretary = (id: any) => {
     localStorage.setItem("idSecretary", id);
