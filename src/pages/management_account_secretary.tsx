@@ -33,7 +33,7 @@ export default function ManagementCompteSecretary() {
     const id_Secretary = localStorage.getItem("idSecretary") || "";
     const data = { status: updatedStatus };
     if (!updatedStatus) {
-      toast.warning("updated Status Needed !!!!!");
+      toast.error("updated Status Needed !!!!!");
       return;
     }
     axios
