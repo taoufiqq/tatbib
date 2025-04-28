@@ -8,10 +8,10 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import logo from "../../public/images/logo.png";
 import { safeLocalStorage } from "@/components/withPrivateRoute"; // Import the shared utility
-
+import { getRoleTokens, ROLES } from "@/utils/roles";
 export default function CreateAccountSecretary() {
   const router = useRouter();
-
+  const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.MEDICINE);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -36,10 +36,10 @@ export default function CreateAccountSecretary() {
 
     try {
       // Check both possible localStorage keys for doctor login
-      const loginMedcine =
-        safeLocalStorage.getItem("login_medcine") ||
-        safeLocalStorage.getItem("LoginMedcine");
-
+      // const loginMedcine =
+      //   safeLocalStorage.getItem("login_medcine") ||
+      //   safeLocalStorage.getItem("LoginMedcine");
+      const loginMedcine = localStorage.getItem(loginKey);
       console.log("Found doctor login:", loginMedcine);
 
       if (!loginMedcine) {
