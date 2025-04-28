@@ -36,13 +36,10 @@ export type Appointment = {
     email: string;
     telephone: string;
   };
-  // medicine: {
-  //   _id: string;
-  //   fullName: string;
-  //   speciality: string;
-  //   email: string;
-  //   telephone: string;
-  // };
+  medicine: {
+    fullName: string;
+    speciality: string;
+  };
   dateTime: string;
   status: 'Pending' | 'Confirmed' | 'Cancelled' | 'Completed' | 'Unconfirmed';
 };
