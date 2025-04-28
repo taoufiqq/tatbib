@@ -16,17 +16,18 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import styles from "../styles/AppointmentButton.module.css";
 import { normalizeRole, ROLES, getRoleTokens } from "@/utils/roles";
 
-
 interface AppointmentWithMedicine extends Appointment {
   medicine: Medicine;
 }
 
 const PatientDashboard = () => {
   const router = useRouter();
-  const [listAppointment, setListAppointment] = useState<AppointmentWithMedicine[] | null>(null);
+  const [listAppointment, setListAppointment] = useState<
+    AppointmentWithMedicine[] | null
+  >(null);
   const [loading, setLoading] = useState(true);
   const [login] = useLocalStorage<string | null>("LoginPatient", null);
-  
+
   // Corrected to use PATIENT role tokens
   const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.PATIENT);
 
@@ -34,7 +35,7 @@ const PatientDashboard = () => {
     console.log("Authentication Status Check:", {
       token: localStorage.getItem(tokenKey),
       role: normalizeRole(localStorage.getItem("role") || ""),
-      patientId: localStorage.getItem(idKey)
+      patientId: localStorage.getItem(idKey),
     });
 
     fetchAppointments();
@@ -44,16 +45,16 @@ const PatientDashboard = () => {
     try {
       const patientId = localStorage.getItem(idKey);
       console.log("Fetching appointments for patient ID:", patientId);
-  
+
       if (!patientId) {
         throw new Error("No patient ID found in localStorage");
       }
-  
+
       const token = localStorage.getItem(tokenKey);
       if (!token) {
         throw new Error("No authentication token found");
       }
-  
+
       const response = await axios.get(
         `https://tatbib-api.onrender.com/appointment/getAppointmentPatient/${patientId}`,
         {
@@ -62,7 +63,10 @@ const PatientDashboard = () => {
           },
         }
       );
-      console.log("First appointment:", JSON.stringify(response.data[0], null, 2));
+      console.log(
+        "First appointment:",
+        JSON.stringify(response.data[0], null, 2)
+      );
       console.log("Medicine object:", response.data[0]?.medicine);
       console.log(response.data); // Log the response here to check the data
       setListAppointment(response.data);
@@ -79,7 +83,7 @@ const PatientDashboard = () => {
       tokenKey,
       loginKey,
       idKey,
-      "role" // Changed to match standard role storage
+      "role", // Changed to match standard role storage
     ];
 
     patientStorageItems.forEach((item) => localStorage.removeItem(item));
@@ -115,8 +119,12 @@ const PatientDashboard = () => {
             margin: 0 auto 16px;
           }
           @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+              transform: rotate(0deg);
+            }
+            100% {
+              transform: rotate(360deg);
+            }
           }
         `}</style>
       </div>
@@ -199,21 +207,26 @@ const PatientDashboard = () => {
                 <tbody>
                   {listAppointment.map((item, index) => (
                     <tr key={index}>
-                    <td>{item.medicine?.fullName || "N/A"}</td>
-                    <td>{item.medicine?.speciality || "N/A"}</td>
+                      <td>{item.medicine?.fullName || "N/A"}</td>
+                      <td>{item.medicine?.speciality || "N/A"}</td>
                       <td>{moment(item.dateTime).format("MMMM DD YYYY")}</td>
                       <td>{moment(item.dateTime).format("HH:mm")}</td>
-                      <td
-                        style={{
-                          color:
-                            item.status === "Confirmed"
-                              ? "green"
-                              : item.status === "Pending"
-                              ? "orange"
-                              : "red",
-                        }}
-                      >
-                        {item.status}
+                      <td style={{ textAlign: "center" }}>
+                        {item.status === "Pending" ? (
+                          <div className="loading-spinner">
+                            <div className="spinner"></div>
+                          </div>
+                        ) : item.status === "Confirmed" ? (
+                          <span style={{ color: "green", fontSize: "18px" }}>
+                            ✔️
+                          </span>
+                        ) : item.status === "Unconfirmed" ? (
+                          <span style={{ color: "red", fontSize: "18px" }}>
+                            ❌
+                          </span>
+                        ) : (
+                          item.status
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -246,6 +259,26 @@ const PatientDashboard = () => {
         )}
 
         <ToastContainer />
+        <style jsx>{`
+          .loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #09f;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+          }
+
+          @keyframes spin {
+            0% {
+              transform: rotate(0deg);
+            }
+            100% {
+              transform: rotate(360deg);
+            }
+          }
+        `}</style>
       </main>
     </div>
   );
