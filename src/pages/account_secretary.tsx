@@ -116,7 +116,6 @@ export default function SecretaryCompte() {
         </div>
       );
     }
-    const login = localStorage.getItem(loginKey) || "";
     return (
       <div className="Container">
         <nav className="menu" tabIndex={0}>
@@ -130,7 +129,7 @@ export default function SecretaryCompte() {
               style={{ borderRadius: "50%" }}
             />
             <h6>Welcome</h6>
-            <h5 style={{ color: "white" }}>{login}</h5>
+            <h5 style={{ color: "white" }}>{loginMedcine}</h5>
           </header>
 
           <ul>
