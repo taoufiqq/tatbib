@@ -4,25 +4,27 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import withAuth from "@/components/withPrivateRoute";
+import { getRoleTokens, ROLES } from "@/utils/roles";
 
 const ManagementAvailablityMedcine = () => {
   const router = useRouter();
   const [availability, setAvailability] = useState("");
   const [updatedAvailability, setUpdatedAvailability] = useState("");
   const [loading, setLoading] = useState(true);
+  const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.MEDICINE);
 
   useEffect(() => {
     const fetchDoctorAvailability = async () => {
       try {
-        const id = localStorage.getItem("id_medcine");
-        if (!id) {
-          console.log("idMedicine", id);
+        const doctorId = localStorage.getItem(idKey);
+        if (!doctorId) {
+          console.log("idMedicine", doctorId);
 
           throw new Error("Doctor ID not found");
         }
-        console.log("idMedicine", id);
+        console.log("idMedicine", doctorId);
         const response = await axios.get(
-          `https://tatbib-api.onrender.com/medcine/getMedcineById/${id}`
+          `https://tatbib-api.onrender.com/medcine/getMedcineById/${doctorId}`
         );
 
         if (response.data?.availablity) {
@@ -44,9 +46,11 @@ const ManagementAvailablityMedcine = () => {
     e.preventDefault();
 
     try {
-      const id = localStorage.getItem("id_medcine");
-      if (!id) {
+      const doctorId = localStorage.getItem(idKey);
+      if (!doctorId) {
         throw new Error("Doctor ID not found");
+        console.log("idMedicine", doctorId);
+
       }
 
       if (!updatedAvailability) {
@@ -55,7 +59,7 @@ const ManagementAvailablityMedcine = () => {
       }
 
       const response = await axios.put(
-        `https://tatbib-api.onrender.com/medcine/updateAvailabilityMedicine/${id}`,
+        `https://tatbib-api.onrender.com/medcine/updateAvailabilityMedicine/${doctorId}`,
         { availability: updatedAvailability }
       );
 
