@@ -6,7 +6,7 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import logo from "../../public/images/patient.png";
-import { Appointment } from "@/types";
+import { Appointment, Medicine } from "@/types";
 import withAuth from "@/components/withPrivateRoute";
 import moment from "moment";
 import { MdDashboard } from "react-icons/md";
@@ -16,15 +16,10 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import styles from "../styles/AppointmentButton.module.css";
 import { normalizeRole, ROLES, getRoleTokens } from "@/utils/roles";
 
-interface Medcine {
-  fullName: string;
-  speciality: string;
-}
 
 interface AppointmentWithMedicine extends Appointment {
-  medicine: Medcine;
+  medicine: Medicine;
 }
-
 
 const PatientDashboard = () => {
   const router = useRouter();
@@ -67,7 +62,8 @@ const PatientDashboard = () => {
           },
         }
       );
-  
+      console.log("First appointment:", JSON.stringify(response.data[0], null, 2));
+      console.log("Medicine object:", response.data[0]?.medicine);
       console.log(response.data); // Log the response here to check the data
       setListAppointment(response.data);
     } catch (err) {
@@ -203,8 +199,8 @@ const PatientDashboard = () => {
                 <tbody>
                   {listAppointment.map((item, index) => (
                     <tr key={index}>
-                      <td>{item.medicine?.fullName || "N/A"}</td>
-                      <td>{item.medicine?.speciality || "N/A"}</td>
+                    <td>{item.medicine?.fullName || "N/A"}</td>
+                    <td>{item.medicine?.speciality || "N/A"}</td>
                       <td>{moment(item.dateTime).format("MMMM DD YYYY")}</td>
                       <td>{moment(item.dateTime).format("HH:mm")}</td>
                       <td
