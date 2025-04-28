@@ -225,7 +225,11 @@ const PatientDashboard = () => {
                               <div className="spinner"></div>
                             </div>
                             <span
-                              style={{ marginLeft: "10px", fontSize: "14px" }}
+                              style={{
+                                marginLeft: "10px",
+                                fontSize: "14px",
+                                color: "orange",
+                              }}
                             >
                               Pending
                             </span>
@@ -234,14 +238,14 @@ const PatientDashboard = () => {
                           <>
                             <span
                               style={{
-                                color: "green",
                                 fontSize: "18px",
                                 marginRight: "8px",
+                                color: "green",
                               }}
                             >
                               ✔️
                             </span>
-                            <span style={{ color: "green", fontSize: "14px" }}>
+                            <span style={{ fontSize: "14px", color: "green" }}>
                               Confirmed
                             </span>
                           </>
@@ -249,14 +253,14 @@ const PatientDashboard = () => {
                           <>
                             <span
                               style={{
-                                color: "red",
                                 fontSize: "18px",
                                 marginRight: "8px",
+                                color: "red",
                               }}
                             >
                               ❌
                             </span>
-                            <span style={{ color: "red", fontSize: "14px" }}>
+                            <span style={{ fontSize: "14px", color: "red" }}>
                               Unconfirmed
                             </span>
                           </>
@@ -264,6 +268,33 @@ const PatientDashboard = () => {
                           item.status
                         )}
                       </td>
+
+                      {/* Add some style for the spinner */}
+                      <style jsx>{`
+                        .loading-spinner {
+                          display: flex;
+                          align-items: center;
+                          justify-content: center;
+                        }
+
+                        .spinner {
+                          width: 24px;
+                          height: 24px;
+                          border: 4px solid rgba(0, 0, 0, 0.1);
+                          border-left-color: #09f;
+                          border-radius: 50%;
+                          animation: spin 1s linear infinite;
+                        }
+
+                        @keyframes spin {
+                          0% {
+                            transform: rotate(0deg);
+                          }
+                          100% {
+                            transform: rotate(360deg);
+                          }
+                        }
+                      `}</style>
                     </tr>
                   ))}
                 </tbody>
