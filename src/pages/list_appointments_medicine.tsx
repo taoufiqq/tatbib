@@ -191,7 +191,7 @@ const ListAppointments = () => {
               width: "80%",
               maxWidth: 500,
               borderRadius: "25px",
-              border: "1px solid #ccc rgb(44 165 184)",
+              border: "1px solid rgb(44 165 184)",
               outline: "none",
               boxShadow: "rgb(41 155 228) 0px 2px 6px",
               transition: "all 0.3s ease",

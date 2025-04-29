@@ -27,7 +27,7 @@ const SecretaryDashboard: NextPage = () => {
   const [status, setStatus] = useState<string>("Inactive");
   const [login, setLogin] = useState<string>("");
   const [loading, setLoading] = useState(true);
-
+  const [searchQuery, setSearchQuery] = useState("");
   // Pagination states
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(5);
@@ -193,16 +193,36 @@ const SecretaryDashboard: NextPage = () => {
     localStorage.removeItem("idAppointment");
     window.location.href = "/login_secretary";
   };
-
+  const filteredAppointments = listAppointment?.filter((item) => {
+    const search = searchQuery.toLowerCase();
+    return (
+      item.patient?.firstName?.toLowerCase().includes(search) ||
+      item.patient?.lastName?.toLowerCase().includes(search) ||
+      item.patient?.email?.toLowerCase().includes(search) ||
+      item.patient?.telephone?.includes(search) ||
+      moment(item.dateTime)
+        .format("MMMM DD YYYY")
+        .toLowerCase()
+        .includes(search) ||
+      moment(item.dateTime).format("HH:mm").includes(search) ||
+      item.status.toLowerCase().includes(search)
+    );
+  });
   // Pagination calculation
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems =
-    listAppointment?.slice(indexOfFirstItem, indexOfLastItem) || [];
-  const totalPages = listAppointment
-    ? Math.ceil(listAppointment.length / itemsPerPage)
-    : 1;
-
+  // const indexOfLastItem = currentPage * itemsPerPage;
+  // const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  // const currentItems =
+  //   listAppointment?.slice(indexOfFirstItem, indexOfLastItem) || [];
+  // const totalPages = listAppointment
+  //   ? Math.ceil(listAppointment.length / itemsPerPage)
+  //   : 1;
+  const paginatedAppointments = filteredAppointments?.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+    const totalPages = filteredAppointments
+    ? Math.ceil(filteredAppointments.length / itemsPerPage)
+    : 0;
   return (
     <div className="dashboard-container">
       {/* Sidebar and Navigation */}
@@ -267,7 +287,33 @@ const SecretaryDashboard: NextPage = () => {
             Appointment<span> Management | Appointment</span>
           </h1>
         </div>
-
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginBottom: 20,
+          }}
+        >
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search appointments..."
+            style={{
+              padding: "10px 16px",
+              width: "80%",
+              maxWidth: 500,
+              borderRadius: "25px",
+              border: "1px solid rgb(44 165 184)",
+              outline: "none",
+              boxShadow: "rgb(41 155 228) 0px 2px 6px",
+              transition: "all 0.3s ease",
+              marginTop: "1%",
+            }}
+            onFocus={(e) => (e.currentTarget.style.borderColor = "#0070f3")}
+            onBlur={(e) => (e.currentTarget.style.borderColor = "#ccc")}
+          />
+        </div>
         {loading ? (
           <div className="loading-container">
             <div className="spinner"></div>
@@ -281,7 +327,7 @@ const SecretaryDashboard: NextPage = () => {
               </h2>
             </div>
 
-            {currentItems.length > 0 ? (
+            {paginatedAppointments?.length ? (
               <div className="table-responsive">
                 <table className="appointment-table">
                   <thead>
@@ -297,7 +343,8 @@ const SecretaryDashboard: NextPage = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {currentItems.map((item) => (
+                  {
+                  paginatedAppointments.map((item) => (
                       <tr key={item._id}>
                         <td>{item.patient.lastName}</td>
                         <td>{item.patient.firstName}</td>
