@@ -28,7 +28,7 @@ const SecretaryDashboard: NextPage = () => {
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemsPerPage = 5; // You can adjust this number
+  const itemsPerPage = 1; // You can adjust this number
 
   // Fetch data and authentication check
   useEffect(() => {
