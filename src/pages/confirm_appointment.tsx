@@ -21,22 +21,31 @@ const ConfirmAppointment = () => {
   const { idKey } = router.query;
 
   useEffect(() => {
-    const id = localStorage.getItem("idAppointment");
-    axios
-      .get(
-        `https://tatbib-api.onrender.com/appointment/getAppointmenById/${id}`
-      )
-      .then(function (response) {
-        setStatus(response.data.status);
-        setEmail(response.data.patient.email);
-        setDateTime(response.data.dateTime);
-        console.log(response.data.patient.email);
-      })
-      .catch(function (err) {
-        console.log(err);
-      });
-    setLoading(false);
-  });
+    const fetchAppointment = async () => {
+      try {
+        const id = localStorage.getItem("idAppointment");
+        if (!id) {
+          console.error("No appointment ID found in localStorage");
+          setLoading(false);
+          return;
+        }
+        const response = await axios.get(
+          `https://tatbib-api.onrender.com/appointment/getAppointmenById/${id}`
+        );
+        const appointment = response.data;
+
+        setStatus(appointment.status);
+        setEmail(appointment.patient.email);
+        setDateTime(appointment.dateTime);
+      } catch (error) {
+        console.error("Failed to fetch appointment:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAppointment();
+  }, []); // ✅ Empty dependency array to run once
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
