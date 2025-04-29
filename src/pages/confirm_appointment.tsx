@@ -14,7 +14,8 @@ const ConfirmAppointment = () => {
   const [updatedStatus, setUpdatedStatus] = useState("");
   const [email, setEmail] = useState("");
   const [dateTime, setDateTime] = useState("");
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     const id = localStorage.getItem("idAppointment");
     axios
@@ -61,7 +62,41 @@ const ConfirmAppointment = () => {
         }
       });
   };
-
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+        }}
+      >
+        <div
+          style={{
+            border: "4px solid rgba(0, 0, 0, 0.1)",
+            width: "36px",
+            height: "36px",
+            borderRadius: "50%",
+            borderLeftColor: "#09f",
+            animation: "spin 1s linear infinite",
+          }}
+        ></div>
+        <p>Loading</p>
+        <style jsx>{`
+          @keyframes spin {
+            0% {
+              transform: rotate(0deg);
+            }
+            100% {
+              transform: rotate(360deg);
+            }
+          }
+        `}</style>
+      </div>
+    );
+  }
   return (
     <div className="Containerr" style={{ overflow: "hidden" }}>
       <main>
@@ -97,14 +132,19 @@ const ConfirmAppointment = () => {
               </div>
             </div>
             <div className="d-grid">
-              <button type="submit" className="button1 py-3">
-                Confirm
-                <ToastContainer />
+              <button
+                type="submit"
+                className="blog-slider__button mt-5"
+                style={{ outline: "none" }}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Processing..." : "Confirm"}
               </button>
             </div>
           </form>
         </div>
       </main>
+      <ToastContainer />
     </div>
   );
 };
