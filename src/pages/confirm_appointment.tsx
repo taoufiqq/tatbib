@@ -137,7 +137,7 @@ const ConfirmAppointment = () => {
                   value={updatedStatus}
                   onChange={(e) => setUpdatedStatus(e.target.value)}
                 >
-                  <option selected>Pending</option>
+                  <option value="Pending">Pending</option>
                   <option value="Confirmed">Confirmed</option>
                   <option value="Unconfirmed">Unconfirmed</option>
                   <option value="Completed">Completed</option>
@@ -150,7 +150,7 @@ const ConfirmAppointment = () => {
                 type="submit"
                 className="blog-slider__button mt-5"
                 style={{ outline: "none" }}
-                disabled={isSubmitting || !idKey}
+                disabled={isSubmitting}
               >
                 {isSubmitting ? "Processing..." : "Confirm"}
               </button>
