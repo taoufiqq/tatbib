@@ -21,7 +21,9 @@ import { IoMenu } from "react-icons/io5";
 const SecretaryDashboard: NextPage = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
-  const [listAppointment, setListAppointment] = useState<Appointment[] | null>(null);
+  const [listAppointment, setListAppointment] = useState<Appointment[] | null>(
+    null
+  );
   const [status, setStatus] = useState<string>("Inactive");
   const [login, setLogin] = useState<string>("");
   const [loading, setLoading] = useState(true);
@@ -126,7 +128,9 @@ const SecretaryDashboard: NextPage = () => {
           }
         )
         .then(() => {
-          setListAppointment((prev) => prev?.filter((app) => app._id !== id) || null);
+          setListAppointment(
+            (prev) => prev?.filter((app) => app._id !== id) || null
+          );
           toast.success("Appointment deleted successfully");
           setLoading(false);
         })
@@ -161,14 +165,20 @@ const SecretaryDashboard: NextPage = () => {
   // Pagination calculation
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = listAppointment?.slice(indexOfFirstItem, indexOfLastItem) || [];
+  const currentItems =
+    listAppointment?.slice(indexOfFirstItem, indexOfLastItem) || [];
 
-  const totalPages = listAppointment ? Math.ceil(listAppointment.length / itemsPerPage) : 1;
+  const totalPages = listAppointment
+    ? Math.ceil(listAppointment.length / itemsPerPage)
+    : 1;
 
   return (
     <div className="dashboard-container">
       {/* Sidebar and Navigation */}
-      <div className="mobile-menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>
+      <div
+        className="mobile-menu-toggle"
+        onClick={() => setMenuOpen(!menuOpen)}
+      >
         <IoMenu />
       </div>
 
@@ -186,7 +196,12 @@ const SecretaryDashboard: NextPage = () => {
             <h6>Welcome</h6>
             <h5>{login}</h5>
             <div className="status-indicator">
-              <FaCircle style={{ color: status === "Active" ? "green" : "gray", fontSize: "12px" }} />
+              <FaCircle
+                style={{
+                  color: status === "Active" ? "green" : "gray",
+                  fontSize: "12px",
+                }}
+              />
               <span>{status === "Active" ? "Online" : "Offline"}</span>
             </div>
           </div>
@@ -258,33 +273,59 @@ const SecretaryDashboard: NextPage = () => {
                         <td className="hide-sm">{item.patient.email}</td>
                         <td>{item.patient.telephone}</td>
                         <td>{moment(item.dateTime).format("MMM DD")}</td>
-                        <td className="hide-sm">{moment(item.dateTime).format("HH:mm")}</td>
-                        <td style={{ textAlign: "center" }}>
+                        <td className="hide-sm">
+                          {moment(item.dateTime).format("HH:mm")}
+                        </td>
+                        <td style={{ textAlign: "center", display: "flex" }}>
                           {item.status === "Pending" ? (
                             <>
                               <div className="spinner"></div>
-                              <span style={{ marginLeft: "10px", color: "orange" }}>Pending</span>
+                              <span
+                                style={{ marginLeft: "10px", color: "orange" }}
+                              >
+                                Pending
+                              </span>
                             </>
                           ) : item.status === "Confirmed" ? (
                             <>
-                              <span style={{ color: "green" }}>✔️ Confirmed</span>
+                              <span style={{ color: "green" }}>
+                                ✔️ Confirmed
+                              </span>
                             </>
                           ) : (
                             <>
-                              <span style={{ color: "red" }}>❌ Unconfirmed</span>
+                              <span style={{ color: "red" }}>
+                                ❌ Unconfirmed
+                              </span>
                             </>
                           )}
                         </td>
                         <td className="action-buttons">
                           {item.status !== "Unconfirmed" && (
-                            <button onClick={() => handleAction(item._id, "/alert_appointment")} title="Alert" className="btn-action alert">
+                            <button
+                              onClick={() =>
+                                handleAction(item._id, "/alert_appointment")
+                              }
+                              title="Alert"
+                              className="btn-action alert"
+                            >
                               <FaBell />
                             </button>
                           )}
-                          <button onClick={() => handleAction(item._id, "/confirm_appointment")} title="Confirm" className="btn-action confirm">
+                          <button
+                            onClick={() =>
+                              handleAction(item._id, "/confirm_appointment")
+                            }
+                            title="Confirm"
+                            className="btn-action confirm"
+                          >
                             <FaCheckCircle />
                           </button>
-                          <button onClick={() => deleteAppointment(item._id)} title="Delete" className="btn-action delete">
+                          <button
+                            onClick={() => deleteAppointment(item._id)}
+                            title="Delete"
+                            className="btn-action delete"
+                          >
                             <FaTrashAlt />
                           </button>
                         </td>
@@ -298,7 +339,9 @@ const SecretaryDashboard: NextPage = () => {
                   {Array.from({ length: totalPages }, (_, i) => (
                     <button
                       key={i}
-                      className={`page-button ${currentPage === i + 1 ? "active" : ""}`}
+                      className={`page-button ${
+                        currentPage === i + 1 ? "active" : ""
+                      }`}
                       onClick={() => setCurrentPage(i + 1)}
                     >
                       {i + 1}
@@ -357,7 +400,14 @@ const SecretaryDashboard: NextPage = () => {
         `}</style>
       </main>
 
-      <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} closeOnClick pauseOnHover draggable />
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+      />
     </div>
   );
 };
