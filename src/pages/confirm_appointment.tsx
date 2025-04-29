@@ -6,6 +6,7 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import withAuth from "@/components/withPrivateRoute";
+import { getRoleTokens, ROLES } from "@/utils/roles";
 
 const ConfirmAppointment = () => {
   const router = useRouter();
@@ -16,6 +17,8 @@ const ConfirmAppointment = () => {
   const [dateTime, setDateTime] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
+  const { idKey } = getRoleTokens(ROLES.SECRETARY);
+
   useEffect(() => {
     const id = localStorage.getItem("idAppointment");
     axios
@@ -136,7 +139,7 @@ const ConfirmAppointment = () => {
                 type="submit"
                 className="blog-slider__button mt-5"
                 style={{ outline: "none" }}
-                disabled={isSubmitting}
+                disabled={isSubmitting || !idKey}
               >
                 {isSubmitting ? "Processing..." : "Confirm"}
               </button>
