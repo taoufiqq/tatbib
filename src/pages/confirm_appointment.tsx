@@ -88,9 +88,11 @@ const ConfirmAppointment = () => {
                   value={updatedStatus}
                   onChange={(e) => setUpdatedStatus(e.target.value)}
                 >
-                  <option selected>Choose a status</option>
+                  <option selected>Pending</option>
                   <option value="Confirmed">Confirmed</option>
                   <option value="Unconfirmed">Unconfirmed</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Cancelled">Cancelled</option>
                 </select>
               </div>
             </div>

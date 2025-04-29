@@ -409,7 +409,7 @@ const SecretaryDashboard: NextPage = () => {
           }
 
           .page-button.active {
-            background: #0070f3;
+            background: #293846;
             color: #fff;
           }
         `}</style>
