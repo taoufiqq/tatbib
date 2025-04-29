@@ -15,41 +15,22 @@ import { MdDashboard, MdFolderShared } from "react-icons/md";
 import type { Appointment } from "@/types";
 import { RiLogoutCircleFill } from "react-icons/ri";
 import { ROLES, getRoleTokens } from "@/utils/roles";
-import { FaCircle } from "react-icons/fa";
+import { FaCircle, FaBell, FaCheckCircle, FaTrashAlt } from "react-icons/fa";
 import { IoMenu } from "react-icons/io5";
-import { FaBell, FaCheckCircle, FaTrashAlt } from "react-icons/fa";
 
 const SecretaryDashboard: NextPage = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
-  const [listAppointment, setListAppointment] = useState<Appointment[] | null>(
-    null
-  );
+  const [listAppointment, setListAppointment] = useState<Appointment[] | null>(null);
   const [status, setStatus] = useState<string>("Inactive");
   const [login, setLogin] = useState<string>("");
   const [loading, setLoading] = useState(true);
+
+  // Pagination states
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const appointmentsPerPage = 5; // Adjust number of rows per page
-  // Pagination calculations
-  const totalPages = listAppointment
-    ? Math.ceil(listAppointment.length / appointmentsPerPage)
-    : 1;
+  const itemsPerPage = 5; // You can adjust this number
 
-  const handlePrevious = () => {
-    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
-  };
-
-  const handleNext = () => {
-    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
-  };
-
-  const paginatedAppointments = listAppointment
-    ? listAppointment.slice(
-        (currentPage - 1) * appointmentsPerPage,
-        currentPage * appointmentsPerPage
-      )
-    : [];
-
+  // Fetch data and authentication check
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
@@ -62,62 +43,46 @@ const SecretaryDashboard: NextPage = () => {
         setMenuOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [menuOpen]);
+
   useEffect(() => {
-    // Check authentication on component mount
     const checkAndLoadData = () => {
       if (typeof window !== "undefined") {
         try {
-          // Use the utility function to get consistent key names
           const { loginKey, tokenKey } = getRoleTokens(ROLES.SECRETARY);
           const secretaryLogin = localStorage.getItem(loginKey);
           const token = localStorage.getItem(tokenKey);
 
-          // Verify we have the necessary auth data
           if (!secretaryLogin || !token) {
-            console.error("Missing secretary authentication data");
             toast.error("Authentication error. Please log in again.");
             handleLogout();
             return;
           }
-          const fetchedStatus = "Active"; // Replace with actual status check
-          setStatus(fetchedStatus);
+          setStatus("Active");
           setLogin(secretaryLogin);
 
           const doctorLogin = localStorage.getItem("login_medcine");
 
           if (!doctorLogin) {
-            console.error("Doctor login information missing");
             toast.error("Doctor information missing. Please log in again.");
             handleLogout();
             return;
           }
-
           fetchAppointments(doctorLogin);
         } catch (error) {
-          console.error("Error in authentication check:", error);
           toast.error("Authentication error. Please log in again.");
           handleLogout();
         }
       }
     };
-
     checkAndLoadData();
   }, []);
 
   const fetchAppointments = (doctorLogin: string) => {
-    if (!doctorLogin) {
-      toast.error("Doctor information missing");
-      handleLogout();
-      return;
-    }
-
-    // Get the token for authorization header
     const { tokenKey } = getRoleTokens(ROLES.SECRETARY);
     const token = localStorage.getItem(tokenKey);
     if (!token) {
@@ -125,94 +90,53 @@ const SecretaryDashboard: NextPage = () => {
       handleLogout();
       return;
     }
-
     axios
       .get(
         `https://tatbib-api.onrender.com/appointment/getAppointmentSecretary/${doctorLogin}`,
         {
-          headers: {
-            Authorization: `Bearer ${token}`, // Add token to request if your API requires it
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       )
       .then((response) => {
-        if (response.data) {
-          setListAppointment(response.data);
-        } else {
-          setListAppointment(null);
-        }
+        setListAppointment(response.data || null);
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Error fetching appointments:", err);
-
-        // Handle unauthorized errors specifically
-        if (err.response && err.response.status === 401) {
-          toast.error("Session expired. Please log in again.", {
-            position: "top-right",
-            autoClose: 5000,
-            theme: "colored",
-          });
+        if (err.response?.status === 401) {
+          toast.error("Session expired. Please log in again.");
           handleLogout();
         } else {
-          toast.error("Failed to load appointments", {
-            position: "top-right",
-            autoClose: 5000,
-            theme: "colored",
-          });
+          toast.error("Failed to load appointments");
         }
-
         setLoading(false);
       });
   };
 
   const deleteAppointment = (id: string) => {
     if (window.confirm("Are you sure you want to delete this appointment?")) {
-      setLoading(true);
-
-      // Get the token for authorization header
       const { tokenKey } = getRoleTokens(ROLES.SECRETARY);
       const token = localStorage.getItem(tokenKey);
+      setLoading(true);
 
       axios
         .delete(
           `https://tatbib-api.onrender.com/secretary/deleteAppointment/${id}`,
           {
-            headers: {
-              Authorization: `Bearer ${token}`, // Add token to request if your API requires it
-            },
+            headers: { Authorization: `Bearer ${token}` },
           }
         )
         .then(() => {
-          setListAppointment(
-            (prev) => prev?.filter((app) => app._id !== id) || null
-          );
-          toast.success("Appointment deleted successfully", {
-            position: "top-right",
-            autoClose: 3000,
-            theme: "colored",
-          });
+          setListAppointment((prev) => prev?.filter((app) => app._id !== id) || null);
+          toast.success("Appointment deleted successfully");
           setLoading(false);
         })
         .catch((err) => {
-          console.error("Error deleting appointment:", err);
-
-          // Handle unauthorized errors specifically
-          if (err.response && err.response.status === 401) {
-            toast.error("Session expired. Please log in again.", {
-              position: "top-right",
-              autoClose: 5000,
-              theme: "colored",
-            });
+          if (err.response?.status === 401) {
+            toast.error("Session expired. Please log in again.");
             handleLogout();
           } else {
-            toast.error("Failed to delete appointment", {
-              position: "top-right",
-              autoClose: 5000,
-              theme: "colored",
-            });
+            toast.error("Failed to delete appointment");
           }
-
           setLoading(false);
         });
     }
@@ -224,39 +148,30 @@ const SecretaryDashboard: NextPage = () => {
   };
 
   const handleLogout = () => {
-    try {
-      // Use the utility function to get consistent key names
-      const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.SECRETARY);
-
-      // Clear all related localStorage items
-      localStorage.removeItem(tokenKey);
-      localStorage.removeItem(loginKey);
-      localStorage.removeItem("role");
-      localStorage.removeItem(idKey);
-      localStorage.removeItem("login_medcine");
-      localStorage.removeItem("idAppointment"); // Also clear any appointment ID
-
-      // Force a complete page reload to clear any in-memory state
-      window.location.href = "/login_secretary";
-    } catch (error) {
-      console.error("Error during logout:", error);
-      // If there's an error during logout, force a hard redirect anyway
-      window.location.href = "/login_secretary";
-    }
+    const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.SECRETARY);
+    localStorage.removeItem(tokenKey);
+    localStorage.removeItem(loginKey);
+    localStorage.removeItem(idKey);
+    localStorage.removeItem("role");
+    localStorage.removeItem("login_medcine");
+    localStorage.removeItem("idAppointment");
+    window.location.href = "/login_secretary";
   };
+
+  // Pagination calculation
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = listAppointment?.slice(indexOfFirstItem, indexOfLastItem) || [];
+
+  const totalPages = listAppointment ? Math.ceil(listAppointment.length / itemsPerPage) : 1;
 
   return (
     <div className="dashboard-container">
-      {/* Hamburger menu for mobile */}
-      <div
-        className="mobile-menu-toggle"
-        onClick={() => setMenuOpen((prev) => !prev)}
-      >
-        {/* <i className="fas fa-bars"></i> */}
+      {/* Sidebar and Navigation */}
+      <div className="mobile-menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>
         <IoMenu />
       </div>
 
-      {/* Sidebar navigation */}
       <nav className={`sidebar-menu ${menuOpen ? "active" : ""}`}>
         <div className="sidebar-header">
           <Image
@@ -264,24 +179,14 @@ const SecretaryDashboard: NextPage = () => {
             src={logo}
             width={80}
             height={80}
-            style={{ borderRadius: "50%", width: "80px", height: "80px" }}
-            onError={(e) => {
-              (e.target as HTMLImageElement).src =
-                "/images/avatar-fallback.png";
-            }}
+            style={{ borderRadius: "50%" }}
             priority
           />
           <div className="user-info">
             <h6>Welcome</h6>
             <h5>{login}</h5>
             <div className="status-indicator">
-              <FaCircle
-                style={{
-                  color: status === "Active" ? "green" : "gray",
-                  marginRight: "5px",
-                  fontSize: "12px",
-                }}
-              />
+              <FaCircle style={{ color: status === "Active" ? "green" : "gray", fontSize: "12px" }} />
               <span>{status === "Active" ? "Online" : "Offline"}</span>
             </div>
           </div>
@@ -309,7 +214,7 @@ const SecretaryDashboard: NextPage = () => {
         </ul>
       </nav>
 
-      {/* Main content area */}
+      {/* Main Content */}
       <main className="main-content">
         <div className="page-header">
           <h1>
@@ -330,224 +235,129 @@ const SecretaryDashboard: NextPage = () => {
               </h2>
             </div>
 
-            {listAppointment && listAppointment.length > 0 ? (
-              <>
-                <div className="table-responsive">
-                  <table className="appointment-table">
-                    <thead>
-                      <tr>
-                        <th>LastName</th>
-                        <th>FirstName</th>
-                        <th className="hide-sm">Email</th>
-                        <th>Telephone</th>
-                        <th>Date</th>
-                        <th className="hide-sm">Time</th>
-                        <th>Status</th>
-                        <th>Action</th>
+            {currentItems.length > 0 ? (
+              <div className="table-responsive">
+                <table className="appointment-table">
+                  <thead>
+                    <tr>
+                      <th>LastName</th>
+                      <th>FirstName</th>
+                      <th className="hide-sm">Email</th>
+                      <th>Telephone</th>
+                      <th>Date</th>
+                      <th className="hide-sm">Time</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentItems.map((item) => (
+                      <tr key={item._id}>
+                        <td>{item.patient.lastName}</td>
+                        <td>{item.patient.firstName}</td>
+                        <td className="hide-sm">{item.patient.email}</td>
+                        <td>{item.patient.telephone}</td>
+                        <td>{moment(item.dateTime).format("MMM DD")}</td>
+                        <td className="hide-sm">{moment(item.dateTime).format("HH:mm")}</td>
+                        <td style={{ textAlign: "center" }}>
+                          {item.status === "Pending" ? (
+                            <>
+                              <div className="spinner"></div>
+                              <span style={{ marginLeft: "10px", color: "orange" }}>Pending</span>
+                            </>
+                          ) : item.status === "Confirmed" ? (
+                            <>
+                              <span style={{ color: "green" }}>✔️ Confirmed</span>
+                            </>
+                          ) : (
+                            <>
+                              <span style={{ color: "red" }}>❌ Unconfirmed</span>
+                            </>
+                          )}
+                        </td>
+                        <td className="action-buttons">
+                          {item.status !== "Unconfirmed" && (
+                            <button onClick={() => handleAction(item._id, "/alert_appointment")} title="Alert" className="btn-action alert">
+                              <FaBell />
+                            </button>
+                          )}
+                          <button onClick={() => handleAction(item._id, "/confirm_appointment")} title="Confirm" className="btn-action confirm">
+                            <FaCheckCircle />
+                          </button>
+                          <button onClick={() => deleteAppointment(item._id)} title="Delete" className="btn-action delete">
+                            <FaTrashAlt />
+                          </button>
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {paginatedAppointments.map((item) => (
-                        <tr key={item._id}>
-                          <td data-label="LastName">{item.patient.lastName}</td>
-                          <td data-label="FirstName">
-                            {item.patient.firstName}
-                          </td>
-                          <td data-label="Email" className="hide-sm">
-                            {item.patient.email}
-                          </td>
-                          <td data-label="Telephone">
-                            {item.patient.telephone}
-                          </td>
-                          <td data-label="Date">
-                            {moment(item.dateTime).format("MMM DD")}
-                          </td>
-                          <td data-label="Time" className="hide-sm">
-                            {moment(item.dateTime).format("HH:mm")}
-                          </td>
-                          <td
-                            style={{
-                              textAlign: "center",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                            }}
-                          >
-                            {item.status === "Pending" ? (
-                              <>
-                                <div className="loading-spinner">
-                                  <div className="spinner"></div>
-                                </div>
-                                <span
-                                  style={{
-                                    marginLeft: "10px",
-                                    fontSize: "14px",
-                                    color: "orange",
-                                  }}
-                                >
-                                  Pending
-                                </span>
-                              </>
-                            ) : item.status === "Confirmed" ? (
-                              <>
-                                <span
-                                  style={{
-                                    fontSize: "18px",
-                                    marginRight: "8px",
-                                    color: "green",
-                                  }}
-                                >
-                                  ✔️
-                                </span>
-                                <span
-                                  style={{ fontSize: "14px", color: "green" }}
-                                >
-                                  Confirmed
-                                </span>
-                              </>
-                            ) : item.status === "Unconfirmed" ? (
-                              <>
-                                <span
-                                  style={{
-                                    fontSize: "18px",
-                                    marginRight: "8px",
-                                    color: "red",
-                                  }}
-                                >
-                                  ❌
-                                </span>
-                                <span
-                                  style={{ fontSize: "14px", color: "red" }}
-                                >
-                                  Unconfirmed
-                                </span>
-                              </>
-                            ) : (
-                              item.status
-                            )}
-                          </td>
-                          <td data-label="Action" className="action-buttons">
-                            {item.status !== "Unconfirmed" && (
-                              <button
-                                onClick={() =>
-                                  handleAction(item._id, "/alert_appointment")
-                                }
-                                className="btn-action alert"
-                                title="Alert"
-                              >
-                                <FaBell />
-                              </button>
-                            )}
-                            <button
-                              onClick={() =>
-                                handleAction(item._id, "/confirm_appointment")
-                              }
-                              className="btn-action confirm"
-                              title="Confirm"
-                            >
-                              <FaCheckCircle />
-                            </button>
-                            <button
-                              onClick={() => deleteAppointment(item._id)}
-                              className="btn-action delete"
-                              title="Delete"
-                            >
-                              <FaTrashAlt />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                    ))}
+                  </tbody>
+                </table>
+
+                {/* Pagination Controls */}
+                <div className="pagination">
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                      key={i}
+                      className={`page-button ${currentPage === i + 1 ? "active" : ""}`}
+                      onClick={() => setCurrentPage(i + 1)}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
                 </div>
-                <div className="pagination-controls">
-                  <button
-                    onClick={handlePrevious}
-                    disabled={currentPage === 1}
-                    className="pagination-btn"
-                  >
-                    Previous
-                  </button>
-                  <span className="page-info">
-                    Page {currentPage} of {totalPages}
-                  </span>
-                  <button
-                    onClick={handleNext}
-                    disabled={currentPage === totalPages}
-                    className="pagination-btn"
-                  >
-                    Next
-                  </button>
-                </div>
-              </>
+              </div>
             ) : (
               <div className="no-data">
-                <i className="fas fa-calendar-times"></i>
                 <p>No appointments found</p>
               </div>
             )}
           </div>
         )}
+
         <style jsx>{`
           .loading-spinner {
             display: flex;
             align-items: center;
             justify-content: center;
           }
-
           .spinner {
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left-color: #ffa500;
+            border-left-color: orange;
             border-radius: 50%;
             animation: spin 1s linear infinite;
           }
-          .pagination-controls {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 20px;
-          }
-          .pagination-btn {
-            background-color: #0070f3;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            margin: 0 8px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.3s ease;
-          }
-          .pagination-btn:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-          }
-          .page-info {
-            font-size: 16px;
-            font-weight: 500;
-            margin: 0 12px;
-          }
+
           @keyframes spin {
-            0% {
-              transform: rotate(0deg);
-            }
-            100% {
+            to {
               transform: rotate(360deg);
             }
+          }
+
+          .pagination {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+          }
+
+          .page-button {
+            background: #eee;
+            border: none;
+            padding: 8px 12px;
+            margin: 0 5px;
+            cursor: pointer;
+            border-radius: 5px;
+          }
+
+          .page-button.active {
+            background: #0070f3;
+            color: #fff;
           }
         `}</style>
       </main>
 
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        closeOnClick
-        pauseOnHover
-        draggable
-      />
+      <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} closeOnClick pauseOnHover draggable />
     </div>
   );
 };
