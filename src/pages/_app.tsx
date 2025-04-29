@@ -4,35 +4,36 @@ import "@/styles/style_medicine.css";
 import type { AppProps } from "next/app";
 import Script from "next/script";
 import Head from "next/head";
-import { Inter, Roboto, Varela_Round } from 'next/font/google';
+import { Inter, Roboto, Varela_Round } from "next/font/google";
+import { appWithTranslation } from 'next-i18next';
 
 // Define fonts with display=optional
-const inter = Inter({ 
-  subsets: ['latin'],
-  display: 'optional',
-  variable: '--font-inter'
+const inter = Inter({
+  subsets: ["latin"],
+  display: "optional",
+  variable: "--font-inter",
 });
 
 const roboto = Roboto({
-  weight: ['400', '700'],
-  subsets: ['latin'],
-  display: 'optional',
-  variable: '--font-roboto'
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  display: "optional",
+  variable: "--font-roboto",
 });
 
 const varelaRound = Varela_Round({
-  weight: '400',
-  subsets: ['latin'],
-  display: 'optional',
-  variable: '--font-varela-round'
+  weight: "400",
+  subsets: ["latin"],
+  display: "optional",
+  variable: "--font-varela-round",
 });
 
-export default function App({ Component, pageProps }: AppProps) {
+function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        
+
         {/* Bootstrap CSS */}
         <link
           href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
@@ -77,3 +78,6 @@ export default function App({ Component, pageProps }: AppProps) {
     </>
   );
 }
+
+// ✅ Wrap your app with next-i18next
+export default appWithTranslation(App);

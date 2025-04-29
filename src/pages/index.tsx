@@ -12,12 +12,15 @@ import icon4 from "../../public/images/clipboard-list.png";
 import Medicin from "../../public/images/doctor.png";
 import wiqaytna from "../../public/images/wiqaytna.png";
 import { Medicine } from "@/types";
+import { useTranslation } from "next-i18next";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 export default function Home() {
   const [speciality, setSpeciality] = useState("");
-  // const [fullName, setFullName] = useState("");
-
+  const { t } = useTranslation("common");
   const router = useRouter();
+  const { locale } = router;
 
   const [medcine, setMedcine] = useState<Medicine[] | null>(null);
 
@@ -36,7 +39,6 @@ export default function Home() {
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    // console.log(speciality);
 
     axios
       .get(
@@ -53,13 +55,17 @@ export default function Home() {
   };
 
   return (
-    <div className="" style={{ overflow: "auto" }}>
+    <div className="" style={{ overflow: "auto", direction: locale === 'ar' ? 'rtl' : 'ltr' }}>
       <section className="header-page">
         <div className="container">
           <div className="py-3 row justify-content-between align-items-center">
             <div className="py-2 col-12 col-sm-3 col-lg-4 d-flex justify-content-center justify-content-lg-start py-lg-0">
               <Image alt="" src={logo} width="100" />
+              <div className="ms-3">
+                <LanguageSwitcher />
+              </div>
             </div>
+
             <div className="col-12 col-sm-9 col-lg-6 col-xl-4">
               <div className="row justify-content-center">
                 <div className="col-6 col-md-4 col-lg-5 col-xl-6 d-flex justify-content-end">
@@ -67,12 +73,13 @@ export default function Home() {
                     className="btn_Espace_Professionnels"
                     href="/professional_space"
                   >
-                    <i className="fas fa-user-injured"></i> Professional Spaces
+                    <i className="fas fa-user-injured"></i>{" "}
+                    {t("professional_space")}
                   </Link>
                 </div>
                 <div className="col-6 col-md-4 col-lg-5 d-flex justify-content-center">
                   <Link className="btn_Espace_Patients" href="/patient_space">
-                    <i className="fas fa-user-injured"></i> Patient Spaces
+                    <i className="fas fa-user-injured"></i> {t("patient_space")}
                   </Link>
                 </div>
               </div>
@@ -110,7 +117,7 @@ export default function Home() {
               style={{ background: "white", borderRadius: "7px" }}
             >
               <h2 className="h2" style={{ textAlign: "center" }}>
-                Find your doctor and make an appointment or teleConsiel
+                {t("find_doctor_title")}
               </h2>
               <form className="py-5" onSubmit={handleSubmit}>
                 <div className="col-12">
@@ -120,7 +127,7 @@ export default function Home() {
                       defaultValue="Choisir Un Medcine"
                     >
                       <option defaultValue="Choisir Un Medcine">
-                        Choose the name of Medcine
+                        {t("choose_medicine")}
                       </option>
                       {medcine &&
                         medcine.map((element, i: any) => (
@@ -137,7 +144,7 @@ export default function Home() {
                       onChange={(e) => setSpeciality(e.target.value)}
                     >
                       <option defaultValue="Choisir Une Spécialité">
-                        Choose A Specialty
+                        {t("choose_speciality")}
                       </option>
                       {medcine &&
                         medcine.map((item, indexSpeciality: any) => (
@@ -153,7 +160,7 @@ export default function Home() {
                       defaultValue="Choisir Une Ville"
                     >
                       <option defaultValue="Choisir Une Ville">
-                        Choose a city
+                        {t("Choose_city")}
                       </option>
                       {medcine &&
                         medcine.map((itemCity, index: any) => (
@@ -166,7 +173,7 @@ export default function Home() {
                 </div>
                 <div className="d-grid">
                   <button type="submit" className="py-3 button1">
-                    Search
+                    {t("search")}
                   </button>
                 </div>
               </form>
@@ -179,7 +186,7 @@ export default function Home() {
       </section>
       <div className="py-5 container-fluid" style={{ background: "#2CA5B8" }}>
         <h3 className="text-center fw-bold fs-2" style={{ color: "white" }}>
-          Why choose TATBIB Connect software ?
+          {t("why_choose_tatbib")}
         </h3>
         <div className="py-3 row justify-content-center">
           <div className="text-center col-12 col-md-2">
@@ -188,7 +195,7 @@ export default function Home() {
               className="py-2 mb-0 text-center fw-bold fs-5"
               style={{ color: "white" }}
             >
-              Smart and ergonomic agenda
+              {t("smart_agenda")}
             </span>
           </div>
           <div className="text-center col-12 col-md-2">
@@ -197,7 +204,7 @@ export default function Home() {
               className="py-2 mb-0 text-center fw-bold fs-5"
               style={{ color: "white" }}
             >
-              Digital medical record
+              {t("digital_medical_record")}
             </span>
           </div>
           <div className="text-center col-12 col-md-2">
@@ -206,7 +213,7 @@ export default function Home() {
               className="py-2 mb-0 text-center fw-bold fs-5"
               style={{ color: "white" }}
             >
-              TeleConsiel
+              {t("teleconsiel")}
             </span>
           </div>
           <div className="text-center col-12 col-md-2">
@@ -215,7 +222,7 @@ export default function Home() {
               className="py-2 mb-0 text-center fw-bold fs-5"
               style={{ color: "white" }}
             >
-              Highly secure access and data
+              {t("secure_access")}
             </span>
           </div>
         </div>
@@ -225,14 +232,14 @@ export default function Home() {
           className="py-3 text-center fs-2 fw-bold"
           style={{ color: "#2CA5B8" }}
         >
-          Our practitioners
+          {t("our_practitioners")}
         </h4>
 
         <div className="row justify-content-evenly">
           {medcine &&
-            medcine.map((item: any) => (
+            medcine.map((item: any, index: number) => (
               <div
-                key={item}
+                key={item._id || index}
                 className="m-2 text-center col-12 col-sm-6 col-md-2 "
                 style={{
                   backgroundColor: "#E5E5E5",
@@ -251,52 +258,16 @@ export default function Home() {
             ))}
         </div>
       </div>
-      {/* ---------------------- start slide-----------------------  */}
-      {/* <div id="slider">
-<input type="radio" name="slider" id="slide1" checked/>
-<input type="radio" name="slider" id="slide2"/>
-<input type="radio" name="slider" id="slide3"/>
-<input type="radio" name="slider" id="slide4"/>
-<div id="slides">
-  <div id="overflow">
-     <div className="inner">
-     { medcine && medcine.map((item) =>(
-        <div className="slide slide_1">           
-           <div className="slide-content">
-          <Image alt=""  src={Medicine} style={{width:'100%'}}/>
-              <h2>{item.fullName}</h2>
-              <span>{item.speciality}</span>
-           </div>
-       
-        </div>
-         ))}
-     </div>
-  </div>
-</div>
-<div id="controls">
-  <label for="slide1"></label>
-  <label for="slide2"></label>
-  <label for="slide3"></label>
-  <label for="slide4"></label>
-</div>
-<div id="bullets">
-  <label for="slide1"></label>
-  <label for="slide2"></label>
-  <label for="slide3"></label>
-  <label for="slide4"></label>
-</div>
-</div> */}
-      {/* ---------------------- end slide-----------------------  */}
-      <div className="nav-elements"></div>{" "}
+  
+      <div className="nav-elements"></div>
       <div className="container">
         <div className="row align-items-center">
           <div className="col-12 col-md-6 col-lg-8">
             <h1 className="py-2">
-              Together, s protect ourselves to limit the spread of the
-              Coronavirus « COVID-19 »
+              {t("covid_message")}
             </h1>
             <span className="fs-4">
-              Download Wiqaytna and help stop the spread of the virus.
+              {t("wiqaytna_message")}
             </span>
             <Link
               href={{ pathname: "https://www.wiqaytna.ma/" }}
@@ -310,7 +281,7 @@ export default function Home() {
                 lineHeight: 1,
               }}
             >
-              More information
+              {t("more_information")}
             </Link>
           </div>
           <div className="col-12 col-md-6 col-lg-4">
@@ -327,31 +298,31 @@ export default function Home() {
           <div className="row">
             <div className="col-lg-4 col-sm-4 col-xs-12">
               <div className="single_footer">
-                <h4>The specialties</h4>
+                <h4>{t("specialties")}</h4>
                 <ul>
                   <li>
                     <Link className="list-item" href="#">
-                      Cardiologist
+                      {locale === 'fr' ? 'Cardiologue' : locale === 'ar' ? 'طبيب القلب' : 'Cardiologist'}
                     </Link>
                   </li>
                   <li>
                     <Link className="list-item" href="#">
-                      Dermatologist
+                      {locale === 'fr' ? 'Dermatologue' : locale === 'ar' ? 'طبيب الجلدية' : 'Dermatologist'}
                     </Link>
                   </li>
                   <li>
                     <Link className="list-item" href="#">
-                      Gastroenterology
+                      {locale === 'fr' ? 'Gastroentérologie' : locale === 'ar' ? 'أمراض الجهاز الهضمي' : 'Gastroenterology'}
                     </Link>
                   </li>
                   <li>
                     <Link className="list-item" href="#">
-                      Dentiste
+                      {locale === 'fr' ? 'Dentiste' : locale === 'ar' ? 'طبيب أسنان' : 'Dentist'}
                     </Link>
                   </li>
                   <li>
                     <Link className="list-item" href="#">
-                      General Medicine
+                      {locale === 'fr' ? 'Médecine Générale' : locale === 'ar' ? 'الطب العام' : 'General Medicine'}
                     </Link>
                   </li>
                 </ul>
@@ -359,31 +330,41 @@ export default function Home() {
             </div>
             <div className="col-md-4 col-sm-4 col-xs-12">
               <div className="single_footer single_footer_address">
-                <h4>Popular searches</h4>
+                <h4>{t("popular_searches")}</h4>
                 <ul>
                   <li>
                     <Link className="list-item" href="#">
-                      General doctor in casablanca
+                      {locale === 'fr' ? 'Médecin généraliste à casablanca' : 
+                       locale === 'ar' ? 'طبيب عام في الدار البيضاء' : 
+                       'General doctor in casablanca'}
                     </Link>
                   </li>
                   <li>
                     <Link className="list-item" href="#">
-                      Dentiste doctor in casablanca
+                      {locale === 'fr' ? 'Médecin dentiste à casablanca' : 
+                       locale === 'ar' ? 'طبيب أسنان في الدار البيضاء' : 
+                       'Dentist doctor in casablanca'}
                     </Link>
                   </li>
                   <li>
                     <Link className="list-item" href="#">
-                      Dentiste doctor in rabat
+                      {locale === 'fr' ? 'Médecin dentiste à rabat' : 
+                       locale === 'ar' ? 'طبيب أسنان في الرباط' : 
+                       'Dentist doctor in rabat'}
                     </Link>
                   </li>
                   <li>
                     <Link className="list-item" href="#">
-                      Dentiste doctor in agadir
+                      {locale === 'fr' ? 'Médecin dentiste à agadir' : 
+                       locale === 'ar' ? 'طبيب أسنان في أكادير' : 
+                       'Dentist doctor in agadir'}
                     </Link>
                   </li>
                   <li>
                     <Link className="list-item" href="#">
-                      Dentiste doctor in Marrakech
+                      {locale === 'fr' ? 'Médecin dentiste à Marrakech' : 
+                       locale === 'ar' ? 'طبيب أسنان في مراكش' : 
+                       'Dentist doctor in Marrakech'}
                     </Link>
                   </li>
                 </ul>
@@ -391,13 +372,13 @@ export default function Home() {
             </div>
             <div className="col-md-4 col-sm-4 col-xs-12">
               <div className="single_footer single_footer_address">
-                <h4>Subscribe today</h4>
+                <h4>{t("subscribe_today")}</h4>
                 <div className="signup_form">
                   <form action="#" className="subscribe">
                     <input
                       type="text"
                       className="subscribe__input"
-                      placeholder="Enter Email Address"
+                      placeholder={t("email_placeholder")}
                     />
                     <button type="button" className="subscribe__btn">
                       <i className="fa fa-paper-plane"></i>
@@ -435,9 +416,9 @@ export default function Home() {
             <div className="col-lg-12 col-sm-12 col-xs-12">
               <span className="copyright">
                 {" "}
-                © 2023 TATBIB.ma . All rights reserved{" "}
+                {t("copyright")}{" "}
                 <Link href="#" className="">
-                  Terms of Service
+                  {t("terms_of_service")}
                 </Link>
                 .
               </span>
@@ -447,4 +428,12 @@ export default function Home() {
       </div>
     </div>
   );
+}
+
+export async function getStaticProps({ locale }: { locale: string }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common'])),
+    },
+  };
 }

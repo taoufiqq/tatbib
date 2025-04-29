@@ -1,3 +1,58 @@
+/* RTL Support for Arabic */
+[dir="rtl"] {
+  /* Reverse margins/paddings */
+  .ms-3 {
+    margin-right: 1rem !important;
+    margin-left: 0 !important;
+  }
+  
+  /* Reverse text alignment */
+  .text-start {
+    text-align: right !important;
+  }
+  
+  .text-end {
+    text-align: left !important;
+  }
+  
+  /* Flip icons */
+  .fa {
+    transform: scaleX(-1);
+  }
+  
+  /* Fix form elements */
+  .select {
+    text-align: right;
+  }
+  
+  /* Adjust social icons */
+  .social_profile ul li {
+    float: right;
+    margin-left: 10px;
+    margin-right: 0;
+  }
+  
+  /* Adjust lists */
+  ul {
+    padding-right: 20px;
+    padding-left: 0;
+  }
+  
+  /* Fix input fields with icons */
+  .input-icons i {
+    right: 10px;
+    left: auto;
+  }
+  
+  /* Fix justification of content */
+  .justify-content-end {
+    justify-content: flex-start !important;
+  }
+  
+  .justify-content-start {
+    justify-content: flex-end !important;
+  }
+}
 
 .header-page{
   background-image: url('../../public/images/bg.jpg');
