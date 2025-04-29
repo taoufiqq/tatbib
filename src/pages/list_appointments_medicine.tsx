@@ -235,16 +235,30 @@ const ListAppointments = () => {
                         {moment(appointment.dateTime).format("MMMM DD YYYY")}
                       </td>
                       <td>{moment(appointment.dateTime).format("HH:mm")}</td>
-                      <td
-                        style={{
-                          color:
-                            appointment.status === "Confirmed"
-                              ? "green"
-                              : "red",
-                        }}
-                      >
-                        {appointment.status}
-                      </td>
+                      <td style={{ textAlign: "center", display: "flex" }}>
+                          {appointment.status === "Pending" ? (
+                            <>
+                              <div className="spinner"></div>
+                              <span
+                                style={{ marginLeft: "10px", color: "orange" }}
+                              >
+                                Pending
+                              </span>
+                            </>
+                          ) : appointment.status === "Confirmed" ? (
+                            <>
+                              <span style={{ color: "green" }}>
+                                ✔️ Confirmed
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <span style={{ color: "red" }}>
+                                ❌ Unconfirmed
+                              </span>
+                            </>
+                          )}
+                        </td>
                       <td>
                         {appointment.status !== "Unconfirmed" && (
                           <button

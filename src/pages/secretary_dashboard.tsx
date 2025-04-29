@@ -303,7 +303,7 @@ useEffect(() => {
                         <td>{item.patient.firstName}</td>
                         <td className="hide-sm">{item.patient.email}</td>
                         <td>{item.patient.telephone}</td>
-                        <td>{moment(item.dateTime).format("MMM DD")}</td>
+                        <td>{moment(item.dateTime).format("MMMM DD YYYY")}</td>
                         <td className="hide-sm">
                           {moment(item.dateTime).format("HH:mm")}
                         </td>
