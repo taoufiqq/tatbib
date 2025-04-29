@@ -44,9 +44,9 @@ const ManagementAvailablityMedcine = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true); // Start submitting
 
     try {
-      // const id = localStorage.getItem("id_medcine");
       const doctorId = localStorage.getItem(idKey);
       if (!doctorId) {
         throw new Error("Doctor ID not found");
@@ -78,6 +78,8 @@ const ManagementAvailablityMedcine = () => {
     } catch (err) {
       console.error("Error updating availability:", err);
       toast.error("Failed to update availability");
+    } finally {
+      setIsSubmitting(false); // Always end submitting
     }
   };
 
@@ -160,13 +162,10 @@ const ManagementAvailablityMedcine = () => {
                 type="submit"
                 className="blog-slider__button mt-5"
                 style={{ outline: "none" }}
-                disabled={isSubmitting || !idKey}
+                disabled={isSubmitting}
               >
                 {isSubmitting ? "Processing..." : "Confirm"}
               </button>
-              {/* <button type="submit" className="submit-button py-3">
-                Confirm
-              </button> */}
             </div>
           </form>
         </div>
