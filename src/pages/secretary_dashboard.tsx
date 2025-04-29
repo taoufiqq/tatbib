@@ -318,19 +318,77 @@ const SecretaryDashboard: NextPage = () => {
                             <>
                               <div className="spinner"></div>
                               <span
-                                style={{ marginLeft: "10px", color: "orange" }}
+                                style={{
+                                  marginLeft: "10px",
+                                  fontSize: "14px",
+                                  color: "orange",
+                                }}
                               >
                                 Pending
                               </span>
                             </>
                           ) : item.status === "Confirmed" ? (
-                            <span style={{ color: "green" }}>✔️ Confirmed</span>
+                            <>
+                              <span
+                                style={{
+                                  fontSize: "18px",
+                                  marginRight: "8px",
+                                  color: "green",
+                                }}
+                              >
+                                ✔️
+                              </span>
+                              <span
+                                style={{ fontSize: "14px", color: "green" }}
+                              >
+                                Confirmed
+                              </span>
+                            </>
                           ) : item.status === "Cancelled" ? (
-                            <span style={{ color: "gray" }}>🚫 Cancelled</span>
+                            <>
+                              <span
+                                style={{
+                                  fontSize: "18px",
+                                  marginRight: "8px",
+                                  color: "red",
+                                }}
+                              >
+                                🚫
+                              </span>
+                              <span style={{ fontSize: "14px", color: "red" }}>
+                                Cancelled
+                              </span>
+                            </>
                           ) : item.status === "Completed" ? (
-                            <span style={{ color: "blue" }}>✅ Completed</span>
+                            <>
+                              <span
+                                style={{
+                                  fontSize: "18px",
+                                  marginRight: "8px",
+                                  color: "red",
+                                }}
+                              >
+                                ✅
+                              </span>
+                              <span style={{ fontSize: "14px", color: "red" }}>
+                                Completed
+                              </span>
+                            </>
                           ) : (
-                            <span style={{ color: "red" }}>❌ Unconfirmed</span>
+                            <>
+                              <span
+                                style={{
+                                  fontSize: "18px",
+                                  marginRight: "8px",
+                                  color: "red",
+                                }}
+                              >
+                                ❌
+                              </span>
+                              <span style={{ fontSize: "14px", color: "red" }}>
+                                Unconfirmed
+                              </span>
+                            </>
                           )}
                         </td>
 
@@ -394,7 +452,6 @@ const SecretaryDashboard: NextPage = () => {
         <style jsx>{`
           .loading-spinner {
             display: flex;
-            align-items: center;
             justify-content: center;
           }
           .spinner {
