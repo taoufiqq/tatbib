@@ -47,7 +47,23 @@ const SecretaryDashboard: NextPage = () => {
       window.removeEventListener("resize", updateItemsPerPage);
     };
   }, []);
+  useEffect(() => {
+    const handleRouteChange = (url: string) => {
+      if (url.includes("/dashboard_secretary")) {
+        // Check if returning to dashboard
+        const doctorLogin = localStorage.getItem("login_medcine");
+        if (doctorLogin) {
+          fetchAppointments(doctorLogin);
+        }
+      }
+    };
 
+    router.events.on("routeChangeComplete", handleRouteChange);
+
+    return () => {
+      router.events.off("routeChangeComplete", handleRouteChange);
+    };
+  }, []);
   // Fetch data and authentication check
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
