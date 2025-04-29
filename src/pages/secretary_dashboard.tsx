@@ -83,39 +83,36 @@ const SecretaryDashboard: NextPage = () => {
     };
   }, [menuOpen]);
 
-  useEffect(() => {
-    const checkAndLoadData = () => {
-      if (typeof window !== "undefined") {
-        try {
-          const { loginKey, tokenKey } = getRoleTokens(ROLES.SECRETARY);
-          const secretaryLogin = localStorage.getItem(loginKey);
-          const token = localStorage.getItem(tokenKey);
-
-          if (!secretaryLogin || !token) {
-            toast.error("Authentication error. Please log in again.");
-            handleLogout();
-            return;
-          }
-          setStatus("Active");
-          setLogin(secretaryLogin);
-
-          const doctorLogin = localStorage.getItem("login_medcine");
-
-          if (!doctorLogin) {
-            toast.error("Doctor information missing. Please log in again.");
-            handleLogout();
-            return;
-          }
-          fetchAppointments(doctorLogin);
-        } catch (error) {
+  const checkAndLoadData = () => {
+    if (typeof window !== "undefined") {
+      try {
+        const { loginKey, tokenKey } = getRoleTokens(ROLES.SECRETARY);
+        const secretaryLogin = localStorage.getItem(loginKey);
+        const token = localStorage.getItem(tokenKey);
+  
+        if (!secretaryLogin || !token) {
           toast.error("Authentication error. Please log in again.");
           handleLogout();
+          return;
         }
+        setStatus("Active");
+        setLogin(secretaryLogin);
+  
+        const doctorLogin = localStorage.getItem("login_medcine");
+  
+        if (!doctorLogin || doctorLogin.length < 3) {   // <- validate length
+          toast.error("Doctor information missing. Please log in again.");
+          handleLogout();
+          return;
+        }
+        fetchAppointments(doctorLogin);
+      } catch (error) {
+        toast.error("Authentication error. Please log in again.");
+        handleLogout();
       }
-    };
-    checkAndLoadData();
-  }, []);
-
+    }
+  };
+  
   const fetchAppointments = (doctorLogin: string) => {
     const { tokenKey } = getRoleTokens(ROLES.SECRETARY);
     const token = localStorage.getItem(tokenKey);
