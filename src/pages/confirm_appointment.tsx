@@ -83,7 +83,7 @@ const ConfirmAppointment = () => {
             animation: "spin 1s linear infinite",
           }}
         ></div>
-        <p>Loading</p>
+        <p>Loading...Please Wait</p>
         <style jsx>{`
           @keyframes spin {
             0% {
