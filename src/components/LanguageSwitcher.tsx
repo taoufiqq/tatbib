@@ -11,9 +11,22 @@ const LanguageSwitcher = () => {
     setIsOpen(false); // Close the dropdown after selecting a language
   };
 
+  const getFlagImage = (locale: string) => {
+    switch (locale) {
+      case 'fr':
+        return '/images/fr.jpg';
+      case 'ar':
+        return '/images/ar.jpg';
+      case 'en':
+      default:
+        return '/images/uk.jpg';
+    }
+  };
+
   return (
     <div className="language-switcher">
       <button className="lang-btn" onClick={() => setIsOpen(!isOpen)}>
+        <img src={getFlagImage(router.locale || 'en')} alt={router.locale?.toUpperCase()} className="flag" />
         {router.locale ? router.locale.toUpperCase() : 'EN'} <span>&#9660;</span>
       </button>
 
