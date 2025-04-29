@@ -235,32 +235,37 @@ const ListAppointments = () => {
                         {moment(appointment.dateTime).format("MMMM DD YYYY")}
                       </td>
                       <td>{moment(appointment.dateTime).format("HH:mm")}</td>
-                      <td style={{ textAlign: "center", display: "flex" }}>
-                          {appointment.status === "Pending" ? (
-                            <>
-                              <div className="spinner"></div>
-                              <span
-                                style={{ marginLeft: "10px", color: "orange" }}
-                              >
-                                Pending
-                              </span>
-                            </>
-                          ) : appointment.status === "Confirmed" ? (
-                            <>
-                              <span style={{ color: "green" }}>
-                                ✔️ Confirmed
-                              </span>
-                            </>
-                          ) : (
-                            <>
-                              <span style={{ color: "red" }}>
-                                ❌ Unconfirmed
-                              </span>
-                            </>
-                          )}
-                        </td>
+                      <td
+                        style={{
+                          textAlign: "center",
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        {appointment.status === "Pending" ? (
+                          <>
+                            <div className="spinner"></div>
+                            <span
+                              style={{ marginLeft: "10px", color: "orange" }}
+                            >
+                              Pending
+                            </span>
+                          </>
+                        ) : appointment.status === "Confirmed" ? (
+                          <span style={{ color: "green" }}>✔️ Confirmed</span>
+                        ) : appointment.status === "Cancelled" ? (
+                          <span style={{ color: "gray" }}>🚫 Cancelled</span>
+                        ) : appointment.status === "Completed" ? (
+                          <span style={{ color: "blue" }}>✅ Completed</span>
+                        ) : (
+                          <span style={{ color: "red" }}>❌ Unconfirmed</span>
+                        )}
+                      </td>
+
                       <td>
-                        {appointment.status !== "Unconfirmed" && (
+                        {!["Cancelled", "Unconfirmed", "Pending"].includes(
+                          appointment.status
+                        ) && (
                           <button
                             onClick={() => {
                               if (appointment.patient?._id) {
@@ -292,6 +297,47 @@ const ListAppointments = () => {
             </table>
           </div>
         </div>
+        <style jsx>{`
+          .loading-spinner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .spinner {
+            width: 20px;
+            height: 20px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: orange;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+          }
+
+          @keyframes spin {
+            to {
+              transform: rotate(360deg);
+            }
+          }
+
+          .pagination {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+          }
+
+          .page-button {
+            background: #eee;
+            border: none;
+            padding: 8px 12px;
+            margin: 0 5px;
+            cursor: pointer;
+            border-radius: 5px;
+          }
+
+          .page-button.active {
+            background: #293846;
+            color: #fff;
+          }
+        `}</style>
       </main>
       <ToastContainer position="top-right" autoClose={5000} />
     </div>

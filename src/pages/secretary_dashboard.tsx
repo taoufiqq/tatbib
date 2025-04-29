@@ -47,23 +47,23 @@ const SecretaryDashboard: NextPage = () => {
       window.removeEventListener("resize", updateItemsPerPage);
     };
   }, []);
-useEffect(() => {
-  const handleRouteChange = (url: string) => {
-    if (url.includes("/dashboard_secretary")) {
-      // Check if returning to dashboard
-      const doctorLogin = localStorage.getItem("login_medcine");
-      if (doctorLogin) {
-        fetchAppointments(doctorLogin);
+  useEffect(() => {
+    const handleRouteChange = (url: string) => {
+      if (url.includes("/dashboard_secretary")) {
+        // Check if returning to dashboard
+        const doctorLogin = localStorage.getItem("login_medcine");
+        if (doctorLogin) {
+          fetchAppointments(doctorLogin);
+        }
       }
-    }
-  };
+    };
 
-  router.events.on("routeChangeComplete", handleRouteChange);
+    router.events.on("routeChangeComplete", handleRouteChange);
 
-  return () => {
-    router.events.off("routeChangeComplete", handleRouteChange);
-  };
-}, []);
+    return () => {
+      router.events.off("routeChangeComplete", handleRouteChange);
+    };
+  }, []);
   // Fetch data and authentication check
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -307,7 +307,13 @@ useEffect(() => {
                         <td className="hide-sm">
                           {moment(item.dateTime).format("HH:mm")}
                         </td>
-                        <td style={{ textAlign: "center", display: "flex" }}>
+                        <td
+                          style={{
+                            textAlign: "center",
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                        >
                           {item.status === "Pending" ? (
                             <>
                               <div className="spinner"></div>
@@ -318,19 +324,16 @@ useEffect(() => {
                               </span>
                             </>
                           ) : item.status === "Confirmed" ? (
-                            <>
-                              <span style={{ color: "green" }}>
-                                ✔️ Confirmed
-                              </span>
-                            </>
+                            <span style={{ color: "green" }}>✔️ Confirmed</span>
+                          ) : item.status === "Cancelled" ? (
+                            <span style={{ color: "gray" }}>🚫 Cancelled</span>
+                          ) : item.status === "Completed" ? (
+                            <span style={{ color: "blue" }}>✅ Completed</span>
                           ) : (
-                            <>
-                              <span style={{ color: "red" }}>
-                                ❌ Unconfirmed
-                              </span>
-                            </>
+                            <span style={{ color: "red" }}>❌ Unconfirmed</span>
                           )}
                         </td>
+
                         <td className="action-buttons">
                           {item.status !== "Unconfirmed" && (
                             <button
