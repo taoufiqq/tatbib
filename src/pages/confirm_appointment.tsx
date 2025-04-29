@@ -18,7 +18,7 @@ const ConfirmAppointment = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const { idKey} = router.query;
+  const { idKey } = router.query;
 
   useEffect(() => {
     const id = localStorage.getItem("idAppointment");
@@ -35,6 +35,7 @@ const ConfirmAppointment = () => {
       .catch(function (err) {
         console.log(err);
       });
+    setLoading(false);
   });
 
   const handleSubmit = (e: any) => {
