@@ -47,7 +47,23 @@ const SecretaryDashboard: NextPage = () => {
       window.removeEventListener("resize", updateItemsPerPage);
     };
   }, []);
+useEffect(() => {
+  const handleRouteChange = (url: string) => {
+    if (url.includes("/dashboard_secretary")) {
+      // Check if returning to dashboard
+      const doctorLogin = localStorage.getItem("login_medcine");
+      if (doctorLogin) {
+        fetchAppointments(doctorLogin);
+      }
+    }
+  };
 
+  router.events.on("routeChangeComplete", handleRouteChange);
+
+  return () => {
+    router.events.off("routeChangeComplete", handleRouteChange);
+  };
+}, []);
   // Fetch data and authentication check
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -85,8 +101,7 @@ const SecretaryDashboard: NextPage = () => {
 
           const doctorLogin = localStorage.getItem("login_medcine");
 
-          if (!doctorLogin || doctorLogin.length < 3) {
-            // <- validate length
+          if (!doctorLogin) {
             toast.error("Doctor information missing. Please log in again.");
             handleLogout();
             return;
@@ -98,7 +113,6 @@ const SecretaryDashboard: NextPage = () => {
         }
       }
     };
-
     checkAndLoadData();
   }, []);
 
