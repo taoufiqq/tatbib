@@ -304,9 +304,9 @@ const SecretaryDashboard: NextPage = () => {
               width: "80%",
               maxWidth: 500,
               borderRadius: "25px",
-              border: "1px solid rgb(44 165 184)",
+              border: "1px solid (248, 249, 250)",
               outline: "none",
-              boxShadow: "rgb(41 155 228) 0px 2px 6px",
+              boxShadow: "rgb(41, 56, 70) 0px 2px 6px",
               transition: "all 0.3s ease",
               marginTop: "1%",
             }}
