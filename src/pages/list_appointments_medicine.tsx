@@ -154,10 +154,11 @@ const ListAppointments = () => {
               width: "80%",
               maxWidth: 500,
               borderRadius: "25px",
-              border: "1px solid #ccc",
+              border: "1px solid #ccc rgb(44 165 184)",
               outline: "none",
-              boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
-              transition: "all 0.3s ease"
+              boxShadow: "rgb(41 155 228) 0px 2px 6px",
+              transition: "all 0.3s ease",
+              marginTop: "1%",
             }}
             onFocus={(e) => (e.currentTarget.style.borderColor = "#0070f3")}
             onBlur={(e) => (e.currentTarget.style.borderColor = "#ccc")}
