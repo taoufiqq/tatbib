@@ -30,7 +30,23 @@ const SecretaryDashboard: NextPage = () => {
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemsPerPage = 1; // You can adjust this number
+  const [itemsPerPage, setItemsPerPage] = useState<number>(5);
+  useEffect(() => {
+    const updateItemsPerPage = () => {
+      if (window.innerWidth <= 500) {
+        setItemsPerPage(1);
+      } else {
+        setItemsPerPage(5);
+      }
+    };
+
+    updateItemsPerPage(); // Initial check
+    window.addEventListener("resize", updateItemsPerPage);
+
+    return () => {
+      window.removeEventListener("resize", updateItemsPerPage);
+    };
+  }, []);
 
   // Fetch data and authentication check
   useEffect(() => {
@@ -167,7 +183,6 @@ const SecretaryDashboard: NextPage = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems =
     listAppointment?.slice(indexOfFirstItem, indexOfLastItem) || [];
-
   const totalPages = listAppointment
     ? Math.ceil(listAppointment.length / itemsPerPage)
     : 1;
