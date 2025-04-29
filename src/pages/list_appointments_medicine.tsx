@@ -62,7 +62,7 @@ const ListAppointments = () => {
         }
       );
       console.log("Appointments data:", response.data);
-      setListAppointment(response.data);
+      setListAppointment(response.data.data); // ✅ correct
     } catch (err: unknown) {
       console.error("Error fetching appointments:", err);
 
@@ -100,26 +100,34 @@ const ListAppointments = () => {
 
   if (loading) {
     return (
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh'
-      }}>
-        <div style={{
-          border: '4px solid rgba(0, 0, 0, 0.1)',
-          width: '36px',
-          height: '36px',
-          borderRadius: '50%',
-          borderLeftColor: '#09f',
-          animation: 'spin 1s linear infinite'
-        }}></div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+        }}
+      >
+        <div
+          style={{
+            border: "4px solid rgba(0, 0, 0, 0.1)",
+            width: "36px",
+            height: "36px",
+            borderRadius: "50%",
+            borderLeftColor: "#09f",
+            animation: "spin 1s linear infinite",
+          }}
+        ></div>
         <p>Loading appointments...</p>
         <style jsx>{`
           @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+              transform: rotate(0deg);
+            }
+            100% {
+              transform: rotate(360deg);
+            }
           }
         `}</style>
       </div>
@@ -130,7 +138,7 @@ const ListAppointments = () => {
 
   return (
     <div className="Container" style={{ overflow: "hidden" }}>
-        <nav className="menu" tabIndex={0}>
+      <nav className="menu" tabIndex={0}>
         <div className="smartphone-menu-trigger" />
         <header className="avatar">
           <Image
@@ -227,9 +235,14 @@ const ListAppointments = () => {
                         {moment(appointment.dateTime).format("MMMM DD YYYY")}
                       </td>
                       <td>{moment(appointment.dateTime).format("HH:mm")}</td>
-                      <td style={{
-                        color: appointment.status === "Confirmed" ? "green" : "red"
-                      }}>
+                      <td
+                        style={{
+                          color:
+                            appointment.status === "Confirmed"
+                              ? "green"
+                              : "red",
+                        }}
+                      >
                         {appointment.status}
                       </td>
                       <td>
