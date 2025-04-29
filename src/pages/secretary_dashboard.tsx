@@ -465,6 +465,15 @@ const SecretaryDashboard: NextPage = () => {
                         </td>
 
                         <td className="action-buttons">
+                          <button
+                            onClick={() =>
+                              handleAction(item._id, "/confirm_appointment")
+                            }
+                            title="Confirm"
+                            className="btn-action confirm"
+                          >
+                            <FaCheckCircle />
+                          </button>
                           {(item.status === "Confirmed" ||
                             item.status === "Completed") && (
                             <button
@@ -477,15 +486,7 @@ const SecretaryDashboard: NextPage = () => {
                               <FaBell />
                             </button>
                           )}
-                          <button
-                            onClick={() =>
-                              handleAction(item._id, "/confirm_appointment")
-                            }
-                            title="Confirm"
-                            className="btn-action confirm"
-                          >
-                            <FaCheckCircle />
-                          </button>
+
                           <button
                             onClick={() => deleteAppointment(item._id)}
                             title="Delete"
