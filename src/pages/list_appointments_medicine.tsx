@@ -110,26 +110,45 @@ const ListAppointments = () => {
           <h6>Welcome</h6>
           <h5 style={{ color: "white" }}>{loginMedcine}</h5>
         </header>
+
         <ul>
-          <li>
+          <li tabIndex={0} className="icon-customers">
             <MdDashboard />
-            <Link href="/list_appointments_medicine">List Appointments</Link>
+            <Link href="/list_appointments_medicine" passHref>
+              <span style={{ textDecoration: "none", color: "white" }}>
+                List Appointments
+              </span>
+            </Link>
           </li>
-          <li>
+          <li tabIndex={0} className="icon-profil">
             <FaUserEdit />
-            <Link href="/medicine_dashboard">My Account</Link>
+            <Link href="/medicine_dashboard" passHref>
+              <span style={{ textDecoration: "none", color: "white" }}>
+                My Account
+              </span>
+            </Link>
           </li>
-          <li>
+          <li tabIndex={0} className="icon-users">
             <FaNotesMedical />
-            <Link href="/ordonnances_by_medicine">Ordonnances</Link>
+            <Link href="/ordonnances_by_medicine" passHref>
+              <span style={{ textDecoration: "none", color: "white" }}>
+                Ordonnances
+              </span>
+            </Link>
           </li>
-          <li>
+          <li tabIndex={0} className="icon-Secrétaire">
             <FaUserPlus />
-            <Link href="/account_secretary">Secretary</Link>
+            <Link href="/account_secretary" passHref>
+              <span style={{ textDecoration: "none", color: "white" }}>
+                Secretary
+              </span>
+            </Link>
           </li>
-          <li>
+          <li tabIndex={0} className="icon-settings">
             <RiLogoutCircleFill />
-            <span onClick={handleLogout}>Log out</span>
+            <span onClick={handleLogout} style={{ cursor: "pointer" }}>
+              Log out
+            </span>
           </li>
         </ul>
       </nav>
