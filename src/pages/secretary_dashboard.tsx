@@ -322,6 +322,7 @@ const SecretaryDashboard: NextPage = () => {
                                   marginLeft: "10px",
                                   fontSize: "14px",
                                   color: "orange",
+                                  fontWeight:"bold",
                                 }}
                               >
                                 Pending
@@ -334,12 +335,13 @@ const SecretaryDashboard: NextPage = () => {
                                   fontSize: "18px",
                                   marginRight: "8px",
                                   color: "green",
+                                  fontWeight:"bold",
                                 }}
                               >
                                 ✔️
                               </span>
                               <span
-                                style={{ fontSize: "14px", color: "green" }}
+                                style={{ fontSize: "14px", color: "green",fontWeight:"bold" }}
                               >
                                 Confirmed
                               </span>
@@ -350,12 +352,13 @@ const SecretaryDashboard: NextPage = () => {
                                 style={{
                                   fontSize: "18px",
                                   marginRight: "8px",
-                                  color: "red",
+                                  color: "black",
+                                  fontWeight:"bold",
                                 }}
                               >
                                 🚫
                               </span>
-                              <span style={{ fontSize: "14px", color: "red" }}>
+                              <span style={{ fontSize: "14px", color: "black",fontWeight:"bold" }}>
                                 Cancelled
                               </span>
                             </>
@@ -365,12 +368,13 @@ const SecretaryDashboard: NextPage = () => {
                                 style={{
                                   fontSize: "18px",
                                   marginRight: "8px",
-                                  color: "red",
+                                  color: "green",
+                                  fontWeight:"bold",
                                 }}
                               >
                                 ✅
                               </span>
-                              <span style={{ fontSize: "14px", color: "red" }}>
+                              <span style={{ fontSize: "14px", color: "green",fontWeight:"bold" }}>
                                 Completed
                               </span>
                             </>
@@ -385,7 +389,7 @@ const SecretaryDashboard: NextPage = () => {
                               >
                                 ❌
                               </span>
-                              <span style={{ fontSize: "14px", color: "red" }}>
+                              <span style={{ fontSize: "14px", color: "red",fontWeight:"bold" }}>
                                 Unconfirmed
                               </span>
                             </>
