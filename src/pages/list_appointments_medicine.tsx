@@ -300,7 +300,6 @@ const ListAppointments = () => {
         <style jsx>{`
           .loading-spinner {
             display: flex;
-            align-items: center;
             justify-content: center;
           }
           .spinner {
