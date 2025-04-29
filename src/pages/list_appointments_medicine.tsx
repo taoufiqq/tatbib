@@ -121,31 +121,102 @@ const ListAppointments = () => {
               </thead>
               <tbody>
                 {paginatedAppointments?.length ? (
-                  paginatedAppointments.map((appointment) => (
-                    <tr key={appointment._id}>
-                      <td>{appointment.patient?.lastName || "N/A"}</td>
-                      <td>{appointment.patient?.firstName || "N/A"}</td>
-                      <td>{appointment.patient?.email || "N/A"}</td>
-                      <td>{appointment.patient?.telephone || "N/A"}</td>
-                      <td>{moment(appointment.dateTime).format("MMMM DD YYYY")}</td>
-                      <td>{moment(appointment.dateTime).format("HH:mm")}</td>
-                      <td style={{ textAlign: "center", display: "flex", alignItems: "center" }}>
-                        {appointment.status === "Pending" ? (
-                          <><div className="spinner"></div><span style={{ marginLeft: 10, color: "orange" }}>Pending</span></>
-                        ) : appointment.status === "Confirmed" ? (
-                          <span style={{ color: "green" }}>✔️ Confirmed</span>
-                        ) : appointment.status === "Cancelled" ? (
-                          <span style={{ color: "gray" }}>🚫 Cancelled</span>
-                        ) : appointment.status === "Completed" ? (
-                          <span style={{ color: "blue" }}>✅ Completed</span>
-                        ) : (
-                          <span style={{ color: "red" }}>❌ Unconfirmed</span>
-                        )}
-                      </td>
+                  paginatedAppointments.map((item) => (
+                    <tr key={item._id}>
+                      <td>{item.patient?.lastName || "N/A"}</td>
+                      <td>{item.patient?.firstName || "N/A"}</td>
+                      <td>{item.patient?.email || "N/A"}</td>
+                      <td>{item.patient?.telephone || "N/A"}</td>
+                      <td>{moment(item.dateTime).format("MMMM DD YYYY")}</td>
+                      <td>{moment(item.dateTime).format("HH:mm")}</td>
+                      <td
+                          style={{
+                            textAlign: "center",
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                        >
+                          {item.status === "Pending" ? (
+                            <>
+                              <div className="spinner"></div>
+                              <span
+                                style={{
+                                  marginLeft: "10px",
+                                  fontSize: "14px",
+                                  color: "orange",
+                                }}
+                              >
+                                Pending
+                              </span>
+                            </>
+                          ) : item.status === "Confirmed" ? (
+                            <>
+                              <span
+                                style={{
+                                  fontSize: "18px",
+                                  marginRight: "8px",
+                                  color: "green",
+                                }}
+                              >
+                                ✔️
+                              </span>
+                              <span
+                                style={{ fontSize: "14px", color: "green" }}
+                              >
+                                Confirmed
+                              </span>
+                            </>
+                          ) : item.status === "Cancelled" ? (
+                            <>
+                              <span
+                                style={{
+                                  fontSize: "18px",
+                                  marginRight: "8px",
+                                  color: "red",
+                                }}
+                              >
+                                🚫
+                              </span>
+                              <span style={{ fontSize: "14px", color: "red" }}>
+                                Cancelled
+                              </span>
+                            </>
+                          ) : item.status === "Completed" ? (
+                            <>
+                              <span
+                                style={{
+                                  fontSize: "18px",
+                                  marginRight: "8px",
+                                  color: "red",
+                                }}
+                              >
+                                ✅
+                              </span>
+                              <span style={{ fontSize: "14px", color: "red" }}>
+                                Completed
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <span
+                                style={{
+                                  fontSize: "18px",
+                                  marginRight: "8px",
+                                  color: "red",
+                                }}
+                              >
+                                ❌
+                              </span>
+                              <span style={{ fontSize: "14px", color: "red" }}>
+                                Unconfirmed
+                              </span>
+                            </>
+                          )}
+                        </td>
                       <td>
-                        {!["Cancelled", "Unconfirmed", "Pending"].includes(appointment.status) && (
+                        {!["Cancelled", "Unconfirmed", "Pending"].includes(item.status) && (
                           <button
-                            onClick={() => appointment.patient?._id ? handleCreateOrdonnance(appointment._id, appointment.patient._id) : toast.error("Patient ID is missing")}
+                            onClick={() => item.patient?._id ? handleCreateOrdonnance(item._id, item.patient._id) : toast.error("Patient ID is missing")}
                             className="edit"
                             title="Create Prescription"
                           >
