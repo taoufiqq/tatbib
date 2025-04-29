@@ -212,89 +212,115 @@ const PatientDashboard = () => {
                       <td>{moment(item.dateTime).format("MMMM DD YYYY")}</td>
                       <td>{moment(item.dateTime).format("HH:mm")}</td>
                       <td
-                          style={{
-                            textAlign: "center",
-                            display: "flex",
-                            alignItems: "center",
-                          }}
-                        >
-                          {item.status === "Pending" ? (
-                            <>
-                              <div className="spinner"></div>
-                              <span
-                                style={{
-                                  marginLeft: "10px",
-                                  fontSize: "14px",
-                                  color: "orange",
-                                }}
-                              >
-                                Pending
-                              </span>
-                            </>
-                          ) : item.status === "Confirmed" ? (
-                            <>
-                              <span
-                                style={{
-                                  fontSize: "18px",
-                                  marginRight: "8px",
-                                  color: "green",
-                                }}
-                              >
-                                ✔️
-                              </span>
-                              <span
-                                style={{ fontSize: "14px", color: "green" }}
-                              >
-                                Confirmed
-                              </span>
-                            </>
-                          ) : item.status === "Cancelled" ? (
-                            <>
-                              <span
-                                style={{
-                                  fontSize: "18px",
-                                  marginRight: "8px",
-                                  color: "red",
-                                }}
-                              >
-                                🚫
-                              </span>
-                              <span style={{ fontSize: "14px", color: "red" }}>
-                                Cancelled
-                              </span>
-                            </>
-                          ) : item.status === "Completed" ? (
-                            <>
-                              <span
-                                style={{
-                                  fontSize: "18px",
-                                  marginRight: "8px",
-                                  color: "red",
-                                }}
-                              >
-                                ✅
-                              </span>
-                              <span style={{ fontSize: "14px", color: "red" }}>
-                                Completed
-                              </span>
-                            </>
-                          ) : (
-                            <>
-                              <span
-                                style={{
-                                  fontSize: "18px",
-                                  marginRight: "8px",
-                                  color: "red",
-                                }}
-                              >
-                                ❌
-                              </span>
-                              <span style={{ fontSize: "14px", color: "red" }}>
-                                Unconfirmed
-                              </span>
-                            </>
-                          )}
-                        </td>
+                        style={{
+                          textAlign: "center",
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        {item.status === "Pending" ? (
+                          <>
+                            <div className="spinner"></div>
+                            <span
+                              style={{
+                                marginLeft: "10px",
+                                fontSize: "14px",
+                                color: "orange",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              Pending
+                            </span>
+                          </>
+                        ) : item.status === "Confirmed" ? (
+                          <>
+                            <span
+                              style={{
+                                fontSize: "18px",
+                                marginRight: "8px",
+                                color: "green",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              ✔️
+                            </span>
+                            <span
+                              style={{
+                                fontSize: "14px",
+                                color: "green",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              Confirmed
+                            </span>
+                          </>
+                        ) : item.status === "Cancelled" ? (
+                          <>
+                            <span
+                              style={{
+                                fontSize: "18px",
+                                marginRight: "8px",
+                                color: "black",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              🚫
+                            </span>
+                            <span
+                              style={{
+                                fontSize: "14px",
+                                color: "black",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              Cancelled
+                            </span>
+                          </>
+                        ) : item.status === "Completed" ? (
+                          <>
+                            <span
+                              style={{
+                                fontSize: "18px",
+                                marginRight: "8px",
+                                color: "green",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              ✅
+                            </span>
+                            <span
+                              style={{
+                                fontSize: "14px",
+                                color: "green",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              Completed
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <span
+                              style={{
+                                fontSize: "18px",
+                                marginRight: "8px",
+                                color: "red",
+                              }}
+                            >
+                              ❌
+                            </span>
+                            <span
+                              style={{
+                                fontSize: "14px",
+                                color: "red",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              Unconfirmed
+                            </span>
+                          </>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

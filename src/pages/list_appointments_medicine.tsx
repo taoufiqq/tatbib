@@ -18,7 +18,9 @@ const ITEMS_PER_PAGE = 5;
 
 const ListAppointments = () => {
   const router = useRouter();
-  const [listAppointment, setListAppointment] = useState<Appointment[] | null>(null);
+  const [listAppointment, setListAppointment] = useState<Appointment[] | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -59,7 +61,9 @@ const ListAppointments = () => {
   };
 
   const handleLogout = () => {
-    [tokenKey, loginKey, idKey, "role", "medcine"].forEach((item) => localStorage.removeItem(item));
+    [tokenKey, loginKey, idKey, "role", "medcine"].forEach((item) =>
+      localStorage.removeItem(item)
+    );
     router.push("/login_medicine");
     toast.success("Logged out successfully");
   };
@@ -69,13 +73,23 @@ const ListAppointments = () => {
     currentPage * ITEMS_PER_PAGE
   );
 
-  const totalPages = listAppointment ? Math.ceil(listAppointment.length / ITEMS_PER_PAGE) : 0;
+  const totalPages = listAppointment
+    ? Math.ceil(listAppointment.length / ITEMS_PER_PAGE)
+    : 0;
 
   const loginMedcine = localStorage.getItem(loginKey) || "";
 
   if (loading) {
     return (
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100vh" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+        }}
+      >
         <div className="spinner" style={{ width: 36, height: 36 }}></div>
         <p>Loading appointments...</p>
       </div>
@@ -86,25 +100,50 @@ const ListAppointments = () => {
     <div className="Container">
       <nav className="menu" tabIndex={0}>
         <header className="avatar">
-          <Image alt="Doctor profile" src={logo} width={150} height={150} style={{ borderRadius: "50%" }} />
+          <Image
+            alt="Doctor profile"
+            src={logo}
+            width={150}
+            height={150}
+            style={{ borderRadius: "50%" }}
+          />
           <h6>Welcome</h6>
           <h5 style={{ color: "white" }}>{loginMedcine}</h5>
         </header>
         <ul>
-          <li><MdDashboard /><Link href="/list_appointments_medicine">List Appointments</Link></li>
-          <li><FaUserEdit /><Link href="/medicine_dashboard">My Account</Link></li>
-          <li><FaNotesMedical /><Link href="/ordonnances_by_medicine">Ordonnances</Link></li>
-          <li><FaUserPlus /><Link href="/account_secretary">Secretary</Link></li>
-          <li><RiLogoutCircleFill /><span onClick={handleLogout}>Log out</span></li>
+          <li>
+            <MdDashboard />
+            <Link href="/list_appointments_medicine">List Appointments</Link>
+          </li>
+          <li>
+            <FaUserEdit />
+            <Link href="/medicine_dashboard">My Account</Link>
+          </li>
+          <li>
+            <FaNotesMedical />
+            <Link href="/ordonnances_by_medicine">Ordonnances</Link>
+          </li>
+          <li>
+            <FaUserPlus />
+            <Link href="/account_secretary">Secretary</Link>
+          </li>
+          <li>
+            <RiLogoutCircleFill />
+            <span onClick={handleLogout}>Log out</span>
+          </li>
         </ul>
       </nav>
 
       <main>
-        <div className="helper">Appointment List <span> Management | Appointments</span></div>
+        <div className="helper">
+          Appointment List <span> Management | Appointments</span>
+        </div>
         <div className="table-responsive">
           <div className="table-wrapper">
             <div className="table-title">
-              <h2>Appointments <b>Management</b></h2>
+              <h2>
+                Appointments <b>Management</b>
+              </h2>
             </div>
             <table className="table table-striped table-hover">
               <thead>
@@ -130,93 +169,129 @@ const ListAppointments = () => {
                       <td>{moment(item.dateTime).format("MMMM DD YYYY")}</td>
                       <td>{moment(item.dateTime).format("HH:mm")}</td>
                       <td
-                          style={{
-                            textAlign: "center",
-                            display: "flex",
-                            alignItems: "center",
-                          }}
-                        >
-                          {item.status === "Pending" ? (
-                            <>
-                              <div className="spinner"></div>
-                              <span
-                                style={{
-                                  marginLeft: "10px",
-                                  fontSize: "14px",
-                                  color: "orange",
-                                }}
-                              >
-                                Pending
-                              </span>
-                            </>
-                          ) : item.status === "Confirmed" ? (
-                            <>
-                              <span
-                                style={{
-                                  fontSize: "18px",
-                                  marginRight: "8px",
-                                  color: "green",
-                                }}
-                              >
-                                ✔️
-                              </span>
-                              <span
-                                style={{ fontSize: "14px", color: "green" }}
-                              >
-                                Confirmed
-                              </span>
-                            </>
-                          ) : item.status === "Cancelled" ? (
-                            <>
-                              <span
-                                style={{
-                                  fontSize: "18px",
-                                  marginRight: "8px",
-                                  color: "red",
-                                }}
-                              >
-                                🚫
-                              </span>
-                              <span style={{ fontSize: "14px", color: "red" }}>
-                                Cancelled
-                              </span>
-                            </>
-                          ) : item.status === "Completed" ? (
-                            <>
-                              <span
-                                style={{
-                                  fontSize: "18px",
-                                  marginRight: "8px",
-                                  color: "red",
-                                }}
-                              >
-                                ✅
-                              </span>
-                              <span style={{ fontSize: "14px", color: "red" }}>
-                                Completed
-                              </span>
-                            </>
-                          ) : (
-                            <>
-                              <span
-                                style={{
-                                  fontSize: "18px",
-                                  marginRight: "8px",
-                                  color: "red",
-                                }}
-                              >
-                                ❌
-                              </span>
-                              <span style={{ fontSize: "14px", color: "red" }}>
-                                Unconfirmed
-                              </span>
-                            </>
-                          )}
-                        </td>
+                        style={{
+                          textAlign: "center",
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        {item.status === "Pending" ? (
+                          <>
+                            <div className="spinner"></div>
+                            <span
+                              style={{
+                                marginLeft: "10px",
+                                fontSize: "14px",
+                                color: "orange",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              Pending
+                            </span>
+                          </>
+                        ) : item.status === "Confirmed" ? (
+                          <>
+                            <span
+                              style={{
+                                fontSize: "18px",
+                                marginRight: "8px",
+                                color: "green",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              ✔️
+                            </span>
+                            <span
+                              style={{
+                                fontSize: "14px",
+                                color: "green",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              Confirmed
+                            </span>
+                          </>
+                        ) : item.status === "Cancelled" ? (
+                          <>
+                            <span
+                              style={{
+                                fontSize: "18px",
+                                marginRight: "8px",
+                                color: "black",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              🚫
+                            </span>
+                            <span
+                              style={{
+                                fontSize: "14px",
+                                color: "black",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              Cancelled
+                            </span>
+                          </>
+                        ) : item.status === "Completed" ? (
+                          <>
+                            <span
+                              style={{
+                                fontSize: "18px",
+                                marginRight: "8px",
+                                color: "green",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              ✅
+                            </span>
+                            <span
+                              style={{
+                                fontSize: "14px",
+                                color: "green",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              Completed
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <span
+                              style={{
+                                fontSize: "18px",
+                                marginRight: "8px",
+                                color: "red",
+                              }}
+                            >
+                              ❌
+                            </span>
+                            <span
+                              style={{
+                                fontSize: "14px",
+                                color: "red",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              Unconfirmed
+                            </span>
+                          </>
+                        )}
+                      </td>
+
                       <td>
-                        {!["Cancelled", "Unconfirmed", "Pending"].includes(item.status) && (
+                        {!["Cancelled", "Unconfirmed", "Pending"].includes(
+                          item.status
+                        ) && (
                           <button
-                            onClick={() => item.patient?._id ? handleCreateOrdonnance(item._id, item.patient._id) : toast.error("Patient ID is missing")}
+                            onClick={() =>
+                              item.patient?._id
+                                ? handleCreateOrdonnance(
+                                    item._id,
+                                    item.patient._id
+                                  )
+                                : toast.error("Patient ID is missing")
+                            }
                             className="edit"
                             title="Create Prescription"
                           >
@@ -227,20 +302,28 @@ const ListAppointments = () => {
                     </tr>
                   ))
                 ) : (
-                  <tr><td colSpan={8} style={{ textAlign: "center" }}>No appointments found</td></tr>
+                  <tr>
+                    <td colSpan={8} style={{ textAlign: "center" }}>
+                      No appointments found
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>
             <div className="pagination">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <button
-                  key={page}
-                  className={`page-button ${currentPage === page ? "active" : ""}`}
-                  onClick={() => setCurrentPage(page)}
-                >
-                  {page}
-                </button>
-              ))}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    className={`page-button ${
+                      currentPage === page ? "active" : ""
+                    }`}
+                    onClick={() => setCurrentPage(page)}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
             </div>
           </div>
         </div>
@@ -248,29 +331,29 @@ const ListAppointments = () => {
       </main>
 
       <style jsx>{`
-         .loading-spinner {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
+        .loading-spinner {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
 
-          .spinner {
-            width: 24px;
-            height: 24px;
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left-color: #ffa500;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-          }
+        .spinner {
+          width: 24px;
+          height: 24px;
+          border: 4px solid rgba(0, 0, 0, 0.1);
+          border-left-color: #ffa500;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
 
-          @keyframes spin {
-            0% {
-              transform: rotate(0deg);
-            }
-            100% {
-              transform: rotate(360deg);
-            }
+        @keyframes spin {
+          0% {
+            transform: rotate(0deg);
           }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
         .pagination {
           margin-top: 20px;
           display: flex;
@@ -302,4 +385,3 @@ const ListAppointments = () => {
 };
 
 export default withAuth(ListAppointments, { role: ROLES.MEDICINE });
-
