@@ -220,7 +220,7 @@ const SecretaryDashboard: NextPage = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-    const totalPages = filteredAppointments
+  const totalPages = filteredAppointments
     ? Math.ceil(filteredAppointments.length / itemsPerPage)
     : 0;
   return (
@@ -343,8 +343,7 @@ const SecretaryDashboard: NextPage = () => {
                     </tr>
                   </thead>
                   <tbody>
-                  {
-                  paginatedAppointments.map((item) => (
+                    {paginatedAppointments.map((item) => (
                       <tr key={item._id}>
                         <td>{item.patient.lastName}</td>
                         <td>{item.patient.firstName}</td>
@@ -369,7 +368,7 @@ const SecretaryDashboard: NextPage = () => {
                                   marginLeft: "10px",
                                   fontSize: "14px",
                                   color: "orange",
-                                  fontWeight:"bold",
+                                  fontWeight: "bold",
                                 }}
                               >
                                 Pending
@@ -382,13 +381,17 @@ const SecretaryDashboard: NextPage = () => {
                                   fontSize: "18px",
                                   marginRight: "8px",
                                   color: "green",
-                                  fontWeight:"bold",
+                                  fontWeight: "bold",
                                 }}
                               >
                                 ✔️
                               </span>
                               <span
-                                style={{ fontSize: "14px", color: "green",fontWeight:"bold" }}
+                                style={{
+                                  fontSize: "14px",
+                                  color: "green",
+                                  fontWeight: "bold",
+                                }}
                               >
                                 Confirmed
                               </span>
@@ -400,12 +403,18 @@ const SecretaryDashboard: NextPage = () => {
                                   fontSize: "18px",
                                   marginRight: "8px",
                                   color: "black",
-                                  fontWeight:"bold",
+                                  fontWeight: "bold",
                                 }}
                               >
                                 🚫
                               </span>
-                              <span style={{ fontSize: "14px", color: "black",fontWeight:"bold" }}>
+                              <span
+                                style={{
+                                  fontSize: "14px",
+                                  color: "black",
+                                  fontWeight: "bold",
+                                }}
+                              >
                                 Cancelled
                               </span>
                             </>
@@ -416,12 +425,18 @@ const SecretaryDashboard: NextPage = () => {
                                   fontSize: "18px",
                                   marginRight: "8px",
                                   color: "green",
-                                  fontWeight:"bold",
+                                  fontWeight: "bold",
                                 }}
                               >
                                 ✅
                               </span>
-                              <span style={{ fontSize: "14px", color: "green",fontWeight:"bold" }}>
+                              <span
+                                style={{
+                                  fontSize: "14px",
+                                  color: "green",
+                                  fontWeight: "bold",
+                                }}
+                              >
                                 Completed
                               </span>
                             </>
@@ -436,7 +451,13 @@ const SecretaryDashboard: NextPage = () => {
                               >
                                 ❌
                               </span>
-                              <span style={{ fontSize: "14px", color: "red",fontWeight:"bold" }}>
+                              <span
+                                style={{
+                                  fontSize: "14px",
+                                  color: "red",
+                                  fontWeight: "bold",
+                                }}
+                              >
                                 Unconfirmed
                               </span>
                             </>
@@ -444,7 +465,8 @@ const SecretaryDashboard: NextPage = () => {
                         </td>
 
                         <td className="action-buttons">
-                          {item.status !== "Unconfirmed" && (
+                          {(item.status === "Confirmed" ||
+                            item.status === "Completed") && (
                             <button
                               onClick={() =>
                                 handleAction(item._id, "/alert_appointment")
