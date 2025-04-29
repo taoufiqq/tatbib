@@ -18,7 +18,9 @@ const ITEMS_PER_PAGE = 5;
 
 const ListAppointments = () => {
   const router = useRouter();
-  const [listAppointment, setListAppointment] = useState<Appointment[] | null>(null);
+  const [listAppointment, setListAppointment] = useState<Appointment[] | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
@@ -60,7 +62,9 @@ const ListAppointments = () => {
   };
 
   const handleLogout = () => {
-    [tokenKey, loginKey, idKey, "role", "medcine"].forEach((item) => localStorage.removeItem(item));
+    [tokenKey, loginKey, idKey, "role", "medcine"].forEach((item) =>
+      localStorage.removeItem(item)
+    );
     router.push("/login_medicine");
     toast.success("Logged out successfully");
   };
@@ -72,7 +76,10 @@ const ListAppointments = () => {
       item.patient?.lastName?.toLowerCase().includes(search) ||
       item.patient?.email?.toLowerCase().includes(search) ||
       item.patient?.telephone?.includes(search) ||
-      moment(item.dateTime).format("MMMM DD YYYY").toLowerCase().includes(search) ||
+      moment(item.dateTime)
+        .format("MMMM DD YYYY")
+        .toLowerCase()
+        .includes(search) ||
       moment(item.dateTime).format("HH:mm").includes(search) ||
       item.status.toLowerCase().includes(search)
     );
@@ -91,7 +98,15 @@ const ListAppointments = () => {
 
   if (loading) {
     return (
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100vh" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+        }}
+      >
         <div className="spinner" style={{ width: 36, height: 36 }}></div>
         <p>Loading appointments...</p>
       </div>
@@ -102,7 +117,13 @@ const ListAppointments = () => {
     <div className="Container">
       <nav className="menu" tabIndex={0}>
         <header className="avatar">
-          <Image alt="Doctor profile" src={logo} width={150} height={150} style={{ borderRadius: "50%" }} />
+          <Image
+            alt="Doctor profile"
+            src={logo}
+            width={150}
+            height={150}
+            style={{ borderRadius: "50%" }}
+          />
           <h6>Welcome</h6>
           <h5 style={{ color: "white" }}>{loginMedcine}</h5>
         </header>
@@ -110,30 +131,40 @@ const ListAppointments = () => {
           <li tabIndex={0} className="icon-customers">
             <MdDashboard />
             <Link href="/list_appointments_medicine" passHref>
-              <span style={{ textDecoration: "none", color: "white" }}>List Appointments</span>
+              <span style={{ textDecoration: "none", color: "white" }}>
+                List Appointments
+              </span>
             </Link>
           </li>
           <li tabIndex={0} className="icon-profil">
             <FaUserEdit />
             <Link href="/medicine_dashboard" passHref>
-              <span style={{ textDecoration: "none", color: "white" }}>My Account</span>
+              <span style={{ textDecoration: "none", color: "white" }}>
+                My Account
+              </span>
             </Link>
           </li>
           <li tabIndex={0} className="icon-users">
             <FaNotesMedical />
             <Link href="/ordonnances_by_medicine" passHref>
-              <span style={{ textDecoration: "none", color: "white" }}>Ordonnances</span>
+              <span style={{ textDecoration: "none", color: "white" }}>
+                Ordonnances
+              </span>
             </Link>
           </li>
           <li tabIndex={0} className="icon-Secrétaire">
             <FaUserPlus />
             <Link href="/account_secretary" passHref>
-              <span style={{ textDecoration: "none", color: "white" }}>Secretary</span>
+              <span style={{ textDecoration: "none", color: "white" }}>
+                Secretary
+              </span>
             </Link>
           </li>
           <li tabIndex={0} className="icon-settings">
             <RiLogoutCircleFill />
-            <span onClick={handleLogout} style={{ cursor: "pointer" }}>Log out</span>
+            <span onClick={handleLogout} style={{ cursor: "pointer" }}>
+              Log out
+            </span>
           </li>
         </ul>
       </nav>
@@ -143,7 +174,13 @@ const ListAppointments = () => {
           Appointment List <span> Management | Appointments</span>
         </div>
 
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginBottom: 20,
+          }}
+        >
           <input
             type="text"
             value={searchQuery}
@@ -395,7 +432,7 @@ const ListAppointments = () => {
           border-radius: 5px;
         }
         .page-button.active {
-          background: #293846;
+          background: #299be4;
           color: #fff;
         }
         @media (max-width: 768px) {
