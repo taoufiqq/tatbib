@@ -18,11 +18,10 @@ const ITEMS_PER_PAGE = 5;
 
 const ListAppointments = () => {
   const router = useRouter();
-  const [listAppointment, setListAppointment] = useState<Appointment[] | null>(
-    null
-  );
+  const [listAppointment, setListAppointment] = useState<Appointment[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.MEDICINE);
 
@@ -61,35 +60,38 @@ const ListAppointments = () => {
   };
 
   const handleLogout = () => {
-    [tokenKey, loginKey, idKey, "role", "medcine"].forEach((item) =>
-      localStorage.removeItem(item)
-    );
+    [tokenKey, loginKey, idKey, "role", "medcine"].forEach((item) => localStorage.removeItem(item));
     router.push("/login_medicine");
     toast.success("Logged out successfully");
   };
 
-  const paginatedAppointments = listAppointment?.slice(
+  const filteredAppointments = listAppointment?.filter((item) => {
+    const search = searchQuery.toLowerCase();
+    return (
+      item.patient?.firstName?.toLowerCase().includes(search) ||
+      item.patient?.lastName?.toLowerCase().includes(search) ||
+      item.patient?.email?.toLowerCase().includes(search) ||
+      item.patient?.telephone?.includes(search) ||
+      moment(item.dateTime).format("MMMM DD YYYY").toLowerCase().includes(search) ||
+      moment(item.dateTime).format("HH:mm").includes(search) ||
+      item.status.toLowerCase().includes(search)
+    );
+  });
+
+  const paginatedAppointments = filteredAppointments?.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
 
-  const totalPages = listAppointment
-    ? Math.ceil(listAppointment.length / ITEMS_PER_PAGE)
+  const totalPages = filteredAppointments
+    ? Math.ceil(filteredAppointments.length / ITEMS_PER_PAGE)
     : 0;
 
   const loginMedcine = localStorage.getItem(loginKey) || "";
 
   if (loading) {
     return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "100vh",
-        }}
-      >
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100vh" }}>
         <div className="spinner" style={{ width: 36, height: 36 }}></div>
         <p>Loading appointments...</p>
       </div>
@@ -100,55 +102,38 @@ const ListAppointments = () => {
     <div className="Container">
       <nav className="menu" tabIndex={0}>
         <header className="avatar">
-          <Image
-            alt="Doctor profile"
-            src={logo}
-            width={150}
-            height={150}
-            style={{ borderRadius: "50%" }}
-          />
+          <Image alt="Doctor profile" src={logo} width={150} height={150} style={{ borderRadius: "50%" }} />
           <h6>Welcome</h6>
           <h5 style={{ color: "white" }}>{loginMedcine}</h5>
         </header>
-
         <ul>
           <li tabIndex={0} className="icon-customers">
             <MdDashboard />
             <Link href="/list_appointments_medicine" passHref>
-              <span style={{ textDecoration: "none", color: "white" }}>
-                List Appointments
-              </span>
+              <span style={{ textDecoration: "none", color: "white" }}>List Appointments</span>
             </Link>
           </li>
           <li tabIndex={0} className="icon-profil">
             <FaUserEdit />
             <Link href="/medicine_dashboard" passHref>
-              <span style={{ textDecoration: "none", color: "white" }}>
-                My Account
-              </span>
+              <span style={{ textDecoration: "none", color: "white" }}>My Account</span>
             </Link>
           </li>
           <li tabIndex={0} className="icon-users">
             <FaNotesMedical />
             <Link href="/ordonnances_by_medicine" passHref>
-              <span style={{ textDecoration: "none", color: "white" }}>
-                Ordonnances
-              </span>
+              <span style={{ textDecoration: "none", color: "white" }}>Ordonnances</span>
             </Link>
           </li>
           <li tabIndex={0} className="icon-Secrétaire">
             <FaUserPlus />
             <Link href="/account_secretary" passHref>
-              <span style={{ textDecoration: "none", color: "white" }}>
-                Secretary
-              </span>
+              <span style={{ textDecoration: "none", color: "white" }}>Secretary</span>
             </Link>
           </li>
           <li tabIndex={0} className="icon-settings">
             <RiLogoutCircleFill />
-            <span onClick={handleLogout} style={{ cursor: "pointer" }}>
-              Log out
-            </span>
+            <span onClick={handleLogout} style={{ cursor: "pointer" }}>Log out</span>
           </li>
         </ul>
       </nav>
@@ -157,6 +142,28 @@ const ListAppointments = () => {
         <div className="helper">
           Appointment List <span> Management | Appointments</span>
         </div>
+
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search appointments..."
+            style={{
+              padding: "10px 16px",
+              width: "80%",
+              maxWidth: 500,
+              borderRadius: "25px",
+              border: "1px solid #ccc",
+              outline: "none",
+              boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+              transition: "all 0.3s ease"
+            }}
+            onFocus={(e) => (e.currentTarget.style.borderColor = "#0070f3")}
+            onBlur={(e) => (e.currentTarget.style.borderColor = "#ccc")}
+          />
+        </div>
+
         <div className="table-responsive">
           <div className="table-wrapper">
             <div className="table-title">
