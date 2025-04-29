@@ -17,7 +17,8 @@ const ConfirmAppointment = () => {
   const [dateTime, setDateTime] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
-  const { idKey } = getRoleTokens(ROLES.SECRETARY);
+
+  const { idKey} = router.query;
 
   useEffect(() => {
     const id = localStorage.getItem("idAppointment");
