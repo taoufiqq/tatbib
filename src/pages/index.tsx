@@ -55,7 +55,10 @@ export default function Home() {
   };
 
   return (
-    <div className="" style={{ overflow: "auto", direction: locale === 'ar' ? 'rtl' : 'ltr' }}>
+    <div
+      className=""
+      style={{ overflow: "auto", direction: locale === "ar" ? "rtl" : "ltr" }}
+    >
       <section className="header-page">
         <div className="container">
           <div className="py-3 row justify-content-between align-items-center">
@@ -116,9 +119,7 @@ export default function Home() {
               className="px-5 py-4 col-12 col-md-6 col-lg-6 formSearch"
               style={{ background: "white", borderRadius: "7px" }}
             >
-              <h2 className="h2" style={{ textAlign: "center" }}>
-                {t("find_doctor_title")}
-              </h2>
+              <h2 className="h2 text-center">{t("find_doctor_title")}</h2>
               <form className="py-5" onSubmit={handleSubmit}>
                 <div className="col-12">
                   <div className="mb-4 input-icons">
@@ -185,48 +186,37 @@ export default function Home() {
         </div>
       </section>
       <div className="py-5 container-fluid" style={{ background: "#2CA5B8" }}>
-        <h3 className="text-center fw-bold fs-2" style={{ color: "white" }}>
+        <h3 className="text-center fw-bold fs-2 text-white">
           {t("why_choose_tatbib")}
         </h3>
         <div className="py-3 row justify-content-center">
-          <div className="text-center col-12 col-md-2">
+          <div className="text-center col-12 col-md-3 mb-4">
             <Image alt="" src={icon1} />
-            <span
-              className="py-2 mb-0 text-center fw-bold fs-5"
-              style={{ color: "white" }}
-            >
+            <span className="py-2 mb-0 text-center fw-bold fs-5 text-white">
               {t("smart_agenda")}
             </span>
           </div>
-          <div className="text-center col-12 col-md-2">
+          <div className="text-center col-12 col-md-3 mb-4">
             <Image alt="" src={icon2} />
-            <span
-              className="py-2 mb-0 text-center fw-bold fs-5"
-              style={{ color: "white" }}
-            >
+            <span className="py-2 mb-0 text-center fw-bold fs-5 text-white">
               {t("digital_medical_record")}
             </span>
           </div>
-          <div className="text-center col-12 col-md-2">
+          <div className="text-center col-12 col-md-3 mb-4">
             <Image alt="" src={icon3} />
-            <span
-              className="py-2 mb-0 text-center fw-bold fs-5"
-              style={{ color: "white" }}
-            >
+            <span className="py-2 mb-0 text-center fw-bold fs-5 text-white">
               {t("teleconsiel")}
             </span>
           </div>
-          <div className="text-center col-12 col-md-2">
+          <div className="text-center col-12 col-md-3 mb-4">
             <Image alt="" src={icon4} />
-            <span
-              className="py-2 mb-0 text-center fw-bold fs-5"
-              style={{ color: "white" }}
-            >
+            <span className="py-2 mb-0 text-center fw-bold fs-5 text-white">
               {t("secure_access")}
             </span>
           </div>
         </div>
       </div>
+
       <div className="container py-5 cardMedcine">
         <h4
           className="py-3 text-center fs-2 fw-bold"
@@ -240,35 +230,24 @@ export default function Home() {
             medcine.map((item: any, index: number) => (
               <div
                 key={item._id || index}
-                className="m-2 text-center col-12 col-sm-6 col-md-2 "
-                style={{
-                  backgroundColor: "#E5E5E5",
-                  borderRadius: "20px",
-                  width: "30%",
-                }}
+                className="m-2 text-center col-12 col-sm-6 col-md-4 col-lg-3"
+                style={{ backgroundColor: "#E5E5E5", borderRadius: "20px" }}
               >
-                <Image
-                  alt=""
-                  src={Medicin}
-                  style={{ width: "70%", height: "80%" }}
-                />
+                <Image alt="" src={Medicin} className="img-fluid" />
                 <h4>{item.fullName}</h4>
                 <h5>{item.speciality}</h5>
               </div>
             ))}
         </div>
       </div>
-  
+
       <div className="nav-elements"></div>
+
       <div className="container">
         <div className="row align-items-center">
           <div className="col-12 col-md-6 col-lg-8">
-            <h1 className="py-2">
-              {t("covid_message")}
-            </h1>
-            <span className="fs-4">
-              {t("wiqaytna_message")}
-            </span>
+            <h1 className="py-2">{t("covid_message")}</h1>
+            <span className="fs-4">{t("wiqaytna_message")}</span>
             <Link
               href={{ pathname: "https://www.wiqaytna.ma/" }}
               target="_blank"
@@ -276,7 +255,7 @@ export default function Home() {
               style={{
                 background: "#1AA9E9",
                 border: "none",
-                width: "215px",
+                width: "30%",
                 height: "50px",
                 lineHeight: 1,
               }}
@@ -285,14 +264,11 @@ export default function Home() {
             </Link>
           </div>
           <div className="col-12 col-md-6 col-lg-4">
-            <Image
-              src={wiqaytna}
-              alt=""
-              style={{ width: "100%", height: "100%" }}
-            />
+            <Image src={wiqaytna} alt="" className="img-fluid" />
           </div>
         </div>
       </div>
+
       <div className="footer">
         <div className="container">
           <div className="row">
@@ -302,27 +278,47 @@ export default function Home() {
                 <ul>
                   <li>
                     <Link className="list-item" href="#">
-                      {locale === 'fr' ? 'Cardiologue' : locale === 'ar' ? 'طبيب القلب' : 'Cardiologist'}
+                      {locale === "fr"
+                        ? "Cardiologue"
+                        : locale === "ar"
+                        ? "طبيب القلب"
+                        : "Cardiologist"}
                     </Link>
                   </li>
                   <li>
                     <Link className="list-item" href="#">
-                      {locale === 'fr' ? 'Dermatologue' : locale === 'ar' ? 'طبيب الجلدية' : 'Dermatologist'}
+                      {locale === "fr"
+                        ? "Dermatologue"
+                        : locale === "ar"
+                        ? "طبيب الجلدية"
+                        : "Dermatologist"}
                     </Link>
                   </li>
                   <li>
                     <Link className="list-item" href="#">
-                      {locale === 'fr' ? 'Gastroentérologie' : locale === 'ar' ? 'أمراض الجهاز الهضمي' : 'Gastroenterology'}
+                      {locale === "fr"
+                        ? "Gastroentérologie"
+                        : locale === "ar"
+                        ? "أمراض الجهاز الهضمي"
+                        : "Gastroenterology"}
                     </Link>
                   </li>
                   <li>
                     <Link className="list-item" href="#">
-                      {locale === 'fr' ? 'Dentiste' : locale === 'ar' ? 'طبيب أسنان' : 'Dentist'}
+                      {locale === "fr"
+                        ? "Dentiste"
+                        : locale === "ar"
+                        ? "طبيب أسنان"
+                        : "Dentist"}
                     </Link>
                   </li>
                   <li>
                     <Link className="list-item" href="#">
-                      {locale === 'fr' ? 'Médecine Générale' : locale === 'ar' ? 'الطب العام' : 'General Medicine'}
+                      {locale === "fr"
+                        ? "Médecine Générale"
+                        : locale === "ar"
+                        ? "الطب العام"
+                        : "General Medicine"}
                     </Link>
                   </li>
                 </ul>
@@ -334,37 +330,47 @@ export default function Home() {
                 <ul>
                   <li>
                     <Link className="list-item" href="#">
-                      {locale === 'fr' ? 'Médecin généraliste à casablanca' : 
-                       locale === 'ar' ? 'طبيب عام في الدار البيضاء' : 
-                       'General doctor in casablanca'}
+                      {locale === "fr"
+                        ? "Médecin généraliste à casablanca"
+                        : locale === "ar"
+                        ? "طبيب عام في الدار البيضاء"
+                        : "General doctor in casablanca"}
                     </Link>
                   </li>
                   <li>
                     <Link className="list-item" href="#">
-                      {locale === 'fr' ? 'Médecin dentiste à casablanca' : 
-                       locale === 'ar' ? 'طبيب أسنان في الدار البيضاء' : 
-                       'Dentist doctor in casablanca'}
+                      {locale === "fr"
+                        ? "Médecin dentiste à casablanca"
+                        : locale === "ar"
+                        ? "طبيب أسنان في الدار البيضاء"
+                        : "Dentist doctor in casablanca"}
                     </Link>
                   </li>
                   <li>
                     <Link className="list-item" href="#">
-                      {locale === 'fr' ? 'Médecin dentiste à rabat' : 
-                       locale === 'ar' ? 'طبيب أسنان في الرباط' : 
-                       'Dentist doctor in rabat'}
+                      {locale === "fr"
+                        ? "Médecin dentiste à rabat"
+                        : locale === "ar"
+                        ? "طبيب أسنان في الرباط"
+                        : "Dentist doctor in rabat"}
                     </Link>
                   </li>
                   <li>
                     <Link className="list-item" href="#">
-                      {locale === 'fr' ? 'Médecin dentiste à agadir' : 
-                       locale === 'ar' ? 'طبيب أسنان في أكادير' : 
-                       'Dentist doctor in agadir'}
+                      {locale === "fr"
+                        ? "Médecin dentiste à agadir"
+                        : locale === "ar"
+                        ? "طبيب أسنان في أكادير"
+                        : "Dentist doctor in agadir"}
                     </Link>
                   </li>
                   <li>
                     <Link className="list-item" href="#">
-                      {locale === 'fr' ? 'Médecin dentiste à Marrakech' : 
-                       locale === 'ar' ? 'طبيب أسنان في مراكش' : 
-                       'Dentist doctor in Marrakech'}
+                      {locale === "fr"
+                        ? "Médecin dentiste à Marrakech"
+                        : locale === "ar"
+                        ? "طبيب أسنان في مراكش"
+                        : "Dentist doctor in Marrakech"}
                     </Link>
                   </li>
                 </ul>
@@ -415,7 +421,6 @@ export default function Home() {
           <div className="row">
             <div className="col-lg-12 col-sm-12 col-xs-12">
               <span className="copyright">
-                {" "}
                 {t("copyright")}{" "}
                 <Link href="#" className="">
                   {t("terms_of_service")}
@@ -429,11 +434,10 @@ export default function Home() {
     </div>
   );
 }
-
 export async function getStaticProps({ locale }: { locale: string }) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ['common'])),
+      ...(await serverSideTranslations(locale, ["common"])),
     },
   };
 }
