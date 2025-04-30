@@ -160,11 +160,68 @@ export default function LoginMedicine(): React.ReactElement {
     }
   };
 
+  // const handleForgotPassword = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+    
+  //   if (!email) {
+  //     toast.error("Please enter your email address");
+  //     return;
+  //   }
+    
+  //   setResetLoading(true);
+    
+  //   try {
+  //     const response = await axios.post(
+  //       `https://tatbib-api.onrender.com/medcine/forgot-password`,
+  //       { email },
+  //       { timeout: 15000 }
+  //     );
+      
+  //     toast.success("Password reset instructions have been sent to your email", {
+  //       position: "top-right",
+  //       autoClose: 5000,
+  //       theme: "colored",
+  //     });
+      
+  //     // Return to login form after successful submission
+  //     setShowForgotPassword(false);
+  //     setEmail("");
+      
+  //   } catch (error: unknown) {
+  //     console.error("Password Reset Error:", error);
+  //     let errorMessage = "Failed to send reset instructions. Please try again.";
+      
+  //     if (axios.isAxiosError(error)) {
+  //       if (error.code === "ECONNABORTED") {
+  //         errorMessage = "Connection timeout. Please check your internet connection.";
+  //       } else if (error.response) {
+  //         errorMessage = error.response.data?.message || `Server error: ${error.response.status}`;
+  //       } else if (error.request) {
+  //         errorMessage = "No response from server. Please try again later.";
+  //       }
+  //     } else if (error instanceof Error) {
+  //       errorMessage = error.message;
+  //     }
+      
+  //     toast.error(errorMessage, {
+  //       position: "top-right",
+  //       autoClose: 5000,
+  //       theme: "colored",
+  //     });
+  //   } finally {
+  //     setResetLoading(false);
+  //   }
+  // };
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!email) {
       toast.error("Please enter your email address");
+      return;
+    }
+    
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error("Please enter a valid email address");
       return;
     }
     
@@ -174,33 +231,41 @@ export default function LoginMedicine(): React.ReactElement {
       const response = await axios.post(
         `https://tatbib-api.onrender.com/medcine/forgot-password`,
         { email },
-        { timeout: 15000 }
+        { 
+          timeout: 15000,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
       );
       
-      toast.success("Password reset instructions have been sent to your email", {
+      toast.success(response.data.message || "Password reset instructions have been sent to your email", {
         position: "top-right",
         autoClose: 5000,
         theme: "colored",
       });
       
-      // Return to login form after successful submission
       setShowForgotPassword(false);
       setEmail("");
       
     } catch (error: unknown) {
       console.error("Password Reset Error:", error);
+      
       let errorMessage = "Failed to send reset instructions. Please try again.";
+      let showContactSupport = false;
       
       if (axios.isAxiosError(error)) {
         if (error.code === "ECONNABORTED") {
-          errorMessage = "Connection timeout. Please check your internet connection.";
+          errorMessage = "Request timed out. Please check your connection.";
         } else if (error.response) {
-          errorMessage = error.response.data?.message || `Server error: ${error.response.status}`;
-        } else if (error.request) {
-          errorMessage = "No response from server. Please try again later.";
+          // Handle specific backend error messages
+          if (error.response.status === 500) {
+            errorMessage = "Our system is currently unavailable. Please try again later.";
+            showContactSupport = true;
+          } else {
+            errorMessage = error.response.data?.message || errorMessage;
+          }
         }
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
       }
       
       toast.error(errorMessage, {
@@ -208,11 +273,18 @@ export default function LoginMedicine(): React.ReactElement {
         autoClose: 5000,
         theme: "colored",
       });
+      
+      if (showContactSupport) {
+        toast.info("Contact support if this persists", {
+          position: "top-right",
+          autoClose: 5000,
+          theme: "colored",
+        });
+      }
     } finally {
       setResetLoading(false);
     }
   };
-
   const toggleForgotPassword = () => {
     setShowForgotPassword(!showForgotPassword);
   };
