@@ -20,5 +20,10 @@
   "subscribe_today": "Subscribe today",
   "email_placeholder": "Enter Email Address",
   "copyright": "© 2023 TATBIB.ma. All rights reserved",
-  "terms_of_service": "Terms of Service"
+  "terms_of_service": "Terms of Service",
+  "professional_spaces": "Professional Spaces",
+  "patient_spaces": "Patient Spaces",
+  "access_professional_spaces": "Access the Professionals spaces",
+  "medicine": "Medicine",
+  "secretary": "Secretary"
 }
