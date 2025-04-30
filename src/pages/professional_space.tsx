@@ -61,7 +61,7 @@ export default function ProfessionalSpaces() {
             <div className="EspaceProfessionnel mb-3">
               {t("access_professional_spaces")}
             </div>
-            <div className="d-flex flex-column flex-md-row justify-content-center gap-3">
+            <div className="d-flex flex-column flex-md-row justify-content-center align-items-center gap-3">
               <Link
                 href="/login_medicine"
                 className="EspaceProfessionnelButton1 text-white text-decoration-none px-4 py-1"
