@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import axios from "axios";
@@ -10,47 +10,48 @@ import "react-toastify/dist/ReactToastify.css";
 import logo from "../../public/images/logo.png";
 import Imglogin from "../../public/images/login3.svg";
 
-export default function ResetPassword(): React.ReactElement {
+export default function ResetPassword(): React.ReactElement | null {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  const [token, setToken] = useState("");
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
     setIsClient(true);
-    
-    // Extract token from URL if running on client side
-    if (typeof window !== "undefined") {
-      const pathParts = window.location.pathname.split('/');
-      const tokenFromUrl = pathParts[pathParts.length - 1];
-      if (tokenFromUrl && tokenFromUrl !== 'reset-password') {
-        setToken(tokenFromUrl);
-      }
-    }
-  }, []);
+    setToken(searchParams.get('token') || '');
+  }, [searchParams]);
+
+  const validatePassword = (pw: string): string | null => {
+    if (pw.length < 8) return "Must be at least 8 characters";
+    if (!/[A-Z]/.test(pw)) return "Must contain uppercase letter";
+    if (!/[a-z]/.test(pw)) return "Must contain lowercase letter";
+    if (!/[0-9]/.test(pw)) return "Must contain number";
+    if (!/[^A-Za-z0-9]/.test(pw)) return "Must contain special character";
+    return null;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate password match
+    // Validate passwords match
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match", {
-        position: "top-right",
-        autoClose: 5000,
-        theme: "colored",
-      });
+      toast.error("Passwords do not match");
       return;
     }
-    
-    // Validate password strength (optional)
-    if (password.length < 8) {
-      toast.error("Password must be at least 8 characters long", {
-        position: "top-right",
-        autoClose: 5000,
-        theme: "colored",
-      });
+
+    // Validate password strength
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      toast.error(`Password requirements: ${passwordError}`);
+      return;
+    }
+
+    // Validate token exists
+    if (!token) {
+      toast.error("Invalid reset link. Please request a new password reset.");
       return;
     }
 
@@ -60,45 +61,60 @@ export default function ResetPassword(): React.ReactElement {
       const response = await axios.post(
         `https://tatbib-api.onrender.com/medcine/reset-password`,
         { token, password },
-        { timeout: 15000 }
+        { 
+          timeout: 15000,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
       );
 
-      toast.success("Password reset successful", {
-        position: "top-right",
-        autoClose: 3000,
-        theme: "colored",
-      });
+      toast.success("Password reset successful. Redirecting to login...");
+      
+      // Clear sensitive data
+      setPassword("");
+      setConfirmPassword("");
 
-      // Redirect to login page after successful reset
-      setTimeout(() => {
-        router.push("/login_medicine");
-      }, 3000);
+      // Redirect after delay
+      setTimeout(() => router.push("/login_medicine"), 3000);
 
     } catch (error: unknown) {
       console.error("Reset Password Error:", error);
-      let errorMessage = "Failed to reset password. Please try again.";
       
+      let errorMessage = "Password reset failed";
+      let showContactSupport = false;
+
       if (axios.isAxiosError(error)) {
-        if (error.code === "ECONNABORTED") {
-          errorMessage = "Connection timeout. Please check your internet connection.";
-        } else if (error.response) {
-          errorMessage = error.response.data?.message || `Server error: ${error.response.status}`;
-        } else if (error.request) {
-          errorMessage = "No response from server. Please try again later.";
+        if (error.response) {
+          switch (error.response.status) {
+            case 400:
+              errorMessage = "Invalid or expired token";
+              break;
+            case 401:
+              errorMessage = "Unauthorized request";
+              break;
+            case 500:
+              errorMessage = "Server error. Please try again later.";
+              showContactSupport = true;
+              break;
+            default:
+              errorMessage = error.response.data?.message || errorMessage;
+          }
+        } else if (error.code === "ECONNABORTED") {
+          errorMessage = "Request timed out. Check your connection.";
         }
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
       }
 
-      toast.error(errorMessage, {
-        position: "top-right",
-        autoClose: 5000,
-        theme: "colored",
-      });
+      toast.error(errorMessage);
+      if (showContactSupport) {
+        toast.info("Contact support if this persists");
+      }
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (!isClient) return null; // SSR guard
 
   return (
     <section className="header-page">
@@ -137,9 +153,15 @@ export default function ResetPassword(): React.ReactElement {
               <form className="row" onSubmit={handleSubmit}>
                 <label className="form-label">Reset Your Password</label>
                 <div className="fromlogin">
-                  <p className="text-muted mb-3">
-                    Enter your new password below.
-                  </p>
+                <div className="password-requirements mb-3">
+                    <small>Password must contain:</small>
+                    <ul className="text-muted" style={{ fontSize: '0.8rem' }}>
+                      <li>At least 8 characters</li>
+                      <li>Uppercase and lowercase letters</li>
+                      <li>At least one number</li>
+                      <li>At least one special character</li>
+                    </ul>
+                  </div>
 
                   <input
                     type="password"
