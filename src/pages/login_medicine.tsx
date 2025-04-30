@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation"; // Changed to next/navigation
+import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import axios from "axios";
@@ -10,14 +10,17 @@ import "react-toastify/dist/ReactToastify.css";
 import logo from "../../public/images/logo.png";
 import Imglogin from "../../public/images/login3.svg";
 import { normalizeRole, ROLES, getRoleTokens } from "@/utils/roles";
-import { safeLocalStorage } from "@/components/withPrivateRoute"; // Import the shared utility
+import { safeLocalStorage } from "@/components/withPrivateRoute";
 
-export default function LoginMedicine() {
+export default function LoginMedicine(): React.ReactElement {
   const router = useRouter();
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
 
   // Only run client-side code after component mounts
   useEffect(() => {
@@ -99,14 +102,12 @@ export default function LoginMedicine() {
       // Get the correct storage keys from our utility function
       const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.MEDICINE);
 
-      // Store all auth data using the keys from our utility function with safeLocalStora
+      // Store all auth data using the keys from our utility function with safeLocalStorage
       const storageSuccess = [
         safeLocalStorage.setItem(tokenKey, token),
         safeLocalStorage.setItem(loginKey, medcine?.login || login),
-
         safeLocalStorage.setItem("role", ROLES.MEDICINE),
         safeLocalStorage.setItem(idKey, id || ""),
-        // medcine?.login ? safeLocalStorage.setItem("login_medcine", medcine.login) : true, // 🔥 use medcine.login
         medcine ? safeLocalStorage.setItem("medcine", JSON.stringify(medcine)) : true
       ].every(Boolean);
 
@@ -159,6 +160,63 @@ export default function LoginMedicine() {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email) {
+      toast.error("Please enter your email address");
+      return;
+    }
+    
+    setResetLoading(true);
+    
+    try {
+      const response = await axios.post(
+        `https://tatbib-api.onrender.com/medcine/forgot-password`,
+        { email },
+        { timeout: 15000 }
+      );
+      
+      toast.success("Password reset instructions have been sent to your email", {
+        position: "top-right",
+        autoClose: 5000,
+        theme: "colored",
+      });
+      
+      // Return to login form after successful submission
+      setShowForgotPassword(false);
+      setEmail("");
+      
+    } catch (error: unknown) {
+      console.error("Password Reset Error:", error);
+      let errorMessage = "Failed to send reset instructions. Please try again.";
+      
+      if (axios.isAxiosError(error)) {
+        if (error.code === "ECONNABORTED") {
+          errorMessage = "Connection timeout. Please check your internet connection.";
+        } else if (error.response) {
+          errorMessage = error.response.data?.message || `Server error: ${error.response.status}`;
+        } else if (error.request) {
+          errorMessage = "No response from server. Please try again later.";
+        }
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        theme: "colored",
+      });
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
+  const toggleForgotPassword = () => {
+    setShowForgotPassword(!showForgotPassword);
+  };
+
   return (
     <section className="header-page">
       <div className="container">
@@ -193,55 +251,113 @@ export default function LoginMedicine() {
         <div className="card EspacePatient">
           <div className="row">
             <div className="col-12 col-md-12 col-lg-6" style={{ marginTop: "4%" }}>
-              <form className="row" onSubmit={handleSubmit}>
-                <label className="form-label">Login as a Doctor</label>
-                <div className="fromlogin">
-                  <input
-                    type="text"
-                    placeholder="Login"
-                    className="form-control"
-                    required
-                    value={login}
-                    onChange={(e) => setLogin(e.target.value)}
-                    disabled={isLoading}
-                  />
+              {!showForgotPassword ? (
+                /* Login Form */
+                <form className="row" onSubmit={handleSubmit}>
+                  <label className="form-label">Login as a Doctor</label>
+                  <div className="fromlogin">
+                    <input
+                      type="text"
+                      placeholder="Login"
+                      className="form-control"
+                      required
+                      value={login}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLogin(e.target.value)}
+                      disabled={isLoading}
+                    />
 
-                  <input
-                    type="password"
-                    placeholder="Password"
-                    className="form-control"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={isLoading}
-                  />
+                    <input
+                      type="password"
+                      placeholder="Password"
+                      className="form-control"
+                      required
+                      value={password}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                      disabled={isLoading}
+                    />
 
-                  <button
-                    type="submit"
-                    className="form-control mt-5 btnConnect"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <>
-                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                        Logging in...
-                      </>
-                    ) : (
-                      "Log in"
-                    )}
-                  </button>
+                    <div className="text-end mt-2">
+                      <button 
+                        type="button" 
+                        className="btn btn-link p-0 text-decoration-none"
+                        onClick={toggleForgotPassword}
+                        disabled={isLoading}
+                      >
+                        Forgot password?
+                      </button>
+                    </div>
 
-                  <Link href="/sign_up_medicine" style={{ textDecoration: "none" }}>
+                    <button
+                      type="submit"
+                      className="form-control mt-4 btnConnect"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <>
+                          <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          Logging in...
+                        </>
+                      ) : (
+                        "Log in"
+                      )}
+                    </button>
+
+                    <Link href="/sign_up_medicine" style={{ textDecoration: "none" }}>
+                      <button
+                        type="button"
+                        className="form-control mt-3 btnAuth"
+                        disabled={isLoading}
+                      >
+                        Create an account
+                      </button>
+                    </Link>
+                  </div>
+                </form>
+              ) : (
+                /* Forgot Password Form */
+                <form className="row" onSubmit={handleForgotPassword}>
+                  <label className="form-label">Forgot Password</label>
+                  <div className="fromlogin">
+                    <p className="text-muted mb-3">
+                      Enter your email address and we will send you instructions to reset your password.
+                    </p>
+                    
+                    <input
+                      type="email"
+                      placeholder="Email Address"
+                      className="form-control"
+                      required
+                      value={email}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                      disabled={resetLoading}
+                    />
+
+                    <button
+                      type="submit"
+                      className="form-control mt-4 btnConnect"
+                      disabled={resetLoading}
+                    >
+                      {resetLoading ? (
+                        <>
+                          <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          Sending...
+                        </>
+                      ) : (
+                        "Reset Password"
+                      )}
+                    </button>
+
                     <button
                       type="button"
                       className="form-control mt-3 btnAuth"
-                      disabled={isLoading}
+                      onClick={toggleForgotPassword}
+                      disabled={resetLoading}
                     >
-                      Create an account
+                      Back to Login
                     </button>
-                  </Link>
-                </div>
-              </form>
+                  </div>
+                </form>
+              )}
             </div>
             <div className="col-12 col-md-12 col-lg-6">
               {isClient && (
