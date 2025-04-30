@@ -1,5 +1,5 @@
-import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import { useRouter } from "next/router";
+import React, { useState } from "react";
 
 const LanguageSwitcher = () => {
   const router = useRouter();
@@ -13,32 +13,37 @@ const LanguageSwitcher = () => {
 
   const getFlagImage = (locale: string) => {
     switch (locale) {
-      case 'fr':
-        return '/images/fr.jpg';
-      case 'ar':
-        return '/images/ar.jpg';
-      case 'en':
+      case "fr":
+        return "/images/fr.jpg";
+      case "ar":
+        return "/images/ar.jpg";
+      case "en":
       default:
-        return '/images/uk.jpg';
+        return "/images/uk.jpg";
     }
   };
 
   return (
     <div className="language-switcher">
       <button className="lang-btn" onClick={() => setIsOpen(!isOpen)}>
-        <img src={getFlagImage(router.locale || 'en')} alt={router.locale?.toUpperCase()} className="flag" />
-        {router.locale ? router.locale.toUpperCase() : 'EN'} <span>&#9660;</span>
+        <img
+          src={getFlagImage(router.locale || "en")}
+          alt={router.locale?.toUpperCase()}
+          className="flag"
+        />
+        {router.locale ? router.locale.toUpperCase() : "EN"}{" "}
+        <span>&#9660;</span>
       </button>
 
       {isOpen && (
         <ul className="dropdown">
-          <li onClick={() => changeLanguage('en')} className="dropdown-item">
+          <li onClick={() => changeLanguage("en")} className="dropdown-item">
             <img src="/images/uk.jpg" alt="English" className="flag" /> EN
           </li>
-          <li onClick={() => changeLanguage('fr')} className="dropdown-item">
+          <li onClick={() => changeLanguage("fr")} className="dropdown-item">
             <img src="/images/fr.jpg" alt="French" className="flag" /> FR
           </li>
-          <li onClick={() => changeLanguage('ar')} className="dropdown-item">
+          <li onClick={() => changeLanguage("ar")} className="dropdown-item">
             <img src="/images/ar.jpg" alt="Arabic" className="flag" /> AR
           </li>
         </ul>
@@ -50,10 +55,11 @@ const LanguageSwitcher = () => {
           display: inline-block;
         }
         .lang-btn {
-          padding: 8px 16px;
-          border: 1px solid #ddd;
+          padding: 8px 25px;
+          border: 1px solid #ffffff;
           border-radius: 4px;
-          background: white;
+          background: #2ba8bc;
+          color: white;
           cursor: pointer;
           font-weight: 500;
           display: flex;
