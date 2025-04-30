@@ -80,7 +80,7 @@
     background-color: #F6F6F6;
     margin-top: 7em;
     padding-top: 3%;
-    height: 57vh;
+    height: auto;
     /* margin-left: 13em; */
     border-radius: 15px;
 }
