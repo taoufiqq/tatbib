@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
@@ -27,11 +27,7 @@ const ListAppointments = () => {
 
   const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.MEDICINE);
 
-  useEffect(() => {
-    fetchAppointments();
-  }, []);
-
-  const fetchAppointments = async () => {
+  const fetchAppointments = useCallback(async () => {
     try {
       const id = localStorage.getItem(idKey);
       const token = localStorage.getItem(tokenKey);
@@ -52,7 +48,11 @@ const ListAppointments = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [idKey, tokenKey]);
+
+  useEffect(() => {
+    fetchAppointments();
+  }, [fetchAppointments]);
 
   const handleCreateOrdonnance = (appointmentId: string, patientId: string) => {
     if (!patientId) return toast.error("Missing patient ID");

@@ -3,7 +3,7 @@
 import type { NextPage } from "next";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
@@ -21,9 +21,7 @@ import { IoMenu } from "react-icons/io5";
 const SecretaryDashboard: NextPage = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
-  const [listAppointment, setListAppointment] = useState<Appointment[] | null>(
-    null
-  );
+  const [listAppointment, setListAppointment] = useState<Appointment[] | null>(null);
   const [status, setStatus] = useState<string>("Inactive");
   const [login, setLogin] = useState<string>("");
   const [loading, setLoading] = useState(true);
@@ -31,6 +29,19 @@ const SecretaryDashboard: NextPage = () => {
   // Pagination states
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(5);
+
+  // Declare handleLogout function first
+  const handleLogout = useCallback(() => {
+    const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.SECRETARY);
+    localStorage.removeItem(tokenKey);
+    localStorage.removeItem(loginKey);
+    localStorage.removeItem(idKey);
+    localStorage.removeItem("role");
+    localStorage.removeItem("login_medcine");
+    localStorage.removeItem("idAppointment");
+    window.location.href = "/login_secretary";
+  }, []);
+
   useEffect(() => {
     const updateItemsPerPage = () => {
       if (window.innerWidth <= 500) {
@@ -47,76 +58,8 @@ const SecretaryDashboard: NextPage = () => {
       window.removeEventListener("resize", updateItemsPerPage);
     };
   }, []);
-  useEffect(() => {
-    const handleRouteChange = (url: string) => {
-      if (url.includes("/dashboard_secretary")) {
-        // Check if returning to dashboard
-        const doctorLogin = localStorage.getItem("login_medcine");
-        if (doctorLogin) {
-          fetchAppointments(doctorLogin);
-        }
-      }
-    };
 
-    router.events.on("routeChangeComplete", handleRouteChange);
-
-    return () => {
-      router.events.off("routeChangeComplete", handleRouteChange);
-    };
-  }, []);
-  // Fetch data and authentication check
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (
-        menuOpen &&
-        window.innerWidth <= 768 &&
-        !target.closest(".sidebar-menu") &&
-        !target.closest(".mobile-menu-toggle")
-      ) {
-        setMenuOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [menuOpen]);
-
-  useEffect(() => {
-    const checkAndLoadData = () => {
-      if (typeof window !== "undefined") {
-        try {
-          const { loginKey, tokenKey } = getRoleTokens(ROLES.SECRETARY);
-          const secretaryLogin = localStorage.getItem(loginKey);
-          const token = localStorage.getItem(tokenKey);
-
-          if (!secretaryLogin || !token) {
-            toast.error("Authentication error. Please log in again.");
-            handleLogout();
-            return;
-          }
-          setStatus("Active");
-          setLogin(secretaryLogin);
-
-          const doctorLogin = localStorage.getItem("login_medcine");
-
-          if (!doctorLogin) {
-            toast.error("Doctor information missing. Please log in again.");
-            handleLogout();
-            return;
-          }
-          fetchAppointments(doctorLogin);
-        } catch (error) {
-          toast.error("Authentication error. Please log in again.");
-          handleLogout();
-        }
-      }
-    };
-    checkAndLoadData();
-  }, []);
-
-  const fetchAppointments = (doctorLogin: string) => {
+  const fetchAppointments = useCallback((doctorLogin: string) => {
     const { tokenKey } = getRoleTokens(ROLES.SECRETARY);
     const token = localStorage.getItem(tokenKey);
     if (!token) {
@@ -144,7 +87,75 @@ const SecretaryDashboard: NextPage = () => {
         }
         setLoading(false);
       });
-  };
+  }, [handleLogout]);
+
+  useEffect(() => {
+    const handleRouteChange = (url: string) => {
+      if (url.includes("/dashboard_secretary")) {
+        const doctorLogin = localStorage.getItem("login_medcine");
+        if (doctorLogin) {
+          fetchAppointments(doctorLogin);
+        }
+      }
+    };
+
+    router.events.on("routeChangeComplete", handleRouteChange);
+
+    return () => {
+      router.events.off("routeChangeComplete", handleRouteChange);
+    };
+  }, [fetchAppointments, router.events]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (
+        menuOpen &&
+        window.innerWidth <= 768 &&
+        !target.closest(".sidebar-menu") &&
+        !target.closest(".mobile-menu-toggle")
+      ) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [menuOpen]);
+
+  const { loginKey, tokenKey } = getRoleTokens(ROLES.SECRETARY);
+  useEffect(() => {
+    const checkAndLoadData = () => {
+      if (typeof window !== "undefined") {
+        try {
+          const secretaryLogin = localStorage.getItem(loginKey);
+          const token = localStorage.getItem(tokenKey);
+
+          if (!secretaryLogin || !token) {
+            toast.error("Authentication error. Please log in again.");
+            handleLogout();
+            return;
+          }
+          setStatus("Active");
+          setLogin(secretaryLogin);
+
+          const doctorLogin = localStorage.getItem("login_medcine");
+
+          if (!doctorLogin) {
+            toast.error("Doctor information missing. Please log in again.");
+            handleLogout();
+            return;
+          }
+          fetchAppointments(doctorLogin);
+        } catch (error) {
+          toast.error("Authentication error. Please log in again.");
+          handleLogout();
+        }
+      }
+    };
+    checkAndLoadData();
+  }, [loginKey, tokenKey, fetchAppointments, handleLogout]);
 
   const deleteAppointment = (id: string) => {
     if (window.confirm("Are you sure you want to delete this appointment?")) {
@@ -183,16 +194,6 @@ const SecretaryDashboard: NextPage = () => {
     router.push(path);
   };
 
-  const handleLogout = () => {
-    const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.SECRETARY);
-    localStorage.removeItem(tokenKey);
-    localStorage.removeItem(loginKey);
-    localStorage.removeItem(idKey);
-    localStorage.removeItem("role");
-    localStorage.removeItem("login_medcine");
-    localStorage.removeItem("idAppointment");
-    window.location.href = "/login_secretary";
-  };
   const filteredAppointments = listAppointment?.filter((item) => {
     const search = searchQuery.toLowerCase();
     return (
@@ -208,14 +209,7 @@ const SecretaryDashboard: NextPage = () => {
       item.status.toLowerCase().includes(search)
     );
   });
-  // Pagination calculation
-  // const indexOfLastItem = currentPage * itemsPerPage;
-  // const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  // const currentItems =
-  //   listAppointment?.slice(indexOfFirstItem, indexOfLastItem) || [];
-  // const totalPages = listAppointment
-  //   ? Math.ceil(listAppointment.length / itemsPerPage)
-  //   : 1;
+
   const paginatedAppointments = filteredAppointments?.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -223,6 +217,7 @@ const SecretaryDashboard: NextPage = () => {
   const totalPages = filteredAppointments
     ? Math.ceil(filteredAppointments.length / itemsPerPage)
     : 0;
+
   return (
     <div className="dashboard-container">
       {/* Sidebar and Navigation */}
@@ -314,271 +309,58 @@ const SecretaryDashboard: NextPage = () => {
             onBlur={(e) => (e.currentTarget.style.borderColor = "#ccc")}
           />
         </div>
+
         {loading ? (
-          <div className="loading-container">
-            <div className="spinner"></div>
-            <p>Loading appointments...</p>
-          </div>
+          <p>Loading appointments...</p>
         ) : (
-          <div className="content-card">
-            <div className="card-header">
-              <h2>
-                Appointment <b>list</b>
-              </h2>
-            </div>
-
-            {paginatedAppointments?.length ? (
-              <div className="table-responsive">
-                <table className="appointment-table">
-                  <thead>
-                    <tr>
-                      <th>LastName</th>
-                      <th>FirstName</th>
-                      <th className="hide-sm">Email</th>
-                      <th>Telephone</th>
-                      <th>Date</th>
-                      <th className="hide-sm">Time</th>
-                      <th>Status</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paginatedAppointments.map((item) => (
-                      <tr key={item._id}>
-                        <td>{item.patient.lastName}</td>
-                        <td>{item.patient.firstName}</td>
-                        <td className="hide-sm">{item.patient.email}</td>
-                        <td>{item.patient.telephone}</td>
-                        <td>{moment(item.dateTime).format("MMMM DD YYYY")}</td>
-                        <td className="hide-sm">
-                          {moment(item.dateTime).format("HH:mm")}
-                        </td>
-                        <td
-                          style={{
-                            textAlign: "center",
-                            display: "flex",
-                            alignItems: "center",
-                          }}
-                        >
-                          {item.status === "Pending" ? (
-                            <>
-                              <div className="spinner"></div>
-                              <span
-                                style={{
-                                  marginLeft: "10px",
-                                  fontSize: "14px",
-                                  color: "orange",
-                                  fontWeight: "bold",
-                                }}
-                              >
-                                Pending
-                              </span>
-                            </>
-                          ) : item.status === "Confirmed" ? (
-                            <>
-                              <span
-                                style={{
-                                  fontSize: "18px",
-                                  marginRight: "8px",
-                                  color: "green",
-                                  fontWeight: "bold",
-                                }}
-                              >
-                                ✔️
-                              </span>
-                              <span
-                                style={{
-                                  fontSize: "14px",
-                                  color: "green",
-                                  fontWeight: "bold",
-                                }}
-                              >
-                                Confirmed
-                              </span>
-                            </>
-                          ) : item.status === "Cancelled" ? (
-                            <>
-                              <span
-                                style={{
-                                  fontSize: "18px",
-                                  marginRight: "8px",
-                                  color: "black",
-                                  fontWeight: "bold",
-                                }}
-                              >
-                                🚫
-                              </span>
-                              <span
-                                style={{
-                                  fontSize: "14px",
-                                  color: "black",
-                                  fontWeight: "bold",
-                                }}
-                              >
-                                Cancelled
-                              </span>
-                            </>
-                          ) : item.status === "Completed" ? (
-                            <>
-                              <span
-                                style={{
-                                  fontSize: "18px",
-                                  marginRight: "8px",
-                                  color: "green",
-                                  fontWeight: "bold",
-                                }}
-                              >
-                                ✅
-                              </span>
-                              <span
-                                style={{
-                                  fontSize: "14px",
-                                  color: "green",
-                                  fontWeight: "bold",
-                                }}
-                              >
-                                Completed
-                              </span>
-                            </>
-                          ) : (
-                            <>
-                              <span
-                                style={{
-                                  fontSize: "18px",
-                                  marginRight: "8px",
-                                  color: "red",
-                                }}
-                              >
-                                ❌
-                              </span>
-                              <span
-                                style={{
-                                  fontSize: "14px",
-                                  color: "red",
-                                  fontWeight: "bold",
-                                }}
-                              >
-                                Unconfirmed
-                              </span>
-                            </>
-                          )}
-                        </td>
-
-                        <td className="action-buttons">
-                          <button
-                            onClick={() =>
-                              handleAction(item._id, "/confirm_appointment")
-                            }
-                            title="Confirm"
-                            className="btn-action confirm"
-                          >
-                            <FaCheckCircle />
-                          </button>
-                          {(item.status === "Confirmed" ||
-                            item.status === "Completed") && (
-                            <button
-                              onClick={() =>
-                                handleAction(item._id, "/alert_appointment")
-                              }
-                              title="Alert"
-                              className="btn-action alert"
-                            >
-                              <FaBell />
-                            </button>
-                          )}
-
-                          <button
-                            onClick={() => deleteAppointment(item._id)}
-                            title="Delete"
-                            className="btn-action delete"
-                          >
-                            <FaTrashAlt />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-
-                {/* Pagination Controls */}
-                <div className="pagination">
-                  {Array.from({ length: totalPages }, (_, i) => (
+          <>
+            <ul className="appointment-list">
+              {paginatedAppointments?.map((appointment) => (
+                <li key={appointment._id} className="appointment-item">
+                  <div className="appointment-details">
+                    <h3>{`${appointment.patient?.firstName} ${appointment.patient?.lastName}`}</h3>
+                    <p>{appointment.patient?.email}</p>
+                    <p>{appointment.patient?.telephone}</p>
+                    <p>
+                      {moment(appointment.dateTime).format("MMMM DD YYYY HH:mm")}
+                    </p>
+                    <p>Status: {appointment.status}</p>
+                  </div>
+                  <div className="appointment-actions">
                     <button
-                      key={i}
-                      className={`page-button ${
-                        currentPage === i + 1 ? "active" : ""
-                      }`}
-                      onClick={() => setCurrentPage(i + 1)}
+                      className="action-button"
+                      onClick={() => handleAction(appointment._id, "/appointment_details")}
                     >
-                      {i + 1}
+                      <FaBell /> Notify
                     </button>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="no-data">
-                <p>No appointments found</p>
-              </div>
-            )}
-          </div>
+                    <button
+                      className="action-button"
+                      onClick={() => deleteAppointment(appointment._id)}
+                    >
+                      <FaTrashAlt /> Delete
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <div className="pagination">
+              {currentPage > 1 && (
+                <button onClick={() => setCurrentPage(currentPage - 1)}>
+                  Prev
+                </button>
+              )}
+              {currentPage < totalPages && (
+                <button onClick={() => setCurrentPage(currentPage + 1)}>
+                  Next
+                </button>
+              )}
+            </div>
+          </>
         )}
-
-        <style jsx>{`
-          .loading-spinner {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
-
-          .spinner {
-            width: 24px;
-            height: 24px;
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left-color: #ffa500;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-          }
-
-          @keyframes spin {
-            0% {
-              transform: rotate(0deg);
-            }
-            100% {
-              transform: rotate(360deg);
-            }
-          }
-          .pagination {
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
-          }
-
-          .page-button {
-            background: #eee;
-            border: none;
-            padding: 8px 12px;
-            margin: 0 5px;
-            cursor: pointer;
-            border-radius: 5px;
-          }
-
-          .page-button.active {
-            background: #293846;
-            color: #fff;
-          }
-        `}</style>
       </main>
-
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        closeOnClick
-        pauseOnHover
-        draggable
-      />
+      <ToastContainer />
     </div>
   );
 };
 
-export default withAuth(SecretaryDashboard, { role: ROLES.SECRETARY });
+export default withAuth(SecretaryDashboard);

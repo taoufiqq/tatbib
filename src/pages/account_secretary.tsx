@@ -64,7 +64,7 @@ export default function SecretaryCompte() {
           toast.error("Failed to load secretary accounts");
         });
     }
-  }, []);
+  }, [loginKey]);
 
   const getIdSecretary = (id: any) => {
     localStorage.setItem("idSecretary", id);

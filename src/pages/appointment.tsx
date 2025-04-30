@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
@@ -32,22 +32,17 @@ const RendezVous = () => {
 
   // Get role-specific tokens
   const { tokenKey, idKey } = getRoleTokens(ROLES.PATIENT);
-
-  useEffect(() => {
-    console.log("Authentication Status Check:", {
-      token: localStorage.getItem(tokenKey),
-      role: localStorage.getItem("role"),
-      patientId: localStorage.getItem(idKey)
-    });
-
-    if (id) fetchDoctorInfo();
-  }, [id]);
-
-  const fetchDoctorInfo = async () => {
+  const handleLogout = useCallback(() => {
+    const patientItems = [tokenKey, idKey, "role"];
+    patientItems.forEach(item => localStorage.removeItem(item));
+    router.push("/login_patient");
+  }, [tokenKey, idKey, router]); // Added dependencies
+  
+  const fetchDoctorInfo = useCallback(async () => {
     try {
       const token = localStorage.getItem(tokenKey);
       if (!token) throw new Error("No authentication token found");
-
+  
       const response = await axios.get<MedecinData>(
         `https://tatbib-api.onrender.com/medcine/getMedcineById/${id}`,
         { headers: { Authorization: `Bearer ${token}` } }
@@ -67,8 +62,17 @@ const RendezVous = () => {
       }
       toast.error(errorMessage);
     }
-  };
+  }, [handleLogout, id, tokenKey]);
 
+  useEffect(() => {
+    console.log("Authentication Status Check:", {
+      token: localStorage.getItem(tokenKey),
+      role: localStorage.getItem("role"),
+      patientId: localStorage.getItem(idKey)
+    });
+
+    if (id) fetchDoctorInfo();
+  }, [id, idKey, tokenKey, fetchDoctorInfo]);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -138,11 +142,7 @@ const RendezVous = () => {
     toast.error(errorMessage, { position: "top-center" });
   };
 
-  const handleLogout = () => {
-    const patientItems = [tokenKey, idKey, "role"];
-    patientItems.forEach(item => localStorage.removeItem(item));
-    router.push("/login_patient");
-  };
+ 
 
   const minDateTime = () => {
     const now = new Date();

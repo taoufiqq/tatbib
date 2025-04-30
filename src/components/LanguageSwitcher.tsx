@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import React, { useState } from "react";
+import Image from "next/image"; // ✅ Import the Image component
 
 const LanguageSwitcher = () => {
   const router = useRouter();
@@ -26,25 +27,26 @@ const LanguageSwitcher = () => {
   return (
     <div className="language-switcher">
       <button className="lang-btn" onClick={() => setIsOpen(!isOpen)}>
-        <img
+        <Image
           src={getFlagImage(router.locale || "en")}
-          alt={router.locale?.toUpperCase()}
+          alt={router.locale?.toUpperCase() || "EN"}
+          width={20}
+          height={15}
           className="flag"
         />
-        {router.locale ? router.locale.toUpperCase() : "EN"}{" "}
-        <span>&#9660;</span>
+        {router.locale ? router.locale.toUpperCase() : "EN"} <span>&#9660;</span>
       </button>
 
       {isOpen && (
         <ul className="dropdown">
           <li onClick={() => changeLanguage("en")} className="dropdown-item">
-            <img src="/images/uk.jpg" alt="English" className="flag" /> EN
+            <Image src="/images/uk.jpg" alt="English" width={20} height={15} className="flag" /> EN
           </li>
           <li onClick={() => changeLanguage("fr")} className="dropdown-item">
-            <img src="/images/fr.jpg" alt="French" className="flag" /> FR
+            <Image src="/images/fr.jpg" alt="French" width={20} height={15} className="flag" /> FR
           </li>
           <li onClick={() => changeLanguage("ar")} className="dropdown-item">
-            <img src="/images/ar.jpg" alt="Arabic" className="flag" /> AR
+            <Image src="/images/ar.jpg" alt="Arabic" width={20} height={15} className="flag" /> AR
           </li>
         </ul>
       )}
@@ -93,8 +95,6 @@ const LanguageSwitcher = () => {
           background-color: #f0f0f0;
         }
         .flag {
-          width: 20px;
-          height: 15px;
           margin-right: 8px;
         }
       `}</style>

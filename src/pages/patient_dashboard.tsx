@@ -32,51 +32,45 @@ const PatientDashboard = () => {
   const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.PATIENT);
 
   useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const patientId = localStorage.getItem(idKey);
+        console.log("Fetching appointments for patient ID:", patientId);
+  
+        if (!patientId) {
+          throw new Error("No patient ID found in localStorage");
+        }
+  
+        const token = localStorage.getItem(tokenKey);
+        if (!token) {
+          throw new Error("No authentication token found");
+        }
+  
+        const response = await axios.get(
+          `https://tatbib-api.onrender.com/appointment/getAppointmentPatient/${patientId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setListAppointment(response.data);
+      } catch (err) {
+        console.error("Error fetching appointments:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
     console.log("Authentication Status Check:", {
       token: localStorage.getItem(tokenKey),
       role: normalizeRole(localStorage.getItem("role") || ""),
       patientId: localStorage.getItem(idKey),
     });
-
+  
     fetchAppointments();
-  }, []);
-
-  const fetchAppointments = async () => {
-    try {
-      const patientId = localStorage.getItem(idKey);
-      console.log("Fetching appointments for patient ID:", patientId);
-
-      if (!patientId) {
-        throw new Error("No patient ID found in localStorage");
-      }
-
-      const token = localStorage.getItem(tokenKey);
-      if (!token) {
-        throw new Error("No authentication token found");
-      }
-
-      const response = await axios.get(
-        `https://tatbib-api.onrender.com/appointment/getAppointmentPatient/${patientId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log(
-        "First appointment:",
-        JSON.stringify(response.data[0], null, 2)
-      );
-      console.log("Medicine object:", response.data[0]?.medicine);
-      console.log(response.data); // Log the response here to check the data
-      setListAppointment(response.data);
-    } catch (err) {
-      console.error("Error fetching appointments:", err);
-      // Handle errors as before
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [idKey, tokenKey]);
+  
 
   const handleLogout = () => {
     const patientStorageItems = [

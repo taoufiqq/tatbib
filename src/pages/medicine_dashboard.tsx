@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
@@ -30,56 +30,14 @@ const DashboardMedcine = () => {
   // Get role-specific tokens
   const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.MEDICINE);
 
-  useEffect(() => {
-    const fetchMedecinData = async () => {
-      try {
-        const doctorId = localStorage.getItem(idKey);
-        if (!doctorId) {
-          toast.error("Doctor ID not found");
-          router.push("/login_medicine");
-          return;
-        }
-
-        const token = localStorage.getItem(tokenKey);
-        if (!token) {
-          throw new Error("No authentication token found");
-        }
-
-        const response = await axios.get<MedecinData>(
-          `https://tatbib-api.onrender.com/medcine/getMedcineById/${doctorId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-
-        setMedecinData(response.data);
-      } catch (err: unknown) {
-        console.error("Error fetching doctor data:", err);
-        
-        if (axios.isAxiosError(err)) {
-          if (err.response?.status === 401) {
-            toast.error("Session expired. Please login again.");
-            handleLogout();
-          } else {
-            toast.error(err.response?.data?.message || "Failed to load doctor data");
-          }
-        } else if (err instanceof Error) {
-          toast.error(err.message);
-        } else {
-          toast.error("An unexpected error occurred");
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMedecinData();
-  }, [router, idKey, tokenKey]);
+ 
 
   const handleEditAccount = (id: string) => {
     localStorage.setItem(idKey, id);
     router.push("/availability_medicine");
   };
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     const medicineItems = [tokenKey, loginKey, idKey, "role"];
     medicineItems.forEach(item => localStorage.removeItem(item));
     
@@ -93,7 +51,7 @@ const DashboardMedcine = () => {
       draggable: true,
       theme: "colored"
     });
-  };
+  }, [router, tokenKey, loginKey, idKey]);
 
   if (typeof window === "undefined") return null;
 

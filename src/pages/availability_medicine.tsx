@@ -40,7 +40,7 @@ const ManagementAvailablityMedcine = () => {
     };
 
     fetchDoctorAvailability();
-  }, []);
+  }, [idKey]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

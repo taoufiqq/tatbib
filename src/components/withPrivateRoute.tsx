@@ -1,79 +1,13 @@
-// import { useRouter } from "next/router";
-// import { useEffect, useState } from "react";
-// import { normalizeRole, ROLES, AuthRole, getRoleTokens } from "@/utils/roles";
-
-// const withAuth = <P extends object>(
-//   WrappedComponent: React.ComponentType<P>,
-//   options?: { role?: AuthRole } // Now using the value type ("medicine" | "secretary" | "patient")
-// ) => {
-//   const AuthComponent = (props: P) => {
-//     const router = useRouter();
-//     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-
-//     const checkAuth = () => {
-//       if (typeof window === "undefined") return false;
-
-//       const storedRole = normalizeRole(localStorage.getItem("role") || "");
-//       const requiredRole = options?.role;
-//       const { tokenKey, loginKey, idKey } = getRoleTokens(storedRole as AuthRole);
-
-//       console.log("Auth Check - localStorage:", {
-//         role: storedRole,
-//         token: localStorage.getItem(tokenKey),
-//         login: localStorage.getItem(loginKey),
-//         id: localStorage.getItem(idKey)
-//       });
-
-//       if (requiredRole && storedRole !== requiredRole) {
-//         console.log(`Role mismatch: stored ${storedRole}, required ${requiredRole}`);
-//         return false;
-//       }
-
-//       const token = localStorage.getItem(tokenKey);
-//       const login = localStorage.getItem(loginKey);
-
-//       if (!token || !login) {
-//         console.log("Missing token or login");
-//         return false;
-//       }
-
-//       return true;
-//     };
-
-//     useEffect(() => {
-//       const authStatus = checkAuth();
-//       setIsAuthenticated(authStatus);
-
-//       if (!authStatus) {
-//         console.log("Not authenticated, redirecting...");
-//         const redirectPath = options?.role === "medicine" ? "/login_medicine" :
-//                           options?.role === "secretary" ? "/login_secretary" :
-//                           "/login_patient";
-//         router.push(redirectPath);
-//       }
-//     }, [router, options?.role]);
-
-//     if (isAuthenticated === null) {
-//       return <div>Loading...</div>;
-//     }
-
-//     if (!isAuthenticated) {
-//       return null;
-//     }
-
-//     return <WrappedComponent {...props} />;
-//   };
-
-//   AuthComponent.displayName = `withAuth(${WrappedComponent.displayName || WrappedComponent.name || 'Component'})`;
-//   return AuthComponent;
-// };
-
-// export default withAuth;
 "use client";
 
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState, ComponentType } from "react";
-import { normalizeRole, type AuthRole, getRoleTokens, ROLES } from "@/utils/roles";
+import {
+  normalizeRole,
+  type AuthRole,
+  getRoleTokens,
+  ROLES,
+} from "@/utils/roles";
 
 // Safely access localStorage with error handling - moved to a shared utility
 export const safeLocalStorage = {
@@ -120,7 +54,7 @@ export const safeLocalStorage = {
       console.error("Error clearing localStorage:", error);
       return false;
     }
-  }
+  },
 };
 
 const withAuth = <P extends object>(
@@ -153,7 +87,7 @@ const withAuth = <P extends object>(
           }
 
           const normalizedRole = normalizeRole(storedRole);
-          
+
           // Type guard to ensure normalizedRole is AuthRole
           const isAuthRole = (role: string): role is AuthRole => {
             return Object.values(ROLES).includes(role as AuthRole);
@@ -190,24 +124,22 @@ const withAuth = <P extends object>(
       setAuthState({ checked: true, isValid: authStatus });
 
       if (!authStatus && mounted) {
-        // Determine redirect path based on role
-        const redirectPath = options?.role === ROLES.MEDICINE
-          ? "/login_medicine"
-          : options?.role === ROLES.SECRETARY
-          ? "/login_secretary"
-          : "/login_patient";
-        
-        // Prevent redirect loops
+        const redirectPath =
+          options?.role === ROLES.MEDICINE
+            ? "/login_medicine"
+            : options?.role === ROLES.SECRETARY
+            ? "/login_secretary"
+            : "/login_patient";
+
         if (pathname !== redirectPath) {
           console.log(`Not authenticated, redirecting to ${redirectPath}...`);
           router.push(redirectPath);
         }
       }
-    }, [mounted, router, pathname, options?.role]);
-
+    }, [mounted, router, pathname]); // ✅ removed options
     // Don't render anything during SSR
     if (typeof window === "undefined") return null;
-    
+
     // Don't render anything until mount
     if (!mounted) return null;
 
