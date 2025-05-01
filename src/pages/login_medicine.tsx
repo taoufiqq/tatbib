@@ -35,7 +35,9 @@ export default function LoginMedicine(): React.ReactElement {
           const token = safeLocalStorage.getItem(tokenKey);
 
           if (token) {
-            console.log("Already logged in as medicine, redirecting to dashboard");
+            console.log(
+              "Already logged in as medicine, redirecting to dashboard"
+            );
             setTimeout(() => {
               window.location.href = "/list_appointments_medicine";
             }, 100);
@@ -77,11 +79,11 @@ export default function LoginMedicine(): React.ReactElement {
       }
 
       const { verified, token, role, id, medcine } = response.data;
-      
+
       // Make sure we have a role string to normalize (add fallback)
       const roleToNormalize = role || "medicine"; // Default to medicine if missing
       const normalizedRole = normalizeRole(roleToNormalize);
-      
+
       console.log("Normalized Role:", normalizedRole);
       console.log("Expected Role:", ROLES.MEDICINE);
 
@@ -108,7 +110,9 @@ export default function LoginMedicine(): React.ReactElement {
         safeLocalStorage.setItem(loginKey, medcine?.login || login),
         safeLocalStorage.setItem("role", ROLES.MEDICINE),
         safeLocalStorage.setItem(idKey, id || ""),
-        medcine ? safeLocalStorage.setItem("medcine", JSON.stringify(medcine)) : true
+        medcine
+          ? safeLocalStorage.setItem("medcine", JSON.stringify(medcine))
+          : true,
       ].every(Boolean);
 
       if (!storageSuccess) {
@@ -120,7 +124,7 @@ export default function LoginMedicine(): React.ReactElement {
         token: safeLocalStorage.getItem(tokenKey),
         role: safeLocalStorage.getItem("role"),
         login: safeLocalStorage.getItem(loginKey),
-        id: safeLocalStorage.getItem(idKey)
+        id: safeLocalStorage.getItem(idKey),
       });
 
       toast.success("Authenticated successfully", {
@@ -133,16 +137,18 @@ export default function LoginMedicine(): React.ReactElement {
       setTimeout(() => {
         window.location.href = "/list_appointments_medicine";
       }, 2000);
-
     } catch (error: unknown) {
       console.error("Login Error:", error);
       let errorMessage = "Login failed. Please try again.";
-      
+
       if (axios.isAxiosError(error)) {
         if (error.code === "ECONNABORTED") {
-          errorMessage = "Connection timeout. Please check your internet connection.";
+          errorMessage =
+            "Connection timeout. Please check your internet connection.";
         } else if (error.response) {
-          errorMessage = error.response.data?.message || `Server error: ${error.response.status}`;
+          errorMessage =
+            error.response.data?.message ||
+            `Server error: ${error.response.status}`;
         } else if (error.request) {
           errorMessage = "No response from server. Please try again later.";
         }
@@ -162,35 +168,35 @@ export default function LoginMedicine(): React.ReactElement {
 
   // const handleForgotPassword = async (e: React.FormEvent) => {
   //   e.preventDefault();
-    
+
   //   if (!email) {
   //     toast.error("Please enter your email address");
   //     return;
   //   }
-    
+
   //   setResetLoading(true);
-    
+
   //   try {
   //     const response = await axios.post(
   //       `https://tatbib-api.onrender.com/medcine/forgot-password`,
   //       { email },
   //       { timeout: 15000 }
   //     );
-      
+
   //     toast.success("Password reset instructions have been sent to your email", {
   //       position: "top-right",
   //       autoClose: 5000,
   //       theme: "colored",
   //     });
-      
+
   //     // Return to login form after successful submission
   //     setShowForgotPassword(false);
   //     setEmail("");
-      
+
   //   } catch (error: unknown) {
   //     console.error("Password Reset Error:", error);
   //     let errorMessage = "Failed to send reset instructions. Please try again.";
-      
+
   //     if (axios.isAxiosError(error)) {
   //       if (error.code === "ECONNABORTED") {
   //         errorMessage = "Connection timeout. Please check your internet connection.";
@@ -202,7 +208,7 @@ export default function LoginMedicine(): React.ReactElement {
   //     } else if (error instanceof Error) {
   //       errorMessage = error.message;
   //     }
-      
+
   //     toast.error(errorMessage, {
   //       position: "top-right",
   //       autoClose: 5000,
@@ -214,66 +220,70 @@ export default function LoginMedicine(): React.ReactElement {
   // };
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email) {
       toast.error("Please enter your email address");
       return;
     }
-    
+
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       toast.error("Please enter a valid email address");
       return;
     }
-    
+
     setResetLoading(true);
-    
+
     try {
       const response = await axios.post(
         `https://tatbib-api.onrender.com/medcine/forgot-password`,
         { email },
-        { 
+        {
           timeout: 15000,
           headers: {
-            'Content-Type': 'application/json'
-          }
+            "Content-Type": "application/json",
+          },
         }
       );
-      
-      toast.success(response.data.message || "Password reset instructions have been sent to your email", {
-        position: "top-right",
-        autoClose: 5000,
-        theme: "colored",
-      });
-      
+
+      toast.success(
+        response.data.message ||
+          "Password reset instructions have been sent to your email",
+        {
+          position: "top-right",
+          autoClose: 5000,
+          theme: "colored",
+        }
+      );
+
       setShowForgotPassword(false);
       setEmail("");
-      
     } catch (error: unknown) {
       console.error("Password Reset Error:", error);
-      
+
       let errorMessage = "Failed to send reset instructions. Please try again.";
       let showContactSupport = false;
-      
+
       if (axios.isAxiosError(error)) {
         if (error.code === "ECONNABORTED") {
           errorMessage = "Request timed out. Please check your connection.";
         } else if (error.response) {
           // Handle specific backend error messages
           if (error.response.status === 500) {
-            errorMessage = "Our system is currently unavailable. Please try again later.";
+            errorMessage =
+              "Our system is currently unavailable. Please try again later.";
             showContactSupport = true;
           } else {
             errorMessage = error.response.data?.message || errorMessage;
           }
         }
       }
-      
+
       toast.error(errorMessage, {
         position: "top-right",
         autoClose: 5000,
         theme: "colored",
       });
-      
+
       if (showContactSupport) {
         toast.info("Contact support if this persists", {
           position: "top-right",
@@ -297,7 +307,13 @@ export default function LoginMedicine(): React.ReactElement {
             <Link href="/">
               <div style={{ width: "100px", height: "auto" }}>
                 {isClient && (
-                  <Image alt="Logo" src={logo} width={100} height={100} priority />
+                  <Image
+                    alt="Logo"
+                    src={logo}
+                    width={100}
+                    height={100}
+                    priority
+                  />
                 )}
               </div>
             </Link>
@@ -322,7 +338,10 @@ export default function LoginMedicine(): React.ReactElement {
         </div>
         <div className="card EspacePatient">
           <div className="row">
-            <div className="col-12 col-md-12 col-lg-6" style={{ marginTop: "4%" }}>
+            <div
+              className="col-12 col-md-12 col-lg-6"
+              style={{ marginTop: "4%" }}
+            >
               {!showForgotPassword ? (
                 /* Login Form */
                 <form className="row" onSubmit={handleSubmit}>
@@ -334,7 +353,9 @@ export default function LoginMedicine(): React.ReactElement {
                       className="form-control"
                       required
                       value={login}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLogin(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setLogin(e.target.value)
+                      }
                       disabled={isLoading}
                     />
 
@@ -344,13 +365,15 @@ export default function LoginMedicine(): React.ReactElement {
                       className="form-control"
                       required
                       value={password}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setPassword(e.target.value)
+                      }
                       disabled={isLoading}
                     />
 
-                    <div className="text-end mt-2">
-                      <button 
-                        type="button" 
+                    <div className="d-flex justify-content-center mt-2">
+                      <button
+                        type="button"
                         className="btn btn-link p-0 text-decoration-none"
                         onClick={toggleForgotPassword}
                         disabled={isLoading}
@@ -366,7 +389,11 @@ export default function LoginMedicine(): React.ReactElement {
                     >
                       {isLoading ? (
                         <>
-                          <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          <span
+                            className="spinner-border spinner-border-sm me-2"
+                            role="status"
+                            aria-hidden="true"
+                          ></span>
                           Logging in...
                         </>
                       ) : (
@@ -374,7 +401,10 @@ export default function LoginMedicine(): React.ReactElement {
                       )}
                     </button>
 
-                    <Link href="/sign_up_medicine" style={{ textDecoration: "none" }}>
+                    <Link
+                      href="/sign_up_medicine"
+                      style={{ textDecoration: "none" }}
+                    >
                       <button
                         type="button"
                         className="form-control mt-3 btnAuth"
@@ -390,17 +420,23 @@ export default function LoginMedicine(): React.ReactElement {
                 <form className="row" onSubmit={handleForgotPassword}>
                   <label className="form-label">Forgot Password</label>
                   <div className="fromlogin">
-                    <p className="text-muted mb-3">
-                      Enter your email address and we will send you instructions to reset your password.
+                    <p
+                      className="text-muted mb-3"
+                      style={{ textAlign: "center", width: "99%" }}
+                    >
+                      Enter your email address and we will send you instructions
+                      to reset your password.
                     </p>
-                    
+
                     <input
                       type="email"
                       placeholder="Email Address"
                       className="form-control"
                       required
                       value={email}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setEmail(e.target.value)
+                      }
                       disabled={resetLoading}
                     />
 
@@ -411,7 +447,11 @@ export default function LoginMedicine(): React.ReactElement {
                     >
                       {resetLoading ? (
                         <>
-                          <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          <span
+                            className="spinner-border spinner-border-sm me-2"
+                            role="status"
+                            aria-hidden="true"
+                          ></span>
                           Sending...
                         </>
                       ) : (
@@ -447,7 +487,7 @@ export default function LoginMedicine(): React.ReactElement {
           </div>
         </div>
       </div>
-      <ToastContainer 
+      <ToastContainer
         position="top-right"
         autoClose={5000}
         hideProgressBar={false}
