@@ -25,5 +25,6 @@
   "patient_spaces": "Espaces patients",
   "access_professional_spaces": "Accéder aux espaces professionnels",
   "medicine": "Médecin",
-  "secretary": "Secrétaire"
+  "secretary": "Secrétaire ",
+  "access_professional_patient":"Accès à l'espace patient"
 }

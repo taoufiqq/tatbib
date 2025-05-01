@@ -25,5 +25,6 @@
   "patient_spaces": "مساحات المرضى",
   "access_professional_spaces": "الولوج الى فضائك  المهني باعتبارك:",
   "medicine": "طبيب",
-  "secretary": "سكرتير"
+  "secretary": "سكرتير",
+  "access_professional_patient": "الولوج الى فضاء المرضى"
 }

@@ -25,5 +25,6 @@
   "patient_spaces": "Patient Spaces",
   "access_professional_spaces": "Access the Professionals spaces",
   "medicine": "Medicine",
-  "secretary": "Secretary"
+  "secretary": "Secretary",
+  "access_professional_patient":"Access to patient space"
 }

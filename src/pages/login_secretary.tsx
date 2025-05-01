@@ -9,7 +9,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { normalizeRole, ROLES, getRoleTokens } from "@/utils/roles";
 import logo from "../../public/images/logo.png";
-import Imglogin from "../../public/images/Login2.svg";
+import Imglogin from "../../public/images/loginS.png";
 import { safeLocalStorage } from "@/components/withPrivateRoute"; // Import the shared utility
 
 export default function LoginSecretary() {
@@ -254,7 +254,7 @@ export default function LoginSecretary() {
                   src={Imglogin}
                   width={500}
                   height={300}
-                  style={{ width: "70%", marginLeft: "60px" }}
+                  // style={{ width: "70%", marginLeft: "60px" }}
                   className="imgLogin"
                   priority
                 />
