@@ -3,6 +3,7 @@ export interface Medicine {
   fullName: string;
   speciality: string;
   city: string;
+  email:string;
   availability: string;
   login?: string; // Optional property
 }

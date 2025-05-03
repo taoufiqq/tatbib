@@ -54,6 +54,69 @@
     justify-content: flex-end !important;
   }
 }
+/* Add these styles to your global CSS or component-specific CSS */
+
+/* Modal overlay styles */
+.ReactModal__Overlay {
+  opacity: 0;
+  transition: opacity 200ms ease-in-out;
+  background-color: rgba(0, 0, 0, 0.75) !important;
+  z-index: 1000;
+}
+
+.ReactModal__Overlay--after-open {
+  opacity: 1;
+}
+
+.ReactModal__Overlay--before-close {
+  opacity: 0;
+}
+
+/* Modal content styles */
+.ReactModal__Content {
+  transform: translateY(-40px);
+  transition: transform 200ms ease-in-out;
+  max-width: 500px;
+  width: 90%;
+  margin: 0 auto;
+  padding: 20px !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.ReactModal__Content--after-open {
+  transform: translateY(0);
+}
+
+.ReactModal__Content--before-close {
+  transform: translateY(-40px);
+}
+
+/* Doctor info modal specific styles */
+.doctor-modal-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #2CA5B8;
+  margin-bottom: 1rem;
+}
+
+.doctor-info-item {
+  margin-bottom: 0.5rem;
+}
+
+.doctor-modal-close {
+  background-color: #2CA5B8;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+.doctor-modal-close:hover {
+  background-color: #238a99;
+}
 
 .header-page{
   background-image: url('../../public/images/bg.jpg');

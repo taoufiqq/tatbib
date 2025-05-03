@@ -17,6 +17,33 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
+import Modal from "react-modal";
+
+// Set the app element for accessibility
+if (typeof window !== "undefined") {
+  Modal.setAppElement("#__next");
+}
+
+// Custom styles for the modal
+const customStyles = {
+  overlay: {
+    backgroundColor: "rgba(0, 0, 0, 0.75)",
+    zIndex: 1000,
+  },
+  content: {
+    top: "50%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    marginRight: "-50%",
+    transform: "translate(-50%, -50%)",
+    maxWidth: "500px",
+    width: "90%",
+    padding: "20px",
+    borderRadius: "10px",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+  },
+};
 
 export default function Home() {
   const [speciality, setSpeciality] = useState("");
@@ -24,21 +51,32 @@ export default function Home() {
   const router = useRouter();
   const { locale } = router;
 
-  const [medcine, setMedcine] = useState<Medicine[] | null>(null);
+  const [medicine, setMedicine] = useState<Medicine[] | null>(null);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [selectedDoctor, setSelectedDoctor] = useState<Medicine | null>(null);
+
+  const openModal = (doctor: Medicine) => {
+    console.log("Opening modal for doctor: ", doctor);
+    setSelectedDoctor(doctor);
+    setModalIsOpen(true);
+  };
+
+  const closeModal = () => {
+    console.log("Closing modal");
+    setModalIsOpen(false);
+  };
 
   useEffect(() => {
     axios
       .get(`https://tatbib-api.onrender.com/medcine/getAllMedcine`)
       .then(function (response) {
-        setMedcine(response.data);
-        setSpeciality(response.data.speciality);
-        console.log("all medcine", response.data);
+        setMedicine(response.data);
+        console.log("All medicine data: ", response.data);
       })
       .catch(function (err) {
-        console.log(err);
+        console.error("Error fetching medicine data: ", err);
       });
   }, []);
-
   const handleSubmit = (e: any) => {
     e.preventDefault();
 
@@ -50,7 +88,7 @@ export default function Home() {
         if (!res.data) {
           return false;
         } else {
-          localStorage.setItem("medcine", JSON.stringify(res.data));
+          localStorage.setItem("medicine", JSON.stringify(res.data));
           router.push("/search_medicine");
         }
       });
@@ -130,17 +168,14 @@ export default function Home() {
               <form className="py-5" onSubmit={handleSubmit}>
                 <div className="col-12">
                   <div className="mb-4 input-icons">
-                    <select
-                      className="p-3 select"
-                      defaultValue="Choisir Un Medcine"
-                    >
-                      <option defaultValue="Choisir Un Medcine">
+                    <select className="p-3 select" defaultValue="full name">
+                      <option defaultValue="full name">
                         {t("choose_medicine")}
                       </option>
-                      {medcine &&
-                        medcine.map((element, i: any) => (
-                          <option key={i} value={element.fullName}>
-                            {element.fullName}
+                      {medicine &&
+                        medicine.map((itemName, index: any) => (
+                          <option key={index} value={itemName.fullName}>
+                            {itemName.fullName}
                           </option>
                         ))}
                     </select>
@@ -154,8 +189,8 @@ export default function Home() {
                       <option defaultValue="Choisir Une Spécialité">
                         {t("choose_speciality")}
                       </option>
-                      {medcine &&
-                        medcine.map((item, indexSpeciality: any) => (
+                      {medicine &&
+                        medicine.map((item, indexSpeciality: any) => (
                           <option key={indexSpeciality} value={item.speciality}>
                             {item.speciality}
                           </option>
@@ -170,8 +205,8 @@ export default function Home() {
                       <option defaultValue="Choisir Une Ville">
                         {t("Choose_city")}
                       </option>
-                      {medcine &&
-                        medcine.map((itemCity, index: any) => (
+                      {medicine &&
+                        medicine.map((itemCity, index: any) => (
                           <option key={index} value={itemCity.city}>
                             {itemCity.city}
                           </option>
@@ -244,7 +279,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* New How It Works Section */}
+      {/* Health Tips Section */}
       <div className="container my-5">
         <h3 className="text-center mb-4" style={{ color: "#2CA5B8" }}>
           {t("health_tips")}
@@ -273,7 +308,48 @@ export default function Home() {
           ))}
         </div>
       </div>
-      {/*card Medcine Section */}
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        contentLabel="Doctor Information"
+        style={customStyles} // Use our custom styles
+        ariaHideApp={false} // This prevents the warning if you can't set appElement
+      >
+        {selectedDoctor && (
+          <div>
+            <h2 className="text-xl font-bold mb-4" style={{ color: "#2CA5B8" }}>
+              {selectedDoctor.fullName}
+            </h2>
+            <div className="mb-4">
+              <p className="mb-2">
+                <strong>Email:</strong> {selectedDoctor.email}
+              </p>
+              <p className="mb-2">
+                <strong>Speciality:</strong> {selectedDoctor.speciality}
+              </p>
+              <p className="mb-2">
+                <strong>City:</strong> {selectedDoctor.city}
+              </p>
+              <p className="mb-2">
+                <strong>Availability:</strong> {selectedDoctor.availability}
+              </p>
+            </div>
+            <button
+              onClick={closeModal}
+              className="py-2 px-4 rounded"
+              style={{
+                backgroundColor: "#2CA5B8",
+                color: "white",
+                cursor: "pointer",
+              }}
+            >
+              Close
+            </button>
+          </div>
+        )}
+      </Modal>
+
+      {/* Medicine Cards Section - Fixed to properly trigger the modal */}
       <div className="container py-5 cardMedcine">
         <h4
           className="py-3 text-center fs-2 fw-bold"
@@ -294,15 +370,20 @@ export default function Home() {
             1024: { slidesPerView: 3 },
           }}
         >
-          {medcine &&
-            medcine.map((item: any, index: number) => (
-              <SwiperSlide key={item._id || index}>
+          {medicine &&
+            medicine.map((item) => (
+              <SwiperSlide key={item._id}>
                 <div
                   className="m-2 text-center p-3"
                   style={{
                     backgroundColor: "#E5E5E5",
                     borderRadius: "20px",
                     height: "100%",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => {
+                    console.log("Card clicked for doctor:", item);
+                    openModal(item);
                   }}
                 >
                   <Image alt="" src={Medicin} className="img-fluid mb-2" />
@@ -313,6 +394,7 @@ export default function Home() {
             ))}
         </Swiper>
       </div>
+
       <div className="nav-elements"></div>
 
       <div className="container py-5">
