@@ -36,13 +36,12 @@ export default function EspacePatient() {
                     className="btn_Espace_Professionnels"
                     href="/professional_space"
                   >
-                    <i className="fas fa-user-injured"></i>{" "}
-                    {t("professional_space")}
+                    <i className="fa fa-user-md"></i> {t("professional_space")}
                   </Link>
                 </div>
                 <div className="col-6 col-md-4 col-lg-5 d-flex justify-content-center">
                   <Link className="btn_Espace_Patients" href="/patient_space">
-                    <i className="fas fa-user-injured"></i> {t("patient_space")}
+                    <i className="fa fa-user"></i> {t("patient_space")}
                   </Link>
                 </div>
               </div>

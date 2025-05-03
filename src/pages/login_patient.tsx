@@ -170,22 +170,22 @@ export default function LoginPatient() {
             </Link>
           </div>
           <div className="col-12 col-sm-9 col-lg-6 col-xl-4">
-            <div className="row justify-content-center">
-              <div className="col-6 col-md-4 col-lg-5 col-xl-6 d-flex justify-content-end">
-                <Link
-                  className="btn_Espace_Professionnels"
-                  href="/professional_space"
-                >
-                  <i className="fas fa-user-injured"></i> Professional Spaces
-                </Link>
-              </div>
-              <div className="col-6 col-md-4 col-lg-5 d-flex justify-content-center">
-                <Link className="btn_Espace_Patients" href="/patient_space">
-                  <i className="fas fa-user-injured"></i> Patient Spaces
-                </Link>
+              <div className="row justify-content-center">
+                <div className="col-6 col-md-4 col-lg-5 col-xl-6 d-flex justify-content-end">
+                  <Link
+                    className="btn_Espace_Professionnels"
+                    href="/professional_space"
+                  >
+                    <i className="fa fa-user-md"></i>professional_space
+                  </Link>
+                </div>
+                <div className="col-6 col-md-4 col-lg-5 d-flex justify-content-center">
+                  <Link className="btn_Espace_Patients" href="/patient_space">
+                    <i className="fa fa-user"></i> patient_space
+                  </Link>
+                </div>
               </div>
             </div>
-          </div>
         </div>
         <div className="card EspacePatient">
           <div className="row">
