@@ -9,6 +9,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import logo from "../../public/images/logo.png";
 import Imglogin from "../../public/images/login3.svg";
+import ForgotPassword from "../../public/images/ForgotM.png";
 import { normalizeRole, ROLES, getRoleTokens } from "@/utils/roles";
 import { safeLocalStorage } from "@/components/withPrivateRoute";
 import { useTranslation } from "next-i18next";
@@ -481,6 +482,7 @@ export default function LoginMedicine(): React.ReactElement {
                         {t("back_to_login")}
                       </button>
                     </div>
+                    
                   </form>
                 )}
               </div>
