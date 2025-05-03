@@ -1,11 +1,14 @@
 import "@/styles/globals.css";
 import "@/styles/style_patient.css";
 import "@/styles/style_medicine.css";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 import type { AppProps } from "next/app";
 import Script from "next/script";
 import Head from "next/head";
 import { Inter, Roboto, Varela_Round } from "next/font/google";
-import { appWithTranslation } from 'next-i18next';
+import { appWithTranslation } from "next-i18next";
 
 // Define fonts with display=optional
 const inter = Inter({

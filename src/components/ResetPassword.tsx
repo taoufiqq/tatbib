@@ -21,7 +21,7 @@ export default function ResetPassword(): React.ReactElement | null {
 
   useEffect(() => {
     setIsClient(true);
-    setToken(searchParams.get('token') || '');
+    setToken(searchParams.get("token") || "");
   }, [searchParams]);
 
   const validatePassword = (pw: string): string | null => {
@@ -59,28 +59,27 @@ export default function ResetPassword(): React.ReactElement | null {
 
     try {
       const response = await axios.post(
-        `https://tatbib-api.onrender.com/medcine/reset-password`,
-        { token, password },
-        { 
+        `http://localhost:3030/medcine/reset-password/${token}`,
+        { password },
+        {
           timeout: 15000,
           headers: {
-            'Content-Type': 'application/json'
-          }
+            "Content-Type": "application/json",
+          },
         }
       );
 
       toast.success("Password reset successful. Redirecting to login...");
-      
+
       // Clear sensitive data
       setPassword("");
       setConfirmPassword("");
 
       // Redirect after delay
       setTimeout(() => router.push("/login_medicine"), 3000);
-
     } catch (error: unknown) {
       console.error("Reset Password Error:", error);
-      
+
       let errorMessage = "Password reset failed";
       let showContactSupport = false;
 
@@ -124,7 +123,13 @@ export default function ResetPassword(): React.ReactElement | null {
             <Link href="/">
               <div style={{ width: "100px", height: "auto" }}>
                 {isClient && (
-                  <Image alt="Logo" src={logo} width={100} height={100} priority />
+                  <Image
+                    alt="Logo"
+                    src={logo}
+                    width={100}
+                    height={100}
+                    priority
+                  />
                 )}
               </div>
             </Link>
@@ -149,13 +154,16 @@ export default function ResetPassword(): React.ReactElement | null {
         </div>
         <div className="card EspacePatient">
           <div className="row">
-            <div className="col-12 col-md-12 col-lg-6" style={{ marginTop: "4%" }}>
+            <div
+              className="col-12 col-md-12 col-lg-6"
+              style={{ marginTop: "4%" }}
+            >
               <form className="row" onSubmit={handleSubmit}>
                 <label className="form-label">Reset Your Password</label>
                 <div className="fromlogin">
-                <div className="password-requirements mb-3">
+                  <div className="password-requirements mb-3">
                     <small>Password must contain:</small>
-                    <ul className="text-muted" style={{ fontSize: '0.8rem' }}>
+                    <ul className="text-muted" style={{ fontSize: "0.8rem" }}>
                       <li>At least 8 characters</li>
                       <li>Uppercase and lowercase letters</li>
                       <li>At least one number</li>
@@ -169,7 +177,9 @@ export default function ResetPassword(): React.ReactElement | null {
                     className="form-control"
                     required
                     value={password}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setPassword(e.target.value)
+                    }
                     disabled={isLoading}
                   />
 
@@ -179,7 +189,9 @@ export default function ResetPassword(): React.ReactElement | null {
                     className="form-control"
                     required
                     value={confirmPassword}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setConfirmPassword(e.target.value)
+                    }
                     disabled={isLoading}
                     style={{ marginTop: "15px" }}
                   />
@@ -191,7 +203,11 @@ export default function ResetPassword(): React.ReactElement | null {
                   >
                     {isLoading ? (
                       <>
-                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        <span
+                          className="spinner-border spinner-border-sm me-2"
+                          role="status"
+                          aria-hidden="true"
+                        ></span>
                         Resetting...
                       </>
                     ) : (
@@ -200,13 +216,16 @@ export default function ResetPassword(): React.ReactElement | null {
                   </button>
 
                   <div className="text-center mt-3">
-                    <Link href="/login_medicine" style={{ textDecoration: "none" }}>
+                    <Link
+                      href="/login_medicine"
+                      style={{ textDecoration: "none" }}
+                    >
                       Back to Login
                     </Link>
                   </div>
                 </div>
               </form>
-              
+
               {!token && (
                 <div className="alert alert-warning mt-3">
                   Invalid reset link. Please request a new password reset.
@@ -229,7 +248,7 @@ export default function ResetPassword(): React.ReactElement | null {
           </div>
         </div>
       </div>
-      <ToastContainer 
+      <ToastContainer
         position="top-right"
         autoClose={5000}
         hideProgressBar={false}

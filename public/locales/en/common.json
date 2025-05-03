@@ -1,4 +1,8 @@
 {
+  "twitter": "Twitter",
+  "linkedin": "LinkedIn",
+  "google_plus": "Google+",
+  "facebook": "Facebook",
   "professional_space": "Professional Space",
   "patient_space": "Patient Space",
   "find_doctor_title": "Find a practitioner & make an appointment online",
@@ -6,6 +10,20 @@
   "choose_speciality": "Choose a Specialty",
   "Choose_city": "Choose a City",
   "search": "Search",
+  "how_it_works": "How It Works",
+  "step1_title": "Search for a Doctor",
+  "step1_description": "Find doctors by specialty, name, or city easily using our platform.",
+  "step2_title": "Book Your Appointment",
+  "step2_description": "Choose the time that suits you best and confirm in just a few clicks.",
+  "step3_title": "Visit or Consult Online",
+  "step3_description": "Meet the doctor at the clinic or use our teleconsultation service.",
+  "health_tips": "Health Tips",
+  "tip1": "Drink at least 8 glasses of water a day.",
+  "tip2": "Exercise regularly.",
+  "tip3": "Sleep at least 7 hours a night.",
+  "tip4": "Eat fruits and vegetables every day.",
+  "tip5": "Avoid stress as much as possible.",
+
   "why_choose_tatbib": "Why choose TATBIB Connect software?",
   "smart_agenda": "Smart and ergonomic agenda",
   "digital_medical_record": "Digital medical record",
@@ -26,5 +44,36 @@
   "access_professional_spaces": "Access the Professionals spaces",
   "medicine": "Medicine",
   "secretary": "Secretary",
-  "access_professional_patient":"Access to patient space"
+  "access_professional_patient": "Access to patient space",
+
+  "login_as_doctor": "Login as a Doctor",
+  "login": "Login",
+  "password": "Password",
+  "forgot_password": "Forgot password?",
+  "logging_in": "Logging in...",
+  "log_in": "Log in",
+  "create_account": "Create an account",
+  "forgot_password_title": "Forgot Password",
+  "forgot_password_instruction": "Enter your email address and we will send you instructions to reset your password.",
+
+  "sending": "Sending...",
+  "reset_password": "Reset Password",
+  "back_to_login": "Back to Login",
+
+
+  "please_enter_email": "Please enter your email address",
+  "please_enter_valid_email": "Please enter a valid email address",
+  "authenticated_successfully": "Authenticated successfully",
+  "already_logged_in": "Already logged in as medicine, redirecting to dashboard",
+  "please_verify_email": "Please verify your account first via email",
+  "login_failed": "Login failed. Please try again.",
+  "no_server_response": "No response from server. Please try again later.",
+  "timeout": "Connection timeout. Please check your internet connection.",
+  "failed_store_auth": "Failed to store authentication data",
+  "system_unavailable": "Our system is currently unavailable. Please try again later.",
+  "contact_support": "Contact support if this persists",
+  "reset_instructions_sent": "Password reset instructions have been sent to your email",
+  "failed_reset": "Failed to send reset instructions. Please try again."
+
+
 }

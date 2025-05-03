@@ -102,12 +102,12 @@ h5 {
     color: #2CA5B8;
     border-radius: 18px;
     border: none;
-    height: 36px;
+    /* height: 36px; */
     text-align: center;
     font-family: Segoe UI;
     outline: none;
     font-weight: bold;
-    margin-top: 2%;
+    /* margin-top: 2%; */
 }
 
 .EspaceProfessionnelButton1 {

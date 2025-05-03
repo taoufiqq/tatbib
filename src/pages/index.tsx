@@ -9,12 +9,14 @@ import icon1 from "../../public/images/map-doctor.png";
 import icon2 from "../../public/images/bell.png";
 import icon3 from "../../public/images/phone-alt.png";
 import icon4 from "../../public/images/clipboard-list.png";
-import Medicin from "../../public/images/doctor.png";
+import Medicin from "../../public/images/d.jpg";
 import wiqaytna from "../../public/images/wiqaytna.png";
 import { Medicine } from "@/types";
 import { useTranslation } from "next-i18next";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination } from "swiper/modules";
 
 export default function Home() {
   const [speciality, setSpeciality] = useState("");
@@ -53,7 +55,13 @@ export default function Home() {
         }
       });
   };
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
+  const tips = [t("tip1"), t("tip2"), t("tip3"), t("tip4"), t("tip5")];
+
+  const toggleTip = (index: number) => {
+    setActiveIndex(activeIndex === index ? null : index);
+  };
   return (
     <div
       className=""
@@ -89,30 +97,31 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <nav className="social">
+        <nav className="social" style={{ direction: "ltr", left: "2%" }}>
           <ul>
             <li>
               <Link href="#">
-                Twitter <i className="fa fa-twitter twitter"></i>
+                {t("twitter")} <i className="fa fa-twitter twitter"></i>
               </Link>
             </li>
             <li>
               <Link href="#">
-                Linkedin <i className="fa fa-linkedin"></i>
+                {t("linkedin")} <i className="fa fa-linkedin"></i>
               </Link>
             </li>
             <li>
               <Link href="#">
-                Google+ <i className="fa fa-google-plus"></i>
+                {t("google_plus")} <i className="fa fa-google-plus"></i>
               </Link>
             </li>
             <li>
               <Link href="#">
-                Facebook <i className="fa fa-facebook"></i>
+                {t("facebook")} <i className="fa fa-facebook"></i>
               </Link>
             </li>
           </ul>
         </nav>
+
         <div className="container">
           <div className="row align-items-center">
             <div
@@ -185,38 +194,88 @@ export default function Home() {
           </div>
         </div>
       </section>
+      {/* New How It Works Section */}
+      <div className="container py-5">
+        <h3 className="text-center fw-bold fs-2" style={{ color: "#2CA5B8" }}>
+          {t("how_it_works")}
+        </h3>
+        <div className="row py-4 text-center">
+          <div className="col-12 col-md-4 mb-4">
+            <i className="fa fa-search fa-3x text-info mb-3"></i>
+            <h5 className="fw-bold">{t("step1_title")}</h5>
+            <p>{t("step1_description")}</p>
+          </div>
+          <div className="col-12 col-md-4 mb-4">
+            <i className="fa fa-calendar fa-3x text-info mb-3"></i>
+
+            <h5 className="fw-bold">{t("step2_title")}</h5>
+            <p>{t("step2_description")}</p>
+          </div>
+          <div className="col-12 col-md-4 mb-4">
+            <i className="fa fa-user-md fa-3x text-info mb-3"></i>
+            <h5 className="fw-bold">{t("step3_title")}</h5>
+            <p>{t("step3_description")}</p>
+          </div>
+        </div>
+      </div>
+      {/* why choose tatbib Section */}
+
       <div className="py-5 container-fluid" style={{ background: "#2CA5B8" }}>
         <h3 className="text-center fw-bold fs-2 text-white">
           {t("why_choose_tatbib")}
         </h3>
-        <div className="py-3 row justify-content-center">
-          <div className="text-center col-12 col-md-3 mb-4">
-            <Image alt="" src={icon1} />
-            <span className="py-2 mb-0 text-center fw-bold fs-5 text-white">
-              {t("smart_agenda")}
-            </span>
-          </div>
-          <div className="text-center col-12 col-md-3 mb-4">
-            <Image alt="" src={icon2} />
-            <span className="py-2 mb-0 text-center fw-bold fs-5 text-white">
-              {t("digital_medical_record")}
-            </span>
-          </div>
-          <div className="text-center col-12 col-md-3 mb-4">
-            <Image alt="" src={icon3} />
-            <span className="py-2 mb-0 text-center fw-bold fs-5 text-white">
-              {t("teleconsiel")}
-            </span>
-          </div>
-          <div className="text-center col-12 col-md-3 mb-4">
-            <Image alt="" src={icon4} />
-            <span className="py-2 mb-0 text-center fw-bold fs-5 text-white">
-              {t("secure_access")}
-            </span>
-          </div>
+        <div className="py-4 row justify-content-center text-center">
+          {[icon1, icon2, icon3, icon4].map((icon, i) => (
+            <div
+              key={i}
+              className="col-12 col-sm-6 col-md-3 d-flex flex-column align-items-center mb-4"
+            >
+              <Image alt="" src={icon} className="mb-3" />
+              <span className="fw-bold fs-5 text-white">
+                {t(
+                  [
+                    "smart_agenda",
+                    "digital_medical_record",
+                    "teleconsiel",
+                    "secure_access",
+                  ][i]
+                )}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
 
+      {/* New How It Works Section */}
+      <div className="container my-5">
+        <h3 className="text-center mb-4" style={{ color: "#2CA5B8" }}>
+          {t("health_tips")}
+        </h3>
+        <div className="accordion" id="healthTipsAccordion">
+          {tips.map((tip, index) => (
+            <div className="accordion-item mb-2" key={index}>
+              <h2 className="accordion-header">
+                <button
+                  className={`accordion-button ${
+                    activeIndex === index ? "" : "collapsed"
+                  }`}
+                  onClick={() => toggleTip(index)}
+                >
+                  {t("tip" + (index + 1))}
+                </button>
+              </h2>
+              <div
+                className={`accordion-collapse collapse ${
+                  activeIndex === index ? "show" : ""
+                }`}
+              >
+                <div className="accordion-body">{tip}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      {/*card Medcine Section */}
       <div className="container py-5 cardMedcine">
         <h4
           className="py-3 text-center fs-2 fw-bold"
@@ -225,46 +284,63 @@ export default function Home() {
           {t("our_practitioners")}
         </h4>
 
-        <div className="row justify-content-evenly">
+        <Swiper
+          modules={[Navigation, Pagination]}
+          spaceBetween={20}
+          slidesPerView={1}
+          navigation
+          pagination={{ clickable: true }}
+          breakpoints={{
+            640: { slidesPerView: 1 },
+            768: { slidesPerView: 2 },
+            1024: { slidesPerView: 3 },
+          }}
+        >
           {medcine &&
             medcine.map((item: any, index: number) => (
-              <div
-                key={item._id || index}
-                className="m-2 text-center col-12 col-sm-6 col-md-4 col-lg-3"
-                style={{ backgroundColor: "#E5E5E5", borderRadius: "20px" }}
-              >
-                <Image alt="" src={Medicin} className="img-fluid" />
-                <h4>{item.fullName}</h4>
-                <h5>{item.speciality}</h5>
-              </div>
+              <SwiperSlide key={item._id || index}>
+                <div
+                  className="m-2 text-center p-3"
+                  style={{
+                    backgroundColor: "#E5E5E5",
+                    borderRadius: "20px",
+                    height: "100%",
+                  }}
+                >
+                  <Image alt="" src={Medicin} className="img-fluid mb-2" />
+                  <h4>{item.fullName}</h4>
+                  <h5>{item.speciality}</h5>
+                </div>
+              </SwiperSlide>
             ))}
-        </div>
+        </Swiper>
       </div>
-
       <div className="nav-elements"></div>
 
-      <div className="container">
+      <div className="container py-5">
         <div className="row align-items-center">
-          <div className="col-12 col-md-6 col-lg-8">
+          {/* Text Section */}
+          <div className="col-12 col-lg-8 mb-4 mb-lg-0">
             <h1 className="py-2">{t("covid_message")}</h1>
-            <span className="fs-4">{t("wiqaytna_message")}</span>
+            <p className="fs-5 mb-3">{t("wiqaytna_message")}</p>
             <Link
-              href={{ pathname: "https://www.wiqaytna.ma/" }}
+              href="https://www.wiqaytna.ma/"
               target="_blank"
-              className="px-4 py-3 btn btn-primary fs-5"
+              className="btn btn-primary fs-5 w-100 w-md-auto"
               style={{
                 background: "#1AA9E9",
                 border: "none",
-                width: "30%",
+                maxWidth: "250px",
                 height: "50px",
-                lineHeight: 1,
               }}
             >
               {t("more_information")}
             </Link>
           </div>
-          <div className="col-12 col-md-6 col-lg-4">
-            <Image src={wiqaytna} alt="" className="img-fluid" />
+
+          {/* Image Section */}
+          <div className="col-12 col-lg-4 text-center">
+            <Image src={wiqaytna} alt="wiqaytna" className="img-fluid" />
           </div>
         </div>
       </div>

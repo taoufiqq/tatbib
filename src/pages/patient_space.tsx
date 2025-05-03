@@ -54,7 +54,7 @@ export default function EspacePatient() {
                 alt="Medicine"
                 src={Medicine}
                 className="img-fluid"
-                style={{ maxWidth: "320px", height: "auto" }}
+                style={{ maxWidth: "30%", height: "auto" }}
               />
             </div>
             <h5 className="fw-bold fs-4"></h5>

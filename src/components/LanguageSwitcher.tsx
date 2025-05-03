@@ -4,7 +4,9 @@ import Image from "next/image"; // ✅ Import the Image component
 
 const LanguageSwitcher = () => {
   const router = useRouter();
-  const { pathname, asPath, query } = router;
+
+  const { pathname, asPath, query, locale } = router;
+
   const [isOpen, setIsOpen] = useState(false);
 
   const changeLanguage = (locale: string) => {
@@ -34,21 +36,50 @@ const LanguageSwitcher = () => {
           height={15}
           className="flag"
         />
-        {router.locale ? router.locale.toUpperCase() : "EN"} <span>&#9660;</span>
+        {router.locale ? router.locale.toUpperCase() : "EN"}{" "}
+        <span>&#9660;</span>
       </button>
 
       {isOpen && (
-        <ul className="dropdown">
-          <li onClick={() => changeLanguage("en")} className="dropdown-item">
-            <Image src="/images/uk.jpg" alt="English" width={20} height={15} className="flag" /> EN
-          </li>
-          <li onClick={() => changeLanguage("fr")} className="dropdown-item">
-            <Image src="/images/fr.jpg" alt="French" width={20} height={15} className="flag" /> FR
-          </li>
-          <li onClick={() => changeLanguage("ar")} className="dropdown-item">
-            <Image src="/images/ar.jpg" alt="Arabic" width={20} height={15} className="flag" /> AR
-          </li>
-        </ul>
+   <ul className="dropdown">
+   <li onClick={() => changeLanguage("en")} className="dropdown-item">
+     <Image
+       src="/images/uk.jpg"
+       alt="English"
+       width={20}
+       height={15}
+       className="flag"
+     />
+     <span style={{ marginLeft: locale === "ar" ? "0" : "10%", marginRight: locale === "ar" ? "10%" : "0" }}>
+       EN
+     </span>
+   </li>
+   <li onClick={() => changeLanguage("fr")} className="dropdown-item">
+     <Image
+       src="/images/fr.jpg"
+       alt="French"
+       width={20}
+       height={15}
+       className="flag"
+     />
+     <span style={{ marginLeft: locale === "ar" ? "0" : "10%", marginRight: locale === "ar" ? "10%" : "0" }}>
+       FR
+     </span>
+   </li>
+   <li onClick={() => changeLanguage("ar")} className="dropdown-item">
+     <Image
+       src="/images/ar.jpg"
+       alt="Arabic"
+       width={20}
+       height={15}
+       className="flag"
+     />
+     <span style={{ marginLeft: locale === "ar" ? "0" : "10%", marginRight: locale === "ar" ? "10%" : "0" }}>
+       AR
+     </span>
+   </li>
+ </ul>
+ 
       )}
 
       <style jsx>{`

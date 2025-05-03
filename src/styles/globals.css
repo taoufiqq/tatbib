@@ -1,3 +1,4 @@
+
 /* RTL Support for Arabic */
 [dir="rtl"] {
   /* Reverse margins/paddings */
@@ -206,8 +207,8 @@ a {
 
 .social {
   position: fixed;
-  top: 167px;
-  left: 10px;
+  /* top: 167px;
+  left: 10px; */
 }
 
 .social ul {
