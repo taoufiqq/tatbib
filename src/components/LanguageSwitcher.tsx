@@ -41,45 +41,59 @@ const LanguageSwitcher = () => {
       </button>
 
       {isOpen && (
-   <ul className="dropdown">
-   <li onClick={() => changeLanguage("en")} className="dropdown-item">
-     <Image
-       src="/images/uk.jpg"
-       alt="English"
-       width={20}
-       height={15}
-       className="flag"
-     />
-     <span style={{ marginLeft: locale === "ar" ? "0" : "10%", marginRight: locale === "ar" ? "10%" : "0" }}>
-       EN
-     </span>
-   </li>
-   <li onClick={() => changeLanguage("fr")} className="dropdown-item">
-     <Image
-       src="/images/fr.jpg"
-       alt="French"
-       width={20}
-       height={15}
-       className="flag"
-     />
-     <span style={{ marginLeft: locale === "ar" ? "0" : "10%", marginRight: locale === "ar" ? "10%" : "0" }}>
-       FR
-     </span>
-   </li>
-   <li onClick={() => changeLanguage("ar")} className="dropdown-item">
-     <Image
-       src="/images/ar.jpg"
-       alt="Arabic"
-       width={20}
-       height={15}
-       className="flag"
-     />
-     <span style={{ marginLeft: locale === "ar" ? "0" : "10%", marginRight: locale === "ar" ? "10%" : "0" }}>
-       AR
-     </span>
-   </li>
- </ul>
- 
+        <ul className="dropdown">
+          <li onClick={() => changeLanguage("en")} className="dropdown-item">
+            <Image
+              src="/images/uk.jpg"
+              alt="English"
+              width={20}
+              height={15}
+              className="flag"
+            />
+            <span
+              style={{
+                marginLeft: locale === "ar" ? "0" : "10%",
+                marginRight: locale === "ar" ? "10%" : "0",
+              }}
+            >
+              EN
+            </span>
+          </li>
+          <li onClick={() => changeLanguage("fr")} className="dropdown-item">
+            <Image
+              src="/images/fr.jpg"
+              alt="French"
+              width={20}
+              height={15}
+              className="flag"
+            />
+            <span
+              style={{
+                marginLeft: locale === "ar" ? "0" : "10%",
+                marginRight: locale === "ar" ? "10%" : "0",
+              }}
+            >
+              FR
+            </span>
+          </li>
+          <li onClick={() => changeLanguage("ar")} className="dropdown-item">
+            <Image
+              src="/images/ar.jpg"
+              alt="Arabic"
+              width={20}
+              height={15}
+              className="flag"
+            />
+            <span
+              style={{
+                marginLeft: locale === "ar" ? "0" : "10%",
+                marginRight: locale === "ar" ? "10%" : "0",
+              }}
+            >
+              AR
+            </span>
+          </li>
+        </ul>
       )}
 
       <style jsx>{`

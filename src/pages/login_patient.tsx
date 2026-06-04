@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation"; // Changed to next/navigation
+import { useRouter } from "next/router";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import axios from "axios";
@@ -11,9 +11,13 @@ import logo from "../../public/images/logo.png";
 import Imglogin from "../../public/images/login.svg";
 import { normalizeRole, ROLES, getRoleTokens } from "@/utils/roles";
 import { safeLocalStorage } from "@/components/withPrivateRoute"; // Import the shared utility
-
+import { useTranslation } from "next-i18next";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 export default function LoginPatient() {
+  const { t } = useTranslation("common");
   const router = useRouter();
+  const { locale } = router;
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -32,7 +36,9 @@ export default function LoginPatient() {
           const token = safeLocalStorage.getItem(tokenKey);
 
           if (token) {
-            console.log("Already logged in as patient, redirecting to dashboard");
+            console.log(
+              "Already logged in as patient, redirecting to dashboard"
+            );
             setTimeout(() => {
               window.location.href = "/patient_dashboard";
             }, 100);
@@ -74,11 +80,11 @@ export default function LoginPatient() {
       }
 
       const { verified, token, role, id } = response.data;
-      
+
       // Make sure we have a role string to normalize (add fallback)
       const roleToNormalize = role || "patient"; // Default to patient if missing
       const normalizedRole = normalizeRole(roleToNormalize);
-      
+
       console.log("Normalized Role:", normalizedRole);
       console.log("Expected Role:", ROLES.PATIENT);
 
@@ -104,7 +110,7 @@ export default function LoginPatient() {
         safeLocalStorage.setItem(tokenKey, token),
         safeLocalStorage.setItem(loginKey, login),
         safeLocalStorage.setItem("role", ROLES.PATIENT), // Always use the constant
-        safeLocalStorage.setItem(idKey, id || "")
+        safeLocalStorage.setItem(idKey, id || ""),
       ].every(Boolean);
 
       if (!storageSuccess) {
@@ -116,7 +122,7 @@ export default function LoginPatient() {
         token: safeLocalStorage.getItem(tokenKey),
         role: safeLocalStorage.getItem("role"),
         login: safeLocalStorage.getItem(loginKey),
-        id: safeLocalStorage.getItem(idKey)
+        id: safeLocalStorage.getItem(idKey),
       });
 
       toast.success("Authenticated successfully", {
@@ -129,16 +135,18 @@ export default function LoginPatient() {
       setTimeout(() => {
         window.location.href = "/patient_dashboard";
       }, 2000);
-
     } catch (error: unknown) {
       console.error("Login Error:", error);
       let errorMessage = "Login failed. Please try again.";
-      
+
       if (axios.isAxiosError(error)) {
         if (error.code === "ECONNABORTED") {
-          errorMessage = "Connection timeout. Please check your internet connection.";
+          errorMessage =
+            "Connection timeout. Please check your internet connection.";
         } else if (error.response) {
-          errorMessage = error.response.data?.message || `Server error: ${error.response.status}`;
+          errorMessage =
+            error.response.data?.message ||
+            `Server error: ${error.response.status}`;
         } else if (error.request) {
           errorMessage = "No response from server. Please try again later.";
         }
@@ -159,33 +167,47 @@ export default function LoginPatient() {
   return (
     <section className="header-page">
       <div className="container">
-        <div className="row justify-content-between py-3 align-items-center">
+        <div
+          className="row justify-content-between py-3 align-items-center"
+          style={{
+            direction: locale === "ar" ? "rtl" : "ltr",
+          }}
+        >
           <div className="col-12 col-sm-3 col-lg-4 d-flex justify-content-center justify-content-lg-start py-2 py-lg-0">
             <Link href="/">
               <div style={{ width: "100px", height: "auto" }}>
                 {isClient && (
-                  <Image alt="Logo" src={logo} width={100} height={100} priority />
+                  <Image
+                    alt="Logo"
+                    src={logo}
+                    width={100}
+                    height={100}
+                    priority
+                  />
                 )}
               </div>
             </Link>
+            <div className="ms-3">
+              <LanguageSwitcher />
+            </div>
           </div>
           <div className="col-12 col-sm-9 col-lg-6 col-xl-4">
-              <div className="row justify-content-center">
-                <div className="col-6 col-md-4 col-lg-5 col-xl-6 d-flex justify-content-end">
-                  <Link
-                    className="btn_Espace_Professionnels"
-                    href="/professional_space"
-                  >
-                    <i className="fa fa-user-md"></i>professional_space
-                  </Link>
-                </div>
-                <div className="col-6 col-md-4 col-lg-5 d-flex justify-content-center">
-                  <Link className="btn_Espace_Patients" href="/patient_space">
-                    <i className="fa fa-user"></i> patient_space
-                  </Link>
-                </div>
+            <div className="row justify-content-center">
+              <div className="col-6 col-md-4 col-lg-5 col-xl-6 d-flex justify-content-end">
+                <Link
+                  className="btn_Espace_Professionnels"
+                  href="/professional_space"
+                >
+                  <i className="fa fa-user-md"></i> {t("professional_space")}
+                </Link>
+              </div>
+              <div className="col-6 col-md-4 col-lg-5 d-flex justify-content-center">
+                <Link className="btn_Espace_Patients" href="/patient_space">
+                  <i className="fa fa-user"></i> {t("patient_space")}
+                </Link>
               </div>
             </div>
+          </div>
         </div>
         <div className="card EspacePatient">
           <div className="row">
@@ -223,7 +245,11 @@ export default function LoginPatient() {
                   >
                     {isLoading ? (
                       <>
-                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        <span
+                          className="spinner-border spinner-border-sm me-2"
+                          role="status"
+                          aria-hidden="true"
+                        ></span>
                         Logging in...
                       </>
                     ) : (
@@ -262,7 +288,7 @@ export default function LoginPatient() {
           </div>
         </div>
       </div>
-      <ToastContainer 
+      <ToastContainer
         position="top-right"
         autoClose={5000}
         hideProgressBar={false}
@@ -272,4 +298,11 @@ export default function LoginPatient() {
       />
     </section>
   );
+}
+export async function getStaticProps({ locale }: { locale: string }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common"])),
+    },
+  };
 }

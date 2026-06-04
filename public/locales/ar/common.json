@@ -46,6 +46,8 @@
   "secretary": "سكرتير",
   "access_professional_patient": "الولوج الى فضاء المرضى",
   "login_as_doctor": "تسجيل الدخول كطبيب",
+  "login_as_secretary": " تسجيل الدخول كسكرتير",
+
   "login": "اسم المستخدم",
   "password": "كلمة المرور",
   "forgot_password": "هل نسيت كلمة المرور؟",

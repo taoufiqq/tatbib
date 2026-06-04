@@ -11,7 +11,7 @@ export default function ManagementCompteSecretary() {
   const router = useRouter();
 
   const [status, setStatus] = useState("");
-  const [updatedStatus, setUpdatedStatus] = useState("");
+  const [updatedStatus, setUpdatedStatus] = useState(""); // ✅ déjà correct
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { idKey } = getRoleTokens(ROLES.MEDICINE);
   useEffect(() => {
@@ -26,7 +26,7 @@ export default function ManagementCompteSecretary() {
       .catch(function (err) {
         console.log(err);
       });
-  });
+  }, []);
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
@@ -79,7 +79,7 @@ export default function ManagementCompteSecretary() {
                   value={updatedStatus}
                   onChange={(e) => setUpdatedStatus(e.target.value)}
                 >
-                  <option selected>Choose a status</option>
+                  <option value="">Choose a status</option> {/* 👈 value="" */}
                   <option value="InActive">InActive</option>
                   <option value="Active">Active</option>
                   <option value="Blocked">Blocked</option>

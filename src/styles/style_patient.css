@@ -8,7 +8,7 @@
   background-repeat: no-repeat;
   background-size: cover;
   background-position: right top;
-  height: 88vh;
+  height: 100vh;
 }
 
 .logo1 {
@@ -66,7 +66,8 @@
 }
 
 .EspacePatient {
-  background-color: #f6f6f6;
+  /* background-color: #f6f6f6; */
+  background-color: #ffffff;
   margin-top: 7em;
   /* padding-top: 3%; */
   height: 57vh;

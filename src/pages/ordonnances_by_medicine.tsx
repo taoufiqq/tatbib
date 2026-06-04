@@ -57,7 +57,9 @@ const OrdonnancesByMedicine = () => {
 
     const fetchOrdonnances = async () => {
       try {
-        const doctorId = localStorage.getItem("id_medcine");
+        const doctorId = localStorage.getItem("id_medicine");
+        console.log("doctorId récupéré:", doctorId); // Vérifie dans la console
+
         if (!doctorId) {
           throw new Error("Doctor authentication required");
         }
@@ -65,7 +67,7 @@ const OrdonnancesByMedicine = () => {
         const response = await axios.get<Ordonnance[]>(
           `https://tatbib-api.onrender.com/medcine/getOrdonnanceByMedcine/${doctorId}`
         );
-
+        console.log("API Response:", response.data);
         if (!response?.data || !Array.isArray(response.data)) {
           throw new Error("Invalid data format received from server");
         }
@@ -152,7 +154,7 @@ const OrdonnancesByMedicine = () => {
             animation: "spin 1s linear infinite",
           }}
         ></div>
-        <p>Loading....</p>
+        <p>Loading Ordonnance....</p>
       </div>
     );
   }
@@ -210,29 +212,6 @@ const OrdonnancesByMedicine = () => {
         >
           Retry
         </button>
-      </div>
-    );
-  }
-
-  if (state.ordonnances.length === 0) {
-    return (
-      <div style={{ textAlign: "center", padding: "2rem" }}>
-        <p>No ordonnances found</p>
-        <Link href="/create-ordonnance">
-          <button
-            style={{
-              padding: "0.75rem 1.5rem",
-              background: "#28a745",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              marginTop: "1rem",
-              cursor: "pointer",
-            }}
-          >
-            Create New Ordonnance
-          </button>
-        </Link>
       </div>
     );
   }
@@ -322,38 +301,50 @@ const OrdonnancesByMedicine = () => {
               </tr>
             </thead>
             <tbody>
-              {state.ordonnances.map((ordonnance) => (
-                <tr key={ordonnance._id}>
-                  <td>
-                    {ordonnance.patient?.firstName || "Unknown"}{" "}
-                    {ordonnance.patient?.lastName || ""}
-                  </td>
-                  <td>{formatDate(ordonnance.date)}</td>
-                  <td>
-                    <ul className="medication-list">
-                      {ordonnance.medications?.slice(0, 2).map((med, idx) => (
-                        <li key={idx}>
-                          <strong>{med.name}</strong> - {med.dosage} (
-                          {med.duration})
-                        </li>
-                      ))}
-                      {ordonnance.medications?.length > 2 && (
-                        <li>
-                          + {ordonnance.medications.length - 2} more medications
-                        </li>
-                      )}
-                    </ul>
-                  </td>
-                  <td>
-                    <button
-                      onClick={() => handleViewDetails(ordonnance._id)}
-                      className="view-button"
-                    >
-                      View Details
-                    </button>
+              {state.ordonnances.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={4}
+                    style={{ textAlign: "center", padding: "2rem" }}
+                  >
+                    Aucune ordonnance trouvée
                   </td>
                 </tr>
-              ))}
+              ) : (
+                state.ordonnances.map((ordonnance) => (
+                  <tr key={ordonnance._id}>
+                    <td>
+                      {ordonnance.patient?.firstName || "Unknown"}{" "}
+                      {ordonnance.patient?.lastName || ""}
+                    </td>
+                    <td>{formatDate(ordonnance.date)}</td>
+                    <td>
+                      <ul className="medication-list">
+                        {ordonnance.medications?.slice(0, 2).map((med, idx) => (
+                          <li key={idx}>
+                            <strong>{med.name}</strong> - {med.dosage} (
+                            {med.duration})
+                          </li>
+                        ))}
+                        {ordonnance.medications?.length > 2 && (
+                          <li>
+                            + {ordonnance.medications.length - 2} more
+                            medications
+                          </li>
+                        )}
+                      </ul>
+                    </td>
+                    <td>
+                      <button
+                        onClick={() => handleViewDetails(ordonnance._id)}
+                        className="view-button"
+                      >
+                        View Details
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

@@ -5,7 +5,7 @@
   "facebook": "Facebook",
   "professional_space": "Professional Space",
   "patient_space": "Patient Space",
-  "find_doctor_title": "Find a practitioner & make an appointment online",
+  "find_doctor_title": "Find a practitioner and make an appointment online",
   "choose_medicine": "Choose a Doctor",
   "choose_speciality": "Choose a Specialty",
   "Choose_city": "Choose a City",
@@ -47,6 +47,7 @@
   "access_professional_patient": "Access to patient space",
 
   "login_as_doctor": "Login as a Doctor",
+  "login_as_secretary": "Login as a Secretary",
   "login": "Login",
   "password": "Password",
   "forgot_password": "Forgot password?",

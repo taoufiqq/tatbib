@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation"; // Changed to next/navigation
+import { useRouter } from "next/router";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import axios from "axios";
@@ -11,14 +11,20 @@ import { normalizeRole, ROLES, getRoleTokens } from "@/utils/roles";
 import logo from "../../public/images/logo.png";
 import Imglogin from "../../public/images/loginS.png";
 import { safeLocalStorage } from "@/components/withPrivateRoute"; // Import the shared utility
-
+import { useTranslation } from "next-i18next";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 export default function LoginSecretary() {
+  const { t } = useTranslation("common");
   const router = useRouter();
+  const { locale } = router;
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isClient, setIsClient] = useState(false);
-
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
   // Only run client-side code after component mounts
   useEffect(() => {
     setIsClient(true);
@@ -160,10 +166,97 @@ export default function LoginSecretary() {
       setIsLoading(false);
     }
   };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!email) {
+      toast.error("Please enter your email address");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    setResetLoading(true);
+
+    try {
+      const response = await axios.post(
+        `http://localhost:3030/medcine/forgot-password`,
+        { email },
+        {
+          timeout: 15000,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      toast.success(
+        response.data.message ||
+          "Password reset instructions have been sent to your email",
+        {
+          position: "top-right",
+          autoClose: 5000,
+          theme: "colored",
+        }
+      );
+
+      setShowForgotPassword(false);
+      setEmail("");
+    } catch (error: unknown) {
+      console.error("Password Reset Error:", error);
+
+      let errorMessage = "Failed to send reset instructions. Please try again.";
+      let showContactSupport = false;
+
+      if (axios.isAxiosError(error)) {
+        if (error.code === "ECONNABORTED") {
+          errorMessage = "Request timed out. Please check your connection.";
+        } else if (error.response) {
+          // Handle specific backend error messages
+          if (error.response.status === 500) {
+            errorMessage =
+              "Our system is currently unavailable. Please try again later.";
+            showContactSupport = true;
+          } else {
+            errorMessage = error.response.data?.message || errorMessage;
+          }
+        }
+      }
+
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        theme: "colored",
+      });
+
+      if (showContactSupport) {
+        toast.info("Contact support if this persists", {
+          position: "top-right",
+          autoClose: 5000,
+          theme: "colored",
+        });
+      }
+    } finally {
+      setResetLoading(false);
+    }
+  };
+  const toggleForgotPassword = () => {
+    setShowForgotPassword(!showForgotPassword);
+  };
+
   return (
     <section className="header-page">
       <div className="container">
-        <div className="row justify-content-between py-3 align-items-center">
+        <div
+          className="row justify-content-between py-3 align-items-center"
+          style={{
+            direction: locale === "ar" ? "rtl" : "ltr",
+          }}
+        >
           <div className="col-12 col-sm-3 col-lg-4 d-flex justify-content-center justify-content-lg-start py-2 py-lg-0">
             <Link href="/">
               <div style={{ width: "100px", height: "auto" }}>
@@ -178,24 +271,27 @@ export default function LoginSecretary() {
                 )}
               </div>
             </Link>
+            <div className="ms-3">
+              <LanguageSwitcher />
+            </div>
           </div>
           <div className="col-12 col-sm-9 col-lg-6 col-xl-4">
-              <div className="row justify-content-center">
-                <div className="col-6 col-md-4 col-lg-5 col-xl-6 d-flex justify-content-end">
-                  <Link
-                    className="btn_Espace_Professionnels"
-                    href="/professional_space"
-                  >
-                    <i className="fa fa-user-md"></i>professional_space
-                  </Link>
-                </div>
-                <div className="col-6 col-md-4 col-lg-5 d-flex justify-content-center">
-                  <Link className="btn_Espace_Patients" href="/patient_space">
-                    <i className="fa fa-user"></i>patient_space
-                  </Link>
-                </div>
+            <div className="row justify-content-center">
+              <div className="col-6 col-md-4 col-lg-5 col-xl-6 d-flex justify-content-end">
+                <Link
+                  className="btn_Espace_Professionnels"
+                  href="/professional_space"
+                >
+                  <i className="fa fa-user-md"></i> {t("professional_space")}
+                </Link>
+              </div>
+              <div className="col-6 col-md-4 col-lg-5 d-flex justify-content-center">
+                <Link className="btn_Espace_Patients" href="/patient_space">
+                  <i className="fa fa-user"></i> {t("patient_space")}
+                </Link>
               </div>
             </div>
+          </div>
         </div>
         <div className="card EspacePatient">
           <div className="row">
@@ -203,49 +299,133 @@ export default function LoginSecretary() {
               className="col-12 col-md-12 col-lg-6"
               style={{ marginTop: "4%" }}
             >
-              <form className="row" onSubmit={handleSubmit}>
-                <label className="form-label">Login as a Secretary</label>
-                <div className="fromlogin">
-                  <input
-                    type="text"
-                    placeholder="Login"
-                    className="form-control"
-                    required
-                    value={login}
-                    onChange={(e) => setLogin(e.target.value)}
-                    disabled={isLoading}
-                  />
+              {!showForgotPassword ? (
+                <form className="row" onSubmit={handleSubmit}>
+                  <label className="form-label">
+                    {t("login_as_secretary")}
+                  </label>
+                  <div className="fromlogin">
+                    <input
+                      type="text"
+                      placeholder={t("login")}
+                      className="form-control"
+                      required
+                      value={login}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setLogin(e.target.value)
+                      }
+                      disabled={isLoading}
+                    />
 
-                  <input
-                    type="password"
-                    placeholder="Password"
-                    className="form-control"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={isLoading}
-                  />
+                    <input
+                      type="password"
+                      placeholder={t("password")}
+                      className="form-control"
+                      required
+                      value={password}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setPassword(e.target.value)
+                      }
+                      disabled={isLoading}
+                    />
+                    <div className="d-flex justify-content-center mt-2">
+                      <button
+                        type="button"
+                        className="btn btn-link p-0 text-decoration-none"
+                        onClick={toggleForgotPassword}
+                        disabled={isLoading}
+                      >
+                        {t("forgot_password")}
+                      </button>
+                    </div>
+                    <button
+                      type="submit"
+                      className="form-control mt-5 btnConnect"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <>
+                          <span
+                            className="spinner-border spinner-border-sm me-2"
+                            role="status"
+                            aria-hidden="true"
+                          ></span>
+                          {t("logging_in")}
+                        </>
+                      ) : (
+                        <>{t("log_in")}</>
+                      )}
+                    </button>
+                    {/* <Link
+                      href="/sign_up_medicine"
+                      style={{ textDecoration: "none" }}
+                    >
+                      <button
+                        type="button"
+                        className="form-control mt-3 btnAuth"
+                        disabled={isLoading}
+                      >
+                        {t("create_account")}
+                      </button>
+                    </Link> */}
+                  </div>
+                </form>
+              ) : (
+                /* Forgot Password Form */
+                <form className="row" onSubmit={handleForgotPassword}>
+                  <label className="form-label">
+                    {t("forgot_password_title")}
+                  </label>
+                  <div className="fromlogin">
+                    <p
+                      className="text-muted mb-3"
+                      style={{ textAlign: "center", width: "99%" }}
+                    >
+                      {t("forgot_password_instruction")}
+                    </p>
 
-                  <button
-                    type="submit"
-                    className="form-control mt-5 btnConnect"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <>
-                        <span
-                          className="spinner-border spinner-border-sm me-2"
-                          role="status"
-                          aria-hidden="true"
-                        ></span>
-                        Logging in...
-                      </>
-                    ) : (
-                      "Log in"
-                    )}
-                  </button>
-                </div>
-              </form>
+                    <input
+                      type="email"
+                      placeholder={t("email_placeholder")}
+                      className="form-control"
+                      required
+                      value={email}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setEmail(e.target.value)
+                      }
+                      disabled={resetLoading}
+                    />
+
+                    <button
+                      type="submit"
+                      className="form-control mt-4 btnConnect"
+                      disabled={resetLoading}
+                    >
+                      {resetLoading ? (
+                        <>
+                          <span
+                            className="spinner-border spinner-border-sm me-2"
+                            role="status"
+                            aria-hidden="true"
+                          ></span>
+                          {t("sending")}
+                        </>
+                      ) : (
+                        <>{t("reset_password")}</>
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      className="form-control mt-3 btnAuth"
+                      onClick={toggleForgotPassword}
+                      disabled={resetLoading}
+                    >
+                      {t("back_to_login")}
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
             <div className="col-12 col-md-12 col-lg-6">
               {isClient && (
@@ -273,4 +453,11 @@ export default function LoginSecretary() {
       />
     </section>
   );
+}
+export async function getStaticProps({ locale }: { locale: string }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common"])),
+    },
+  };
 }

@@ -224,6 +224,83 @@ export default function LoginMedicine(): React.ReactElement {
   //     setResetLoading(false);
   //   }
   // };
+  // const handleForgotPassword = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+
+  //   if (!email) {
+  //     toast.error("Please enter your email address");
+  //     return;
+  //   }
+
+  //   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  //     toast.error("Please enter a valid email address");
+  //     return;
+  //   }
+
+  //   setResetLoading(true);
+
+  //   try {
+  //     const response = await axios.post(
+  //       `http://localhost:3030/medcine/forgot-password`,
+  //       { email },
+  //       {
+  //         timeout: 15000,
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       }
+  //     );
+
+  //     toast.success(
+  //       response.data.message ||
+  //         "Password reset instructions have been sent to your email",
+  //       {
+  //         position: "top-right",
+  //         autoClose: 5000,
+  //         theme: "colored",
+  //       }
+  //     );
+
+  //     setShowForgotPassword(false);
+  //     setEmail("");
+  //   } catch (error: unknown) {
+  //     console.error("Password Reset Error:", error);
+
+  //     let errorMessage = "Failed to send reset instructions. Please try again.";
+  //     let showContactSupport = false;
+
+  //     if (axios.isAxiosError(error)) {
+  //       if (error.code === "ECONNABORTED") {
+  //         errorMessage = "Request timed out. Please check your connection.";
+  //       } else if (error.response) {
+  //         // Handle specific backend error messages
+  //         if (error.response.status === 500) {
+  //           errorMessage =
+  //             "Our system is currently unavailable. Please try again later.";
+  //           showContactSupport = true;
+  //         } else {
+  //           errorMessage = error.response.data?.message || errorMessage;
+  //         }
+  //       }
+  //     }
+
+  //     toast.error(errorMessage, {
+  //       position: "top-right",
+  //       autoClose: 5000,
+  //       theme: "colored",
+  //     });
+
+  //     if (showContactSupport) {
+  //       toast.info("Contact support if this persists", {
+  //         position: "top-right",
+  //         autoClose: 5000,
+  //         theme: "colored",
+  //       });
+  //     }
+  //   } finally {
+  //     setResetLoading(false);
+  //   }
+  // };
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -241,7 +318,9 @@ export default function LoginMedicine(): React.ReactElement {
 
     try {
       const response = await axios.post(
-        `http://localhost:3030/medcine/forgot-password`,
+        `${
+          process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3030"
+        }/medcine/forgot-password`, // Ensure the backend URL is correct
         { email },
         {
           timeout: 15000,
@@ -262,7 +341,7 @@ export default function LoginMedicine(): React.ReactElement {
       );
 
       setShowForgotPassword(false);
-      setEmail("");
+      setEmail(""); // Reset email field after success
     } catch (error: unknown) {
       console.error("Password Reset Error:", error);
 
@@ -278,6 +357,8 @@ export default function LoginMedicine(): React.ReactElement {
             errorMessage =
               "Our system is currently unavailable. Please try again later.";
             showContactSupport = true;
+          } else if (error.response.status === 400) {
+            errorMessage = "This email is not registered.";
           } else {
             errorMessage = error.response.data?.message || errorMessage;
           }
@@ -301,18 +382,21 @@ export default function LoginMedicine(): React.ReactElement {
       setResetLoading(false);
     }
   };
+
   const toggleForgotPassword = () => {
     setShowForgotPassword(!showForgotPassword);
   };
 
   return (
-    <div
-      className="container-fluid px-0"
-      style={{ overflow: "auto", direction: locale === "ar" ? "rtl" : "ltr" }}
-    >
+    <div className="container-fluid px-0">
       <section className="header-page">
         <div className="container">
-          <div className="row justify-content-between py-3 align-items-center">
+          <div
+            className="row justify-content-between py-3 align-items-center"
+            style={{
+              direction: locale === "ar" ? "rtl" : "ltr",
+            }}
+          >
             <div className="col-12 col-sm-3 col-lg-4 d-flex justify-content-center justify-content-lg-start py-2 py-lg-0">
               <Link href="/">
                 <div style={{ width: "100px", height: "auto" }}>
@@ -482,7 +566,6 @@ export default function LoginMedicine(): React.ReactElement {
                         {t("back_to_login")}
                       </button>
                     </div>
-                    
                   </form>
                 )}
               </div>
