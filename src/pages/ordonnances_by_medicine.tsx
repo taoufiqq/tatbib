@@ -10,6 +10,7 @@ import withAuth from "@/components/withPrivateRoute";
 import { MdDashboard } from "react-icons/md";
 import { FaNotesMedical, FaUserEdit, FaUserPlus } from "react-icons/fa";
 import { RiLogoutCircleFill } from "react-icons/ri";
+import { getRoleTokens, ROLES } from "@/utils/roles";
 
 interface Medication {
   name: string;
@@ -47,7 +48,7 @@ const OrdonnancesByMedicine = () => {
     useState<Ordonnance | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
-
+  const { tokenKey, loginKey, idKey } = getRoleTokens(ROLES.MEDICINE);
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -65,7 +66,7 @@ const OrdonnancesByMedicine = () => {
         }
 
         const response = await axios.get<Ordonnance[]>(
-          `https://tatbib-api.onrender.com/medcine/getOrdonnanceByMedcine/${doctorId}`
+          `https://tatbib-api.onrender.com/medcine/getOrdonnanceByMedcine/${doctorId}`,
         );
         console.log("API Response:", response.data);
         if (!response?.data || !Array.isArray(response.data)) {
@@ -216,13 +217,12 @@ const OrdonnancesByMedicine = () => {
     );
   }
 
-  const login = isClient
-    ? localStorage.getItem("LoginMedcine") || "Doctor"
-    : "Doctor";
+  const login =
+    (typeof window !== "undefined" && localStorage.getItem(loginKey)) || "";
 
   return (
-    <div className="Container">
-      <nav className="menu" tabIndex={0}>
+    <div className="Container" style={{ overflow: "hidden" }}>
+      <nav className="menu bg" tabIndex={0}>
         <div className="smartphone-menu-trigger" />
         <header className="avatar">
           <Image
@@ -482,7 +482,6 @@ const OrdonnancesByMedicine = () => {
 
         .menu {
           width: 250px;
-          background: #2b2b2b;
           position: fixed;
           height: 100%;
           transition: all 0.3s;
@@ -519,8 +518,6 @@ const OrdonnancesByMedicine = () => {
 
         main {
           flex: 1;
-          padding: 20px;
-          margin-left: 250px;
         }
 
         .helper {
@@ -530,10 +527,7 @@ const OrdonnancesByMedicine = () => {
         .helper h1 {
           font-size: 24px;
           margin-bottom: 5px;
-        }
-
-        .helper span {
-          color: #666;
+          font-weight: bold;
         }
 
         .table-container {
@@ -549,7 +543,7 @@ const OrdonnancesByMedicine = () => {
         }
 
         .ordonnance-table th {
-          background: #2b6cb0;
+          background: #299be4;
           color: white;
           padding: 15px;
           text-align: left;
@@ -561,7 +555,7 @@ const OrdonnancesByMedicine = () => {
         }
 
         .ordonnance-table tr:hover {
-          background: #f9f9f9;
+          background: #000;
         }
 
         .medication-list {

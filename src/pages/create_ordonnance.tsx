@@ -27,15 +27,16 @@ const CreateOrdonnances = () => {
     const idAppointment = localStorage.getItem("idAppointment");
     axios
       .get(
-        `https://tatbib-api.onrender.com/appointment/getAppointmenById/${idAppointment}`
+        `https://tatbib-api.onrender.com/appointment/getAppointmenById/${idAppointment}`,
       )
       .then(function (response) {
-        setFullNameDoctor(response.data.medcine.fullName);
-        setSpeciality(response.data.medcine.speciality);
+        setFullNameDoctor(response.data.medicine.fullName);
+        setSpeciality(response.data.medicine.speciality);
         setFirstNamePatient(response.data.patient.firstName);
         setLastNamePatient(response.data.patient.lastName);
         setDate(response.data.dateTime);
         // setTime(response.data.time)
+        console.log("data ", response.data);
       })
       .catch(function (err) {
         console.log(err);
@@ -46,9 +47,13 @@ const CreateOrdonnances = () => {
     e.preventDefault();
 
     const idPatient = localStorage.getItem("id_patient");
-    const idMedcine = localStorage.getItem("id_medcine");
+    const idMedicine = localStorage.getItem("id_medicine");
 
-    const Ordonnance = { medcine: idMedcine, patient: idPatient, medicamment };
+    const Ordonnance = {
+      medicine: idMedicine,
+      patient: idPatient,
+      medicamment,
+    };
 
     axios
       .post(`https://tatbib-api.onrender.com/medcine/addOrdonnance`, Ordonnance)
@@ -58,7 +63,7 @@ const CreateOrdonnances = () => {
           return false;
         } else {
           console.log(res.data);
-          router.push("/list_appointments_medicine");
+
           toast.success("Ordonnance created SuccessFully", {
             position: "top-right",
             autoClose: 5000,
@@ -69,6 +74,7 @@ const CreateOrdonnances = () => {
             progress: undefined,
             theme: "colored",
           });
+          router.push("/ordonnances_by_medicine");
           //   toastr.success('Ordonnance added SuccessFully')
         }
       });
